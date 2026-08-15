@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SOMENTE PARA BUILD DE DEBUG. Substitui o arquivo de produção, que continua
+  exigindo HTTPS para tudo.
+
+  Existe porque o servidor de desenvolvimento roda em HTTP num IP de rede local
+  que muda a cada lugar onde o time se conecta — listar IP por IP significa
+  refazer o APK toda vez que a rede muda, que é como se perde uma demonstração.
+
+  O APK de release (`assembleRelease`) nunca vê este arquivo.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
