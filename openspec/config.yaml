@@ -5,6 +5,28 @@ context: |
   ATENCAO: esse e o nome para pitch, site e imprensa. NAO pode ser o nome que aparece
   no celular da usuaria — ver RNF-1 (discricao) e docs/identidade-visual.md.
 
+  A IDEIA (definida pelo time em 15/08/2026): NAO e um botao, e um GATILHO DE VOZ.
+  A mulher fala uma palavra secreta escolhida por ela; o celular ouve mesmo largado,
+  e envia alerta com localizacao e AUDIO AO VIVO para uma central de seguranca, que
+  despacha a policia durante a ocorrencia. O audio tambem vira prova. App disfarcado
+  de calculadora. Modelo B2G: Secretaria Estadual de Seguranca instala em mulheres
+  ja identificadas como em risco.
+  Proposta tecnica a preservar: buffer circular de audio — grava continuo, apaga a
+  cada 10 min, e ao acionar trava os ultimos 5 a 10 minutos como prova.
+
+  TRES RISCOS ABERTOS, nenhum resolvido ainda:
+  1. Ela consegue falar? Gatilho de voz exige voz. Sem resposta de quem atende.
+  2. Bloco juridico inteiro em aberto — transmitir audio ambiente ao vivo para orgao
+     publico sem o agressor saber esbarra em interceptacao? O audio serve como prova?
+  3. A solucao GERA MAIS ALERTA para uma central que ja nao vaza (SP: 1.250
+     tornozeleiras, 189 em uso; Franca: 5-7 mil alertas/dia para 10 pessoas).
+
+  ONDE ESTAO AS COISAS:
+  - docs/ — pesquisa de dominio, benchmark de 4 continentes, identidade visual
+  - docs/*.html — cedula do time, pauta de mentoria, questionarios de campo
+  - servidor/ — Node + MariaDB para coletar a pesquisa de campo em escala
+  - Repositorio: github.com/Ssnowzx/FormularioStartupWeekend
+
   PROJETO: Startup Weekend Women Lages 2026 (14-16/08/2026, Orion Parque Tecnologico).
   Hackathon de 54h. Pitch final domingo. Time sem hardware — SOFTWARE ONLY.
 
