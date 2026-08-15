@@ -163,11 +163,15 @@ class VoskKeywordDetector(private val context: Context) : KeywordDetector {
         val children = context.assets.list(assetPath) ?: emptyArray()
         if (children.isEmpty()) {
             target.parentFile?.mkdirs()
-            // openFd gives the real length, which only works because the model
-            // extensions are in noCompress. It is also the check that matters:
-            // a compressed asset gets truncated at 4 MiB and the failure only
-            // surfaces much later, inside Vosk, looking like a corrupt download.
-            val expected = context.assets.openFd(assetPath).use { it.length }
+            // openFd only succeeds for assets excluded from compression, and
+            // that is exactly the property worth asserting: a compressed asset
+            // is truncated at 4 MiB, and the failure surfaces much later inside
+            // Vosk, looking like a corrupt download rather than a build setting.
+            val expected = try {
+                context.assets.openFd(assetPath).use { it.length }
+            } catch (e: java.io.FileNotFoundException) {
+                error("asset $assetPath está comprimido no APK; acrescente a extensão a noCompress")
+            }
             context.assets.open(assetPath).use { input ->
                 target.outputStream().use { output -> input.copyTo(output) }
             }

@@ -55,6 +55,9 @@ android {
     // tempo de execução.
     androidResources {
         noCompress += listOf("mdl", "fst", "int", "conf", "dubm", "ie", "mat", "txt", "stats")
+        // O README do modelo não tem extensão e não serve para nada em execução.
+        // Fora do APK, ele não pode ser esquecido fora da lista acima.
+        ignoreAssetsPatterns += "README"
     }
 
     packaging {
