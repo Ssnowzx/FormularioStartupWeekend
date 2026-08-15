@@ -1,0 +1,19 @@
+{
+  "name": "mulheres-em-risco-pesquisa",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pesquisa de campo do projeto Mulheres em Risco — Startup Weekend Women Lages 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env --watch server.js"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  }
+}
