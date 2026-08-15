@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel · Mulheres em Risco</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  /* Precisa vir antes das classes de tela: sem isto, .login-tela { display:grid }
+     vence o display:none que o atributo hidden aplica, e a tela de login fica
+     por cima do painel mesmo estando "escondida". */
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:16px; line-height:1.6; }
+
+  /* ---------- login ---------- */
+  .login-tela { min-height:100vh; display:grid; place-items:center; padding:1.2rem; }
+  .login-caixa { background:var(--surface); border:1px solid var(--line); border-radius:1.1rem;
+                 padding:2rem 1.7rem; width:100%; max-width:24rem; box-shadow:0 2px 12px var(--shadow); }
+  .login-caixa h1 { font-family:var(--f-display); font-size:1.6rem; margin:0 0 .2rem;
+                    color:var(--petrol-deep); letter-spacing:-.02em; }
+  .login-caixa .sub { color:var(--ink-soft); font-size:.9rem; margin:0 0 1.5rem; }
+  label.campo { display:block; margin-bottom:1rem; }
+  label.campo span { display:block; font-size:.88rem; font-weight:600; margin-bottom:.35rem; }
+  input { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
+          border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
+  input:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
+  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn:disabled { opacity:.55; cursor:progress; }
+  .btn.pequeno { width:auto; font-size:.88rem; padding:.5rem 1rem; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
+           padding:.7rem .85rem; border-radius:.65rem; margin-top:.9rem; }
+
+  /* ---------- painel ---------- */
+  .topo { background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  .topo-int { max-width:64rem; margin:0 auto; padding:.9rem 1.1rem; display:flex; align-items:center;
+              gap:1rem; flex-wrap:wrap; }
+  .topo h1 { font-family:var(--f-display); font-size:1.15rem; margin:0; color:var(--petrol-deep);
+             letter-spacing:-.01em; flex:1; min-width:12rem; }
+  .vivo { display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; color:var(--ink-soft); }
+  .pulso { width:.5rem; height:.5rem; border-radius:50%; background:var(--good); }
+  @keyframes bater { 0%,100%{opacity:1} 50%{opacity:.25} }
+  .pulso.ativo { animation:bater 2s ease-in-out infinite; }
+
+  .wrap { max-width:64rem; margin:0 auto; padding:1.4rem 1.1rem 5rem; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
+          padding:1.15rem 1.1rem; margin-bottom:1rem; }
+  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .9rem; letter-spacing:-.01em; }
+
+  .numeros { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.8rem; margin-bottom:1rem; }
+  .num { background:var(--surface); border:1px solid var(--line); border-radius:1rem; padding:1rem 1.05rem; }
+  .num b { font-family:var(--f-display); font-size:2.1rem; font-weight:750; color:var(--petrol-deep);
+           display:block; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .num span { font-size:.82rem; color:var(--ink-soft); display:block; margin-top:.3rem; }
+
+  .destaque { background:var(--mint); border:1px solid var(--line-soft); border-radius:1rem;
+              padding:1rem 1.1rem; margin-bottom:1rem; font-size:.95rem; }
+  .destaque b { color:var(--good); }
+
+  .grade { display:grid; grid-template-columns:repeat(auto-fit,minmax(17rem,1fr)); gap:1rem; }
+  .bar-row { margin-bottom:.55rem; }
+  .bar-row:last-child { margin-bottom:0; }
+  .bar-head { display:flex; justify-content:space-between; gap:1rem; font-size:.86rem; margin-bottom:.2rem; }
+  .bar-head .n { font-variant-numeric:tabular-nums; color:var(--ink-soft); flex:none; }
+  .bar-track { height:.45rem; background:var(--cream-deep); border-radius:99px; overflow:hidden; }
+  .bar-fill { height:100%; background:var(--petrol-mid); border-radius:99px; transition:width .4s ease; }
+  .bar-fill.win { background:var(--good); }
+
+  .quote { border-left:3px solid var(--petrol-mid); padding-left:.8rem; margin:0 0 .7rem; font-size:.92rem; }
+  .quote:last-child { margin-bottom:0; }
+  .quote cite { display:block; font-style:normal; font-size:.76rem; color:var(--ink-soft); margin-top:.15rem; }
+  .vazio { color:var(--ink-soft); font-style:italic; }
+  .acoes { display:flex; gap:.6rem; flex-wrap:wrap; }
+  a.btn { text-decoration:none; display:inline-block; text-align:center; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="tela-login" class="login-tela" hidden>
+  <form class="login-caixa" id="form-login">
+    <h1>Painel da pesquisa</h1>
+    <p class="sub">Mulheres em Risco · Startup Weekend Women Lages 2026</p>
+    <label class="campo"><span>Usuário</span>
+      <input type="text" id="usuario" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+    <label class="campo"><span>Senha</span>
+      <input type="password" id="senha" autocomplete="current-password"></label>
+    <button class="btn" type="submit" id="btn-entrar">Entrar</button>
+    <p class="aviso" id="login-erro" hidden></p>
+  </form>
+</div>
+
+<div id="tela-painel" hidden>
+  <div class="topo">
+    <div class="topo-int">
+      <h1>Painel da pesquisa</h1>
+      <span class="vivo"><span class="pulso ativo" id="pulso"></span><span id="atualizado">atualizando…</span></span>
+      <button class="btn ghost pequeno" id="btn-sair">Sair</button>
+    </div>
+  </div>
+  <div class="wrap" id="conteudo"><p class="vazio">Carregando…</p></div>
+</div>
+
+<script>
+const ROTULOS = {
+  idade:"Idade", etnia:"Cor ou raça", civil:"Estado civil",
+  renda:"Renda da família", religiao:"Religião", cidade:"Cidade"
+};
+const PERGUNTAS = {
+  p1:"O que você entende por violência doméstica?",
+  p2:"Conhece alguém que já passou por isso?",
+  p3:"Por que uma mulher demora tanto para pedir ajuda?",
+  p4:"Quem você indicaria para uma amiga procurar?",
+  p5:"Já ouviu falar do Sinal Vermelho?",
+  p6:"Se houvesse um botão de emergência, viria ajuda?",
+  p7:"Como pedir socorro sem poder pegar o celular?",
+  p8:"Falaria uma palavra secreta em voz alta?",
+  p10:"E se isso deixasse a pessoa mais brava?",
+  p11:"Que palavra você escolheria?",
+  p12:"Seu celular fica com você o tempo todo?",
+  p13:"Alguém além de você mexe no seu celular?",
+  p14:"Alguém sabe a sua senha?",
+  p15:"Instalaria um aplicativo dado pela polícia ou prefeitura?",
+  p16:"Ouvir o som da sua casa: segurança ou incômodo?",
+  p17:"Por quê? (sobre ouvir o som da casa)",
+  p18:"Disfarçado de calculadora muda algo?",
+  p19:"Algo que deixamos de perguntar?"
+};
+const ESCOLHA = ["p8","p16","p6","p15","p2","p5","p10","p12","p13","p14","p18"];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- login ---------- */
+
+$("form-login").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const botao = $("btn-entrar"), erro = $("login-erro");
+  erro.hidden = true;
+  botao.disabled = true; botao.textContent = "Entrando…";
+  try {
+    const r = await fetch("/api/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuario: $("usuario").value, senha: $("senha").value })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.erro || "Não foi possível entrar.");
+    mostrarPainel();
+  } catch (e) {
+    erro.textContent = e.message === "Failed to fetch" ? "Sem conexão com o servidor." : e.message;
+    erro.hidden = false;
+    botao.disabled = false; botao.textContent = "Entrar";
+  }
+});
+
+$("btn-sair").addEventListener("click", async () => {
+  await fetch("/api/sair", { method: "POST" }).catch(() => {});
+  clearInterval(relogio);
+  $("tela-painel").hidden = true;
+  $("tela-login").hidden = false;
+  $("senha").value = "";
+  $("btn-entrar").disabled = false;
+  $("btn-entrar").textContent = "Entrar";
+});
+
+/* ---------- painel ---------- */
+
+function barras(titulo, itens, total) {
+  if (!itens.length) return "";
+  const max = Math.max(...itens.map(i => i.n));
+  return `<div class="card"><h2>${esc(titulo)}</h2>` + itens.map(i => {
+    const pct = total ? Math.round(i.n / total * 100) : 0;
+    return `<div class="bar-row"><div class="bar-head"><span>${esc(i.valor)}</span>
+      <span class="n">${i.n} · ${pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill${i.n === max ? " win" : ""}" style="width:${pct}%"></div></div></div>`;
+  }).join("") + "</div>";
+}
+
+function quando(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso), min = Math.round((Date.now() - d) / 60000);
+  if (min < 1) return "agora mesmo";
+  if (min < 60) return `há ${min} min`;
+  if (min < 1440) return `há ${Math.round(min / 60)} h`;
+  return d.toLocaleDateString("pt-BR");
+}
+
+async function carregar() {
+  let d;
+  try {
+    const r = await fetch("/api/resultados");
+    if (r.status === 401) { $("tela-painel").hidden = true; $("tela-login").hidden = false; clearInterval(relogio); return; }
+    d = await r.json();
+  } catch (e) {
+    $("pulso").classList.remove("ativo");
+    $("atualizado").textContent = "sem conexão";
+    return;
+  }
+  $("pulso").classList.add("ativo");
+  $("atualizado").textContent = "atualizado " + new Date().toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"});
+
+  const alvo = $("conteudo");
+  if (!d.total) {
+    alvo.innerHTML = '<div class="card"><p class="vazio">Nenhuma resposta ainda. Assim que a primeira chegar, ela aparece aqui sozinha.</p></div>';
+    return;
+  }
+
+  const respostas = d.respostas.map(l =>
+    typeof l.respostas === "string" ? JSON.parse(l.respostas) : l.respostas);
+
+  let html = `<div class="numeros">
+    <div class="num"><b>${d.total}</b><span>respostas no total</span></div>
+    <div class="num"><b>${d.hoje}</b><span>hoje</span></div>
+    <div class="num"><b>${d.ultimaHora}</b><span>na última hora</span></div>
+    <div class="num"><b style="font-size:1.3rem">${quando(d.ultima)}</b><span>última resposta</span></div>
+  </div>`;
+
+  // Recorte racial: 64% das vítimas de feminicídio no Brasil são mulheres negras.
+  const etnia = d.perfil.etnia || [];
+  const comEtnia = etnia.reduce((s, x) => s + x.n, 0);
+  const negras = etnia.filter(x => x.valor === "Preta" || x.valor === "Parda").reduce((s, x) => s + x.n, 0);
+  if (comEtnia) {
+    html += `<div class="destaque"><b>${Math.round(negras / comEtnia * 100)}% das respondentes se declararam pretas ou pardas.</b>
+      No Brasil, 64% das vítimas de feminicídio são mulheres negras — vale comparar os dois números no pitch.</div>`;
+  }
+
+  // As duas perguntas que decidem o produto.
+  const chave = (id) => {
+    const c = {};
+    respostas.forEach(r => { if (r[id]) { const k = String(r[id]).split(" — ")[0]; c[k] = (c[k]||0)+1; } });
+    return Object.entries(c).map(([valor, n]) => ({ valor, n })).sort((a,b) => b.n - a.n);
+  };
+  const voz = chave("p8"), escuta = chave("p16");
+  const somaVoz = voz.reduce((s,i) => s+i.n, 0);
+  const nao = (voz.find(i => i.valor === "Não") || {n:0}).n;
+  if (somaVoz >= 5) {
+    const pct = Math.round(nao / somaVoz * 100);
+    html += `<div class="destaque" style="background:${pct >= 40 ? "var(--peach)" : "var(--mint)"}">
+      <b style="color:${pct >= 40 ? "var(--coral)" : "var(--good)"}">${pct}% disseram que NÃO falariam a palavra secreta em voz alta.</b>
+      ${pct >= 40 ? "Isso é sinal de alerta para o gatilho de voz — vale levar aos mentores." : "O gatilho de voz tem aceitação até aqui."}</div>`;
+  }
+
+  html += `<div class="card"><h2>Ações</h2><div class="acoes">
+    <a class="btn pequeno" href="/api/exportar.csv">Baixar planilha CSV</a>
+    <button class="btn ghost pequeno" onclick="carregar()">Atualizar agora</button>
+  </div></div>`;
+
+  html += '<div class="grade">' + [voz.length ? barras(PERGUNTAS.p8, voz, somaVoz) : "",
+    escuta.length ? barras(PERGUNTAS.p16, escuta, escuta.reduce((s,i)=>s+i.n,0)) : ""].join("") + "</div>";
+
+  html += '<div class="grade">';
+  for (const campo of Object.keys(ROTULOS)) html += barras(ROTULOS[campo], d.perfil[campo] || [], d.total);
+  html += "</div>";
+
+  html += '<div class="grade">';
+  for (const id of ESCOLHA) {
+    if (id === "p8" || id === "p16") continue;
+    const itens = chave(id);
+    html += barras(PERGUNTAS[id], itens, itens.reduce((s,i) => s+i.n, 0));
+  }
+  html += "</div>";
+
+  for (const id of Object.keys(PERGUNTAS)) {
+    if (ESCOLHA.includes(id)) continue;
+    const textos = respostas.map(r => r[id]).filter(Boolean);
+    if (!textos.length) continue;
+    html += `<div class="card"><h2>${esc(PERGUNTAS[id])} · ${textos.length}</h2>` +
+      textos.slice(0, 60).map(t => `<blockquote class="quote">${esc(t)}</blockquote>`).join("") +
+      (textos.length > 60 ? `<p class="vazio">…e mais ${textos.length - 60}. Baixe o CSV para ver todas.</p>` : "") +
+      "</div>";
+  }
+
+  alvo.innerHTML = html;
+}
+
+let relogio = null;
+function mostrarPainel() {
+  $("tela-login").hidden = true;
+  $("tela-painel").hidden = false;
+  carregar();
+  clearInterval(relogio);
+  relogio = setInterval(carregar, 30000); // dados novos aparecem sozinhos
+}
+
+(async () => {
+  try {
+    const { ok } = await (await fetch("/api/sessao")).json();
+    if (ok) { mostrarPainel(); return; }
+  } catch (e) { /* sem servidor */ }
+  $("tela-login").hidden = false;
+  $("usuario").focus();
+})();
+</script>
+</body>
+</html>

@@ -22,7 +22,7 @@ alterar estrutura. Se a aplicação for invadida, o estrago é limitado.
 cd servidor
 npm install
 cp .env.example .env
-nano .env          # preencha DB_PASSWORD e ADMIN_PASSWORD
+nano .env          # preencha DB_PASSWORD, ADMIN_USER e ADMIN_PASSWORD
 openssl rand -base64 24   # use isto como ADMIN_PASSWORD
 npm start
 ```
@@ -119,8 +119,16 @@ localhost. Confirme com `sudo ufw status`.
 | Endereço | O que é |
 |---|---|
 | `https://pesquisa.seudominio.com.br/` | O formulário. É este link que vai para as mulheres |
-| `https://pesquisa.seudominio.com.br/painel` | Resultados com gráficos. Pede a `ADMIN_PASSWORD` |
-| `https://pesquisa.seudominio.com.br/api/exportar.csv` | Planilha com tudo, para abrir no Excel |
+| `https://pesquisa.seudominio.com.br/admin` | Painel de resultados. Pede `ADMIN_USER` e `ADMIN_PASSWORD` |
+
+O painel se atualiza sozinho a cada 30 segundos, então dá para deixar aberto num
+notebook durante a coleta e ver as respostas chegando. Ele destaca automaticamente
+duas coisas: o percentual de respondentes pretas ou pardas (para comparar com os 64%
+nacionais de vítimas de feminicídio) e o percentual que **não** falaria a palavra
+secreta em voz alta — este fica vermelho se passar de 40%, porque aí o gatilho de voz
+precisa ser repensado.
+
+O botão de baixar planilha CSV fica dentro do painel.
 
 ---
 
@@ -131,7 +139,7 @@ Não são detalhe: esta é uma pesquisa com mulheres sobre violência.
 - **Nenhuma tabela guarda IP, user-agent, cookie ou identificador.** Não existe coluna para isso.
 - **O nginx está com `access_log off`.** Sem isso, o IP de cada respondente ficaria em disco ao lado do horário — e cruzar horário do log com horário da resposta desanonimiza qualquer uma.
 - **O limite de envios usa hash do IP com sal que troca a cada hora, só em memória.** Barra robô sem guardar nada.
-- **O painel exige senha.** Ele mostra tudo que as mulheres escreveram.
+- **O painel exige login.** Sessão de 8 horas em cookie HttpOnly, senha comparada em tempo constante, e no máximo 8 tentativas por hora por origem. O servidor recusa subir se a senha tiver menos de 12 caracteres.
 - **O usuário do banco não pode apagar nem alterar tabelas.**
 
 Se alguém do time sugerir "vamos guardar o IP para evitar resposta duplicada": a resposta
