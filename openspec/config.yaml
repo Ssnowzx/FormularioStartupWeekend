@@ -1,0 +1,63 @@
+schema: spec-driven
+
+context: |
+  PRODUTO: "Mulheres em Risco" (nome institucional, definido em 15/08/2026).
+  ATENCAO: esse e o nome para pitch, site e imprensa. NAO pode ser o nome que aparece
+  no celular da usuaria — ver RNF-1 (discricao) e docs/identidade-visual.md.
+
+  PROJETO: Startup Weekend Women Lages 2026 (14-16/08/2026, Orion Parque Tecnologico).
+  Hackathon de 54h. Pitch final domingo. Time sem hardware — SOFTWARE ONLY.
+
+  IDENTIDADE VISUAL: ilustracao vetorial plana, personagens de corpos diversos, paleta
+  creme + azul, sem agressividade. Referencia: todasporuma.com. Duas identidades
+  separadas — institucional (ilustrada) e produto (neutro/discreto). Ver
+  docs/identidade-visual.md para paleta e regras.
+
+  DOMINIO: produto de protecao para mulheres em situacao de vulnerabilidade
+  (violencia domestica e familiar). Ver docs/pesquisa-dominio.md para dados,
+  concorrencia e analise de gap.
+
+  MODELO DE AMEACA (incomum — sempre considerar):
+  O adversario tem acesso fisico e recorrente ao dispositivo da vitima, conhece
+  suas senhas e as vezes controla a conta do celular. Vazamento de dados e risco
+  de VIDA, nao apenas de LGPD.
+
+  GAP QUE ATACAMOS: 61% de subnotificacao. Todas as solucoes oficiais existentes
+  (SP Mulher Segura, Programa Mulher Alerta, Rede Catarina/PMSC) exigem medida
+  protetiva ja concedida. A mulher que ainda nao denunciou esta descoberta.
+
+  REQUISITOS NAO-FUNCIONAIS OBRIGATORIOS (RNF-1 a RNF-7 em docs/pesquisa-dominio.md):
+  RNF-1 discricao — nao pode parecer app de seguranca
+  RNF-2 sem rastro local legivel no aparelho
+  RNF-3 funciona offline / sem dados moveis
+  RNF-4 acionamento silencioso (sem som, vibracao ou tela acesa)
+  RNF-5 criptografia fim-a-fim e minimizacao de dados
+  RNF-6 saida de emergencia em um toque
+  RNF-7 integridade e datacao da evidencia
+
+  IDIOMA: codigo, identificadores, nomes de arquivo, comentarios, tabelas e
+  commits em INGLES. Texto que a usuaria final le (rotulos, botoes, mensagens
+  de erro) em PORTUGUES DO BRASIL. Documentacao do time em portugues.
+
+rules:
+  proposal:
+    - Sempre avaliar a proposta contra os RNF-1 a RNF-7 do modelo de ameaca; se um RNF for violado, dizer explicitamente e propor mitigacao
+    - Incluir secao "Nao-objetivos" — em 54h cortar escopo e a decisao mais importante
+    - Responder explicitamente "por que isso nao e so mais um botao do panico?"
+    - Toda proposta deve caber em 54h com time so de software; se nao couber, marcar como roadmap
+  spec:
+    - Minimizacao de dados e o default — justificar por escrito qualquer dado pessoal que for persistido
+    - Todo fluxo de emergencia precisa de um caminho degradado que funcione offline
+  tasks:
+    - Quebrar em tarefas de no maximo 2 horas
+    - Marcar explicitamente quais tarefas sao criticas para a DEMO do pitch versus nice-to-have
+    - Priorizar o caminho feliz demonstravel antes de qualquer edge case
+
+operations:
+  apply:
+    guidance:
+      - Priorizar o que aparece na demo; hardening completo e roadmap declarado, nao promessa silenciosa
+      - Nunca commitar segredos, chaves de API ou dados reais de vitimas
+  archive:
+    guidance:
+      - Registrar o que virou material de pitch e o que ficou como roadmap
