@@ -32,11 +32,24 @@ Estado em 15/08/2026, fim da sessão de implementação.
 - [x] Número "até o primeiro Anjo a caminho" no topo da central — 0:20
 - [x] `baixar-modelo.sh`, para o modelo de 51 MB ficar fora do git — 0:15
 
+## Verificado em emulador Android 16
+
+- [x] APK instala, abre sem crash e aparece como "Calculadora" na gaveta de apps
+- [x] `FLAG_SECURE` bloqueia captura de tela — a prova é que o `screencap` sai preto
+- [x] Vínculo por código de convite funciona contra o servidor de verdade
+- [x] Os 9 arquivos do modelo copiam com o tamanho exato dos originais
+- [x] Vosk carrega nnet, extrator de i-vector e FSTs, e aplica a gramática
+      `["abacaxi azul", "[unk]"]` — 4 estados, 7 arcos
+- [x] O microfone abre e a tela mostra "Fale agora"
+- [x] Modelo fica em `filesDir`; `/sdcard/Android/data/<pacote>/` **nem existe**
+
 ## Pendentes — críticas, mas dependem de aparelho e de gente
 
-- [ ] **Instalar o APK num celular Android real e rodar o fluxo inteiro.** Nada substitui
-      isto: é onde aparecem o fabricante que mata serviço em background, o Play Protect e a
-      qualidade real do reconhecimento na sala. **Fazer na noite anterior, nunca no palco.**
+- [ ] **Falar a frase para um microfone de verdade.** É o único elo que o emulador não
+      exercita, porque não há como injetar áudio real nele. Tudo em volta está verificado.
+- [ ] **Instalar o APK num celular Android real e rodar o fluxo inteiro.** É onde aparecem
+      o fabricante que mata serviço em background e o Play Protect.
+      **Fazer na noite anterior, nunca no palco.**
 - [ ] Testar com a tela apagada e com o celular dentro da bolsa, a 1 metro
 - [ ] Deixar o serviço 30 minutos rodando e conferir que não morreu
 - [ ] Isenção de otimização de bateria e autostart do fabricante, no aparelho da demo

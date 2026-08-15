@@ -48,10 +48,14 @@ O passo a passo está em `servidor/README.md`.
 alerta em menos de um segundo, o trajeto se movendo, o Anjo abrindo o link e o "estou a
 caminho" voltando: 7 segundos entre o acionamento e o Anjo confirmar.
 
-**O APK compila e empacota corretamente, mas ainda não rodou num celular de verdade.** É a
-única lacuna que importa, e é onde aparecem o fabricante que mata serviço em segundo plano,
-o Play Protect e a qualidade real do reconhecimento na sala. Instalar na noite anterior,
-nunca no palco.
+**O APK foi instalado e exercitado num emulador Android 16**: abre como "Calculadora",
+vincula pelo código de convite contra o servidor de verdade, carrega o modelo de voz por
+inteiro e aplica a gramática de duas palavras. A captura de tela sai preta, que é a prova de
+que o `FLAG_SECURE` funciona.
+
+**Falta falar a frase para um microfone de verdade** — o emulador não injeta áudio. É o
+único elo não exercitado, e é também onde aparecem o fabricante que mata serviço em segundo
+plano e o Play Protect. Instalar no celular na noite anterior, nunca no palco.
 
 ---
 
