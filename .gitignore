@@ -34,6 +34,15 @@ coverage/
 tmp/
 temp/
 
+# Android
+app-android/.gradle/
+app-android/local.properties
+*.apk
+
+# Modelo de reconhecimento de voz do Vosk: 51 MB de binário reinstalável.
+# Baixe com:  ./app-android/baixar-modelo.sh
+app-android/app/src/main/assets/model-pt/
+
 # Skills de terceiros instaladas localmente (Anthropic, Twilio, Trail of Bits e
 # outras). São dependências reinstaláveis, não código nosso — e somam ~9 MB.
 # As do OpenSpec voltam com "openspec update".

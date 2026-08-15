@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cinza de utilitário. Nada de cadeado, escudo ou coração: ícone de
+         app de segurança na tela inicial é exatamente o que não pode existir. -->
+    <color name="ic_launcher_background">#FF4A5257</color>
+</resources>

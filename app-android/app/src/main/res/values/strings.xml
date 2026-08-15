@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Todo texto visível fica em português do Brasil, e o app se apresenta como
+  uma calculadora comum. O modelo de ameaça diz que o agressor tem acesso
+  físico e recorrente ao aparelho: nada aqui pode entregar o que o app faz.
+-->
+<resources>
+    <string name="app_name">Calculadora</string>
+    <string name="channel_name">Calculadora</string>
+</resources>
