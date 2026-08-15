@@ -48,10 +48,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Os arquivos do modelo ficam comprimidos no APK de propósito: são copiados
-    // para o armazenamento privado por stream antes de serem abertos, então o
-    // Vosk nunca faz mmap direto do asset. Comprimir corta ~20 MB do download,
-    // o que importa quando o APK é baixado na rede do evento.
+    // Os arquivos do modelo NÃO podem ser comprimidos. O AssetManager trunca
+    // asset comprimido em 4 MiB na leitura, e o Vosk falha depois, na hora de
+    // ler a matriz — com o modelo já copiado e o erro parecendo corrupção de
+    // download. Custa ~20 MB a mais no APK e evita um bug que só aparece em
+    // tempo de execução.
+    androidResources {
+        noCompress += listOf("mdl", "fst", "int", "conf", "dubm", "ie", "mat", "txt", "stats")
+    }
 
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
