@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<!-- A aba não diz "Mulheres em Risco": o Anjo pode abrir isto em qualquer lugar,
+     e o nome institucional na aba entrega a situação de outra pessoa. -->
+<title>Aviso urgente</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:17px; line-height:1.6; }
+  .wrap { max-width:32rem; margin:0 auto; padding:1.1rem 1.1rem 4rem; }
+
+  .cabeca { background:var(--coral); color:#FFF6F0; border-radius:1rem; padding:1.3rem 1.2rem; margin-bottom:1rem; }
+  .cabeca h1 { font-family:var(--f-display); font-size:1.7rem; margin:0 0 .2rem; letter-spacing:-.02em;
+               line-height:1.2; }
+  .cabeca p { margin:0; opacity:.92; font-size:.95rem; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
+          padding:1.15rem 1.1rem; margin-bottom:1rem; }
+  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .8rem; letter-spacing:-.01em; }
+  .mapa { width:100%; height:15rem; background:var(--cream-deep); border-radius:.8rem; display:block; }
+  .coords { font-variant-numeric:tabular-nums; font-size:.88rem; color:var(--ink-soft); margin:.6rem 0 0; }
+
+  .btn { font-family:inherit; font-size:1.1rem; font-weight:700; padding:1.1rem 1.3rem; border-radius:.85rem;
+         border:0; cursor:pointer; background:var(--coral); color:#FFF6F0; width:100%; display:block;
+         text-align:center; text-decoration:none; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line);
+               font-size:1rem; font-weight:650; padding:.9rem 1.2rem; margin-top:.7rem; }
+  .btn:disabled { opacity:.6; }
+
+  .feito { background:var(--mint); border:1px solid var(--line-soft); border-radius:1rem;
+           padding:1.2rem 1.1rem; text-align:center; }
+  .feito b { display:block; font-family:var(--f-display); font-size:1.25rem; color:var(--good);
+             margin-bottom:.2rem; }
+  .vazio { color:var(--ink-soft); font-style:italic; }
+  .rodape { font-size:.85rem; color:var(--ink-soft); text-align:center; margin-top:1.5rem; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="tela">
+  <p class="vazio">Carregando…</p>
+</div>
+
+<script>
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+  ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const token = location.pathname.split("/").filter(Boolean).pop() || "";
+let dados = null;
+
+function decorrido(desde) {
+  const s = Math.max(0, Math.floor((Date.now() - new Date(desde).getTime()) / 1000));
+  const m = Math.floor(s / 60);
+  return m ? `há ${m} min` : `há ${s} s`;
+}
+
+/* Mesmo desenho local do painel: nenhuma requisição a terceiros, para a página
+   abrir mesmo com internet ruim — e para não vazar a localização dela num
+   Referer para um servidor de mapas. */
+function mapa(p) {
+  if (!p) return '<p class="vazio">Ainda sem posição. Ligue para ela.</p>';
+  const r = p.accuracy_m || 30;
+  const lado = Math.max(r * 4, 120);
+  return `<svg class="mapa" viewBox="${-lado/2} ${-lado/2} ${lado} ${lado}" role="img"
+            aria-label="Posição aproximada">
+    <circle cx="0" cy="0" r="${r}" fill="#AE432B" opacity=".16"/>
+    <circle cx="0" cy="0" r="${lado/40}" fill="#AE432B"/>
+    <line x1="${-lado/2 + lado*.08}" y1="${lado/2 - lado*.1}"
+          x2="${-lado/2 + lado*.08 + r}" y2="${lado/2 - lado*.1}"
+          stroke="#55605F" stroke-width="${lado/300}"/>
+    <text x="${-lado/2 + lado*.08}" y="${lado/2 - lado*.14}" font-size="${lado/22}"
+          fill="#55605F" font-family="system-ui">${r} m</text>
+  </svg>`;
+}
+
+function pintar() {
+  const d = dados;
+  const nome = d.user.first_name || "Alguém de sua confiança";
+  const encerrado = d.alert.status === "resolved" || d.alert.status === "cancelled";
+  const p = d.location;
+
+  document.getElementById("tela").innerHTML = `
+    <div class="cabeca">
+      <h1>${esc(nome)} acionou um alerta</h1>
+      <p>${decorrido(d.alert.opened_at)}${encerrado ? " · ocorrência encerrada" : ""}</p>
+    </div>
+
+    <div class="card">
+      <h2>Onde ela está</h2>
+      ${mapa(p)}
+      ${p ? `<p class="coords">${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · margem de ±${p.accuracy_m ?? "?"} m</p>
+        <a class="btn ghost" target="_blank" rel="noopener"
+           href="https://www.google.com/maps?q=${p.lat},${p.lng}">Abrir no mapa</a>` : ""}
+    </div>
+
+    ${d.on_the_way
+      ? `<div class="feito"><b>A central foi avisada</b>Você está a caminho.</div>`
+      : encerrado ? "" : `<button class="btn" id="btn-caminho">Estou a caminho</button>`}
+
+    <a class="btn ghost" href="tel:190">Se houver perigo imediato, ligue 190</a>
+    <p class="rodape">Este link é só seu e expira em algumas horas. Não encaminhe.</p>`;
+
+  const botao = document.getElementById("btn-caminho");
+  if (botao) botao.addEventListener("click", async () => {
+    botao.disabled = true;
+    botao.textContent = "Avisando…";
+    try {
+      await fetch(`/api/guardian/${encodeURIComponent(token)}/on-the-way`, { method: "POST" });
+      dados.on_the_way = true;
+      pintar();
+    } catch (e) { botao.disabled = false; botao.textContent = "Estou a caminho"; }
+  });
+}
+
+async function carregar() {
+  try {
+    const r = await fetch(`/api/guardian/${encodeURIComponent(token)}`);
+    if (!r.ok) {
+      document.getElementById("tela").innerHTML =
+        '<div class="card"><h2>Link inválido</h2><p class="vazio">Este link não existe mais ou já expirou.</p>' +
+        '<a class="btn ghost" href="tel:190">Em caso de emergência, ligue 190</a></div>';
+      return false;
+    }
+    dados = await r.json();
+    pintar();
+    return true;
+  } catch (e) { return true; }
+}
+
+(async () => {
+  if (await carregar()) {
+    // fetch curto em vez de SSE: navegador de celular suspende a aba em segundo
+    // plano e o SSE ficaria reconectando à toa.
+    setInterval(carregar, 10000);
+  }
+})();
+</script>
+</body>
+</html>

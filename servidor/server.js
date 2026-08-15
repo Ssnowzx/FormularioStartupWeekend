@@ -16,6 +16,8 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { mountAlerts } from "./alerts.js";
+
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORTA = Number(process.env.PORT || 3000);
 const ADMIN_USUARIO = process.env.ADMIN_USER || "admin";
@@ -247,6 +249,13 @@ app.get("/api/exportar.csv", async (req, res) => {
      .set("Content-Disposition", `attachment; filename="respostas-${new Date().toISOString().slice(0,10)}.csv"`)
      .send("﻿" + cabecalho.map(escapar).join(",") + "\n" + corpo);
 });
+
+/* ---------------- alertas ---------------- */
+
+// Precisa vir depois do express.json e antes do express.static, para que
+// /anjo/:token seja capturado por rota. Se este módulo falhar, ele responde
+// 503 nas rotas novas e a pesquisa continua no ar.
+mountAlerts(app, { exigirLogin, autenticado, DIR, EM_PRODUCAO });
 
 /* ---------------- páginas ---------------- */
 

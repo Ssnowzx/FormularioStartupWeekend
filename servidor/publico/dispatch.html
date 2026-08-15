@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Central · Mulheres em Risco</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  /* Precisa vir antes das classes de tela: sem isto, .login-tela { display:grid }
+     vence o display:none que o atributo hidden aplica. */
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:16px; line-height:1.6; }
+
+  /* ---------- login ---------- */
+  .login-tela { min-height:100vh; display:grid; place-items:center; padding:1.2rem; }
+  .login-caixa { background:var(--surface); border:1px solid var(--line); border-radius:1.1rem;
+                 padding:2rem 1.7rem; width:100%; max-width:24rem; box-shadow:0 2px 12px var(--shadow); }
+  .login-caixa h1 { font-family:var(--f-display); font-size:1.6rem; margin:0 0 .2rem;
+                    color:var(--petrol-deep); letter-spacing:-.02em; }
+  .login-caixa .sub { color:var(--ink-soft); font-size:.9rem; margin:0 0 1.5rem; }
+  label.campo { display:block; margin-bottom:1rem; }
+  label.campo span { display:block; font-size:.88rem; font-weight:600; margin-bottom:.35rem; }
+  input, select, textarea { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem;
+          border-radius:.65rem; border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
+  input:focus, select:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
+  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn:disabled { opacity:.55; cursor:progress; }
+  .btn.pequeno { width:auto; font-size:.88rem; padding:.5rem 1rem; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .btn.perigo { background:var(--coral); }
+  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
+           padding:.7rem .85rem; border-radius:.65rem; margin-top:.9rem; }
+
+  /* ---------- topo ---------- */
+  .topo { background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  .topo-int { max-width:76rem; margin:0 auto; padding:.9rem 1.1rem; display:flex; align-items:center;
+              gap:1rem; flex-wrap:wrap; }
+  .topo h1 { font-family:var(--f-display); font-size:1.15rem; margin:0; color:var(--petrol-deep);
+             letter-spacing:-.01em; flex:1; min-width:12rem; }
+  .vivo { display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; color:var(--ink-soft); }
+  .pulso { width:.5rem; height:.5rem; border-radius:50%; background:var(--good); }
+  @keyframes bater { 0%,100%{opacity:1} 50%{opacity:.25} }
+  .pulso.ativo { animation:bater 2s ease-in-out infinite; }
+  .pulso.morto { background:var(--coral); animation:none; }
+
+  .wrap { max-width:76rem; margin:0 auto; padding:1.4rem 1.1rem 5rem; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
+          padding:1.15rem 1.1rem; margin-bottom:1rem; }
+  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .9rem; letter-spacing:-.01em; }
+  .numeros { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.8rem; margin-bottom:1rem; }
+  .num { background:var(--surface); border:1px solid var(--line); border-radius:1rem; padding:1rem 1.05rem; }
+  .num b { font-family:var(--f-display); font-size:2.1rem; font-weight:750; color:var(--petrol-deep);
+           display:block; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .num b.alerta { color:var(--coral); }
+  .num span { font-size:.82rem; color:var(--ink-soft); display:block; margin-top:.3rem; }
+  .vazio { color:var(--ink-soft); font-style:italic; }
+  .acoes { display:flex; gap:.6rem; flex-wrap:wrap; }
+  a.btn { text-decoration:none; display:inline-block; text-align:center; }
+
+  /* ---------- duas colunas ---------- */
+  .duas { display:grid; grid-template-columns:22rem 1fr; gap:1rem; align-items:start; }
+  @media (max-width:60rem) { .duas { grid-template-columns:1fr; } }
+
+  /* ---------- fila ---------- */
+  .fila { display:flex; flex-direction:column; gap:.7rem; }
+  .ocorrencia { background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--petrol-mid);
+                border-radius:.9rem; padding:.85rem .95rem; cursor:pointer; text-align:left; width:100%;
+                font-family:inherit; font-size:1rem; color:inherit; }
+  .ocorrencia.aberta { border-left-color:var(--coral); }
+  .ocorrencia.escolhida { box-shadow:0 0 0 3px var(--petrol-wash); border-color:var(--petrol-deep); }
+  .ocorrencia.fria { opacity:.55; border-left-color:var(--line); }
+  .ocorrencia .nome { font-family:var(--f-display); font-weight:700; font-size:1.05rem; letter-spacing:-.01em; }
+  .ocorrencia .linha2 { display:flex; justify-content:space-between; gap:.6rem; font-size:.84rem;
+                        color:var(--ink-soft); margin-top:.1rem; }
+  .crono { font-variant-numeric:tabular-nums; font-weight:650; }
+  .crono.tarde { color:var(--coral); }
+  .pilula { display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:.04em; padding:.15rem .5rem; border-radius:99px; background:var(--petrol-wash);
+            color:var(--petrol-deep); }
+  .pilula.open { background:var(--peach); color:var(--coral); }
+  .pilula.in_progress { background:var(--petrol-wash); color:var(--petrol-deep); }
+  .pilula.resolved { background:var(--mint); color:var(--good); }
+  .pilula.cancelled { background:var(--cream-deep); color:var(--ink-soft); }
+
+  .janela { height:.3rem; background:var(--cream-deep); border-radius:99px; overflow:hidden; margin-top:.5rem; }
+  .janela i { display:block; height:100%; background:var(--coral); border-radius:99px; }
+
+  /* ---------- detalhe ---------- */
+  .id-grande { font-family:var(--f-display); font-size:1.8rem; font-weight:750; letter-spacing:-.02em;
+               margin:0 0 .1rem; color:var(--petrol-deep); }
+  .campos { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.8rem; margin-bottom:.9rem; }
+  .campo-ro span { display:block; font-size:.76rem; color:var(--ink-soft); text-transform:uppercase;
+                   letter-spacing:.05em; }
+  .campo-ro b { font-weight:650; font-size:1rem; }
+  .referencia { background:var(--peach); border-radius:.65rem; padding:.7rem .85rem; font-size:.95rem; }
+  .coords { font-variant-numeric:tabular-nums; font-size:.9rem; color:var(--ink-soft); }
+  .mapa { width:100%; height:16rem; background:var(--cream-deep); border-radius:.8rem; display:block; }
+
+  .anjo { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; padding:.6rem 0;
+          border-bottom:1px solid var(--line-soft); }
+  .anjo:last-child { border-bottom:0; }
+  .anjo .quem { flex:1; min-width:9rem; }
+  .anjo .quem b { display:block; font-weight:650; }
+  .anjo .quem span { font-size:.82rem; color:var(--ink-soft); }
+  .a-caminho { color:var(--good); font-weight:700; font-size:.88rem; }
+
+  .quote { border-left:3px solid var(--petrol-mid); padding-left:.8rem; margin:0 0 .7rem; font-size:.92rem; }
+  .quote:last-child { margin-bottom:0; }
+  .quote cite { display:block; font-style:normal; font-size:.76rem; color:var(--ink-soft); margin-top:.15rem; }
+
+  .faixa { background:var(--peach); color:var(--coral); font-weight:650; font-size:.88rem;
+           padding:.5rem 1.1rem; text-align:center; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="tela-login" class="login-tela" hidden>
+  <form class="login-caixa" id="form-login">
+    <h1>Central de atendimento</h1>
+    <p class="sub">Mulheres em Risco · Startup Weekend Women Lages 2026</p>
+    <label class="campo"><span>Usuário</span>
+      <input type="text" id="usuario" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+    <label class="campo"><span>Senha</span>
+      <input type="password" id="senha" autocomplete="current-password"></label>
+    <button class="btn" type="submit" id="btn-entrar">Entrar</button>
+    <p class="aviso" id="login-erro" hidden></p>
+  </form>
+</div>
+
+<div id="tela-central" hidden>
+  <div class="topo">
+    <div class="topo-int">
+      <h1>Central de atendimento</h1>
+      <span class="vivo"><span class="pulso" id="pulso"></span><span id="estado">conectando…</span></span>
+      <a class="btn ghost pequeno" href="/cadastro">Cadastro</a>
+      <button class="btn ghost pequeno" id="btn-sair">Sair</button>
+    </div>
+  </div>
+  <p class="faixa" id="faixa-banco" hidden>Sem banco de dados. As ocorrências estão só na memória do servidor.</p>
+
+  <div class="wrap">
+    <div class="numeros">
+      <div class="num"><b id="n-abertos" class="alerta">0</b><span>alertas abertos</span></div>
+      <div class="num"><b id="n-atendimento">0</b><span>em atendimento</span></div>
+      <div class="num"><b id="n-resolvidos">0</b><span>resolvidos hoje</span></div>
+      <div class="num"><b id="n-tempo">—</b><span>até o primeiro Anjo a caminho</span></div>
+    </div>
+
+    <div class="duas">
+      <div>
+        <div class="card" style="padding:.9rem">
+          <h2 style="margin-bottom:.7rem">Fila</h2>
+          <div class="fila" id="fila"><p class="vazio">Nenhum alerta agora.</p></div>
+        </div>
+      </div>
+      <div id="detalhe"><div class="card"><p class="vazio">Escolha uma ocorrência à esquerda.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+  ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+
+let alertas = [];
+let escolhida = null;
+let detalhe = null;
+let fonte = null;
+let relogio = null;
+let poll = null;
+let audio = null;
+
+/* ---------- som de alerta novo: gerado, sem arquivo e sem rede ---------- */
+function bipe() {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === "suspended") audio.resume();
+    [0, 0.18, 0.36].forEach((atraso, i) => {
+      const osc = audio.createOscillator(), vol = audio.createGain();
+      osc.type = "sine";
+      osc.frequency.value = [880, 1180, 880][i];
+      vol.gain.setValueAtTime(0.0001, audio.currentTime + atraso);
+      vol.gain.exponentialRampToValueAtTime(0.25, audio.currentTime + atraso + 0.02);
+      vol.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + atraso + 0.15);
+      osc.connect(vol).connect(audio.destination);
+      osc.start(audio.currentTime + atraso);
+      osc.stop(audio.currentTime + atraso + 0.16);
+    });
+  } catch (e) { /* sem áudio, a tela ainda avisa */ }
+}
+
+/* ---------- tempo ---------- */
+function decorrido(desde) {
+  const s = Math.max(0, Math.floor((Date.now() - new Date(desde).getTime()) / 1000));
+  const m = Math.floor(s / 60);
+  return m ? `${m}min ${String(s % 60).padStart(2, "0")}s` : `${s}s`;
+}
+
+/* ---------- fila ---------- */
+function pintarFila() {
+  const alvo = $("fila");
+  if (!alertas.length) { alvo.innerHTML = '<p class="vazio">Nenhum alerta agora.</p>'; return; }
+  alvo.innerHTML = alertas.map((a) => {
+    const fria = a.status === "resolved" || a.status === "cancelled";
+    const seg = (Date.now() - new Date(a.opened_at).getTime()) / 1000;
+    const restante = (new Date(a.cancel_until).getTime() - Date.now()) / 1000;
+    const barra = a.status === "open" && restante > 0
+      ? `<div class="janela" title="Janela de cancelamento"><i style="width:${(restante / 15) * 100}%"></i></div>` : "";
+    return `<button class="ocorrencia ${a.status === "open" ? "aberta" : ""} ${fria ? "fria" : ""}
+              ${escolhida === a.alert_id ? "escolhida" : ""}" data-id="${a.alert_id}">
+        <span class="nome">${esc(a.user.display_name || "Sem nome")}</span>
+        <span class="linha2">
+          <span>${esc(a.user.city || "—")}</span>
+          <span class="crono ${seg > 120 && !fria ? "tarde" : ""}" data-desde="${a.opened_at}">${decorrido(a.opened_at)}</span>
+        </span>
+        <span class="linha2"><span class="pilula ${a.status}">${rotulo(a.status)}</span>
+          ${a.guardians_on_the_way ? `<span class="a-caminho">${a.guardians_on_the_way} a caminho</span>` : ""}</span>
+        ${barra}
+      </button>`;
+  }).join("");
+  alvo.querySelectorAll(".ocorrencia").forEach((b) =>
+    b.addEventListener("click", () => abrir(b.dataset.id)));
+}
+
+const rotulo = (s) => ({ open:"Novo", in_progress:"Em atendimento", resolved:"Resolvido", cancelled:"Falso alarme" }[s] || s);
+
+// O operador lê este número em voz alta, no rádio ou no telefone.
+// "(49) 99912-3456" se lê; "5549999123456" se erra.
+function fone(e164) {
+  if (!e164) return null;
+  const n = String(e164).replace(/\D/g, "").replace(/^55/, "");
+  if (n.length === 11) return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;
+  if (n.length === 10) return `(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`;
+  return e164;
+}
+
+function pintarNumeros() {
+  $("n-abertos").textContent = alertas.filter((a) => a.status === "open").length;
+  $("n-atendimento").textContent = alertas.filter((a) => a.status === "in_progress").length;
+  const hoje = new Date().toDateString();
+  $("n-resolvidos").textContent = alertas.filter((a) =>
+    a.status === "resolved" && new Date(a.opened_at).toDateString() === hoje).length;
+
+  const tempos = alertas.filter((a) => a.first_on_the_way_at)
+    .map((a) => (new Date(a.first_on_the_way_at) - new Date(a.opened_at)) / 1000);
+  $("n-tempo").textContent = tempos.length
+    ? Math.round(tempos.reduce((s, t) => s + t, 0) / tempos.length) + "s"
+    : "—";
+}
+
+/* ---------- mapa desenhado localmente, sem CDN ---------- *
+ * Projeção equirretangular. Em escala de quarteirão o erro é irrelevante,
+ * e a página continua inteira mesmo sem internet nenhuma.               */
+function mapa(pontos) {
+  if (!pontos.length) return '<p class="vazio">Sem posição ainda. O alerta abre mesmo sem GPS.</p>';
+  const o = pontos[0];
+  const cos = Math.cos(o.lat * Math.PI / 180);
+  const xy = pontos.map((p) => ({
+    x: (p.lng - o.lng) * 111320 * cos,
+    y: (o.lat - p.lat) * 110540,
+    r: p.accuracy_m || 25
+  }));
+  const raio = Math.max(...xy.map((p) => p.r), 30);
+  const minX = Math.min(...xy.map((p) => p.x - p.r)) - 10, maxX = Math.max(...xy.map((p) => p.x + p.r)) + 10;
+  const minY = Math.min(...xy.map((p) => p.y - p.r)) - 10, maxY = Math.max(...xy.map((p) => p.y + p.r)) + 10;
+  const larg = Math.max(maxX - minX, 60), alt = Math.max(maxY - minY, 60);
+  const lado = Math.max(larg, alt);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const vb = `${cx - lado / 2} ${cy - lado / 2} ${lado} ${lado}`;
+  const atual = xy[xy.length - 1];
+  const escala = lado / 4;
+  const passo = [10, 25, 50, 100, 250, 500].find((p) => p >= escala) || 1000;
+
+  return `<svg class="mapa" viewBox="${vb}" preserveAspectRatio="xMidYMid meet" role="img"
+            aria-label="Posição aproximada, com margem de erro do GPS">
+    <circle cx="${atual.x}" cy="${atual.y}" r="${atual.r}" fill="#AE432B" opacity=".14"/>
+    ${xy.length > 1 ? `<polyline points="${xy.map((p) => `${p.x},${p.y}`).join(" ")}"
+        fill="none" stroke="#3E8A8F" stroke-width="${lado / 140}" stroke-linejoin="round"/>` : ""}
+    ${xy.slice(0, -1).map((p) => `<circle cx="${p.x}" cy="${p.y}" r="${lado / 110}" fill="#9CC5C7"/>`).join("")}
+    <circle cx="${atual.x}" cy="${atual.y}" r="${lado / 55}" fill="#AE432B"/>
+    <g stroke="#55605F" stroke-width="${lado / 260}" fill="none">
+      <line x1="${cx - lado / 2 + lado * .06}" y1="${cy + lado / 2 - lado * .07}"
+            x2="${cx - lado / 2 + lado * .06 + passo}" y2="${cy + lado / 2 - lado * .07}"/>
+    </g>
+    <text x="${cx - lado / 2 + lado * .06}" y="${cy + lado / 2 - lado * .1}" font-size="${lado / 28}"
+          fill="#55605F" font-family="system-ui">${passo} m</text>
+  </svg>`;
+}
+
+/* ---------- detalhe ---------- */
+async function abrir(id) {
+  escolhida = id;
+  pintarFila();
+  try {
+    const r = await fetch(`/api/panel/alerts/${encodeURIComponent(id)}`);
+    if (!r.ok) throw new Error("falhou");
+    detalhe = (await r.json()).alert;
+    pintarDetalhe();
+  } catch (e) { $("detalhe").innerHTML = '<div class="card"><p class="vazio">Não foi possível carregar.</p></div>'; }
+}
+
+function pintarDetalhe() {
+  const a = detalhe;
+  if (!a) return;
+  const u = a.user;
+  const pos = a.last_location;
+  const fim = a.status === "resolved" || a.status === "cancelled";
+
+  $("detalhe").innerHTML = `
+    <div class="card">
+      <p class="id-grande">${esc(u.display_name || "Sem nome")}</p>
+      <p style="margin:0 0 .9rem"><span class="pilula ${a.status}">${rotulo(a.status)}</span>
+        <span class="crono" data-desde="${a.opened_at}">${decorrido(a.opened_at)}</span> desde o acionamento</p>
+      <div class="campos">
+        <div class="campo-ro"><span>Telefone</span>
+          <b>${u.phone_e164 ? `<a href="tel:+${esc(u.phone_e164)}">${esc(fone(u.phone_e164))}</a>` : "—"}</b></div>
+        <div class="campo-ro"><span>Cidade</span><b>${esc(u.city || "—")}</b></div>
+        <div class="campo-ro"><span>Bateria</span><b>${a.battery_pct != null ? a.battery_pct + "%" : "—"}</b></div>
+      </div>
+      ${u.reference_note ? `<p class="referencia"><b>Referência:</b> ${esc(u.reference_note)}</p>` : ""}
+    </div>
+
+    <div class="card">
+      <h2>Onde ela está</h2>
+      ${mapa(a.locations)}
+      ${pos ? `<p class="coords">${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}
+          · ±${pos.accuracy_m ?? "?"} m · ${a.locations.length} posições</p>
+        <div class="acoes">
+          <button class="btn ghost pequeno" id="btn-copiar">Copiar coordenadas</button>
+          <a class="btn ghost pequeno" target="_blank" rel="noopener"
+             href="https://www.google.com/maps?q=${pos.lat},${pos.lng}">Abrir no mapa</a>
+        </div>` : ""}
+    </div>
+
+    <div class="card">
+      <h2>Anjos de ${esc((u.display_name || "").split(" ")[0] || "confiança")}</h2>
+      ${a.guardians.length ? a.guardians.map((g) => `
+        <div class="anjo">
+          <span class="quem"><b>${esc(g.name)}</b><span>${esc(g.relationship || "contato de confiança")}${
+            g.phone_e164 ? " · " + esc(fone(g.phone_e164)) : ""}</span></span>
+          ${g.on_the_way_at ? '<span class="a-caminho">Está a caminho</span>'
+            : g.opened_at ? '<span class="vazio">abriu o link</span>'
+            : g.notified_at ? '<span class="vazio">avisado</span>' : ""}
+          ${fim ? "" : `<button class="btn pequeno ${g.notified_at ? "ghost" : ""}"
+                data-anjo="${g.guardian_id}">${g.notified_at ? "Avisar de novo" : "Avisar pelo WhatsApp"}</button>`}
+        </div>`).join("") : '<p class="vazio">Nenhum Anjo cadastrado para ela.</p>'}
+    </div>
+
+    <div class="card">
+      <h2>Atendimento</h2>
+      <div class="acoes" style="margin-bottom:1rem">
+        <button class="btn pequeno ${a.status === "in_progress" ? "" : "ghost"}" data-status="in_progress"
+          ${fim ? "disabled" : ""}>Assumir</button>
+        <button class="btn pequeno ghost" data-status="resolved" ${fim ? "disabled" : ""}>Resolver</button>
+      </div>
+      ${[...a.events].reverse().map((e) => `<p class="quote">${esc(textoEvento(e))}
+        <cite>${new Date(e.created_at).toLocaleTimeString("pt-BR")}</cite></p>`).join("")}
+    </div>`;
+
+  $("detalhe").querySelectorAll("[data-status]").forEach((b) =>
+    b.addEventListener("click", () => mudarStatus(a.alert_id, b.dataset.status)));
+  $("detalhe").querySelectorAll("[data-anjo]").forEach((b) =>
+    b.addEventListener("click", () => avisarAnjo(a.alert_id, Number(b.dataset.anjo), b)));
+  const copiar = $("btn-copiar");
+  if (copiar && pos) copiar.addEventListener("click", () => {
+    navigator.clipboard.writeText(`${pos.lat}, ${pos.lng}`);
+    copiar.textContent = "Copiado";
+  });
+}
+
+function textoEvento(e) {
+  const quem = { device:"Aparelho", operator:"Central", guardian:"Anjo", system:"Sistema" }[e.actor] || e.actor;
+  const oque = {
+    created:"alerta acionado por voz", location:"nova posição", status_changed:"status alterado",
+    cancelled:"cancelado pela usuária — falso alarme", guardian_notified:"Anjo avisado pelo WhatsApp",
+    guardian_opened:"Anjo abriu o link", guardian_on_the_way:"Anjo confirmou que está a caminho", note:"anotação"
+  }[e.kind] || e.kind;
+  return `${quem}: ${oque}${e.note ? ` — ${e.note}` : ""}`;
+}
+
+async function mudarStatus(id, status) {
+  await fetch(`/api/panel/alerts/${encodeURIComponent(id)}/status`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status })
+  });
+  abrir(id);
+}
+
+async function avisarAnjo(id, guardianId, botao) {
+  botao.disabled = true;
+  try {
+    const r = await fetch(`/api/panel/alerts/${encodeURIComponent(id)}/guardian-links`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ guardian_ids: [guardianId] })
+    });
+    const { links } = await r.json();
+    const link = links && links[0];
+    if (!link) throw new Error("sem link");
+    // Abrir antes de recarregar: o navegador só deixa abrir aba a partir do clique.
+    if (link.wa_url) window.open(link.wa_url, "_blank", "noopener");
+    else { await navigator.clipboard.writeText(link.message); botao.textContent = "Mensagem copiada"; }
+    abrir(id);
+  } catch (e) { botao.disabled = false; }
+}
+
+/* ---------- carga e tempo real ---------- */
+async function carregar() {
+  try {
+    const r = await fetch("/api/panel/alerts");
+    if (r.status === 401) { location.reload(); return; }
+    const d = await r.json();
+    alertas = d.alerts || [];
+    $("faixa-banco").hidden = d.db !== false;
+    pintarFila(); pintarNumeros();
+  } catch (e) { vivo(false); }
+}
+
+function vivo(ok) {
+  $("pulso").className = "pulso " + (ok ? "ativo" : "morto");
+  $("estado").textContent = ok ? "ao vivo" : "sem conexão";
+}
+
+function entrou(resumo) {
+  const i = alertas.findIndex((a) => a.alert_id === resumo.alert_id);
+  if (i >= 0) alertas[i] = resumo; else { alertas.unshift(resumo); bipe(); }
+  pintarFila(); pintarNumeros();
+  if (detalhe && detalhe.alert_id === resumo.alert_id) abrir(resumo.alert_id);
+}
+
+function ligarStream() {
+  fonte = new EventSource("/api/panel/stream");
+  ["alert.created", "alert.status", "alert.cancelled", "alert.guardian"].forEach((ev) =>
+    fonte.addEventListener(ev, (e) => entrou(JSON.parse(e.data))));
+  fonte.addEventListener("alert.location", (e) => {
+    const d = JSON.parse(e.data);
+    if (detalhe && detalhe.alert_id === d.alert_id) { detalhe.locations.push(d.location); pintarDetalhe(); }
+  });
+  fonte.onopen = () => vivo(true);
+  // O EventSource reconecta sozinho; recriar aqui só multiplicaria conexões.
+  fonte.onerror = () => vivo(false);
+}
+
+function mostrarCentral() {
+  $("tela-login").hidden = true;
+  $("tela-central").hidden = false;
+  carregar();
+  ligarStream();
+  // Rede de segurança: se o stream morrer sem avisar, a tela se conserta em 20s.
+  poll = setInterval(carregar, 20000);
+  relogio = setInterval(() => {
+    document.querySelectorAll(".crono[data-desde]").forEach((el) => {
+      el.textContent = decorrido(el.dataset.desde);
+    });
+    document.querySelectorAll(".janela i").forEach((el) => {
+      const w = parseFloat(el.style.width);
+      if (w > 0) el.style.width = Math.max(0, w - 100 / 15) + "%";
+    });
+  }, 1000);
+}
+
+$("form-login").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const btn = $("btn-entrar");
+  btn.disabled = true;
+  $("login-erro").hidden = true;
+  try {
+    const r = await fetch("/api/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuario: $("usuario").value, senha: $("senha").value })
+    });
+    if (!r.ok) throw new Error((await r.json()).erro || "Não foi possível entrar.");
+    bipe(); // o clique em Entrar é o gesto que libera o áudio para o resto da sessão
+    mostrarCentral();
+  } catch (e) {
+    $("login-erro").textContent = e.message;
+    $("login-erro").hidden = false;
+  } finally { btn.disabled = false; }
+});
+
+$("btn-sair").addEventListener("click", async () => {
+  await fetch("/api/sair", { method: "POST" });
+  location.reload();
+});
+
+window.addEventListener("pagehide", () => {
+  if (fonte) fonte.close();
+  clearInterval(poll); clearInterval(relogio);
+});
+
+(async () => {
+  try {
+    const { ok } = await (await fetch("/api/sessao")).json();
+    if (ok) { mostrarCentral(); return; }
+  } catch (e) { /* sem servidor */ }
+  $("tela-login").hidden = false;
+  $("usuario").focus();
+})();
+</script>
+</body>
+</html>

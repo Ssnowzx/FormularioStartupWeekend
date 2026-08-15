@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Simulador do aparelho</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F;
+    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body); line-height:1.6; }
+  .wrap { max-width:34rem; margin:0 auto; padding:1.3rem 1.1rem 4rem; }
+  h1 { font-family:var(--f-display); font-size:1.4rem; margin:0 0 .2rem; color:var(--petrol-deep);
+       letter-spacing:-.02em; }
+  .sub { color:var(--ink-soft); font-size:.9rem; margin:0 0 1.3rem; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
+          padding:1.15rem 1.1rem; margin-bottom:1rem; }
+  .card h2 { font-family:var(--f-display); font-size:1rem; margin:0 0 .8rem; }
+  label.campo { display:block; margin-bottom:.9rem; }
+  label.campo span { display:block; font-size:.86rem; font-weight:600; margin-bottom:.3rem; }
+  input, select { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
+          border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
+  input:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
+  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn.perigo { background:var(--coral); font-size:1.15rem; padding:1.15rem; font-weight:750; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
+           padding:.7rem .85rem; border-radius:.65rem; margin-top:.8rem; }
+  .ok { background:var(--mint); color:var(--good); font-size:.9rem; font-weight:600;
+        padding:.7rem .85rem; border-radius:.65rem; margin-top:.8rem; }
+  .log { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.8rem; color:var(--ink-soft);
+         background:var(--cream); border-radius:.6rem; padding:.7rem .8rem; max-height:11rem; overflow:auto;
+         white-space:pre-wrap; }
+  .nota { font-size:.85rem; color:var(--ink-soft); }
+  .acoes { display:grid; gap:.6rem; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Simulador do aparelho</h1>
+  <p class="sub">Finge ser o app no celular da usuária. Serve para testar o fluxo inteiro
+     sem depender do aparelho — e é o plano B se o microfone falhar no palco.</p>
+
+  <div class="card" id="c-vincular">
+    <h2>1 · Vincular o aparelho</h2>
+    <label class="campo"><span>Código de convite</span>
+      <input id="convite" placeholder="XXXX-XXXX" autocapitalize="characters" spellcheck="false"></label>
+    <button class="btn" id="btn-vincular">Vincular</button>
+    <p class="aviso" id="erro-vincular" hidden></p>
+    <p class="ok" id="ok-vincular" hidden></p>
+  </div>
+
+  <div class="card" id="c-disparar" hidden>
+    <h2>2 · Falar a palavra-chave</h2>
+    <p class="nota">No aparelho de verdade isto acontece sozinho, quando o app reconhece
+       a frase secreta. Aqui o botão faz o mesmo POST que o app faria.</p>
+    <label class="campo"><span>Posição inicial</span>
+      <select id="origem">
+        <option value="lages">Centro de Lages (fixa, sem depender de GPS)</option>
+        <option value="gps">Usar o GPS deste navegador</option>
+      </select></label>
+    <button class="btn perigo" id="btn-disparar">Acionar alerta</button>
+    <p class="aviso" id="erro-disparar" hidden></p>
+  </div>
+
+  <div class="card" id="c-ativo" hidden>
+    <h2>3 · Alerta ativo</h2>
+    <div class="acoes">
+      <button class="btn ghost" id="btn-andar">Andar 40 metros</button>
+      <button class="btn ghost" id="btn-cancelar">Cancelar (falso alarme)</button>
+    </div>
+    <p class="nota" id="janela" style="margin-top:.7rem"></p>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+// Praça João Costa, centro de Lages. Coordenada fixa para a demo não depender de GPS.
+const LAGES = { lat: -27.8161, lng: -50.3264 };
+
+let token = null, alertaId = null, pos = null, rumo = 0.6, fimJanela = 0, cronometro = null;
+
+const anotar = (t) => { $("log").textContent = `${new Date().toLocaleTimeString("pt-BR")}  ${t}\n` + $("log").textContent; };
+
+async function api(caminho, corpo, comToken) {
+  const cab = { "Content-Type": "application/json" };
+  if (comToken) cab.Authorization = `Bearer ${token}`;
+  const r = await fetch(caminho, { method: "POST", headers: cab, body: JSON.stringify(corpo || {}) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.erro || `Falhou (${r.status})`);
+  return d;
+}
+
+$("btn-vincular").addEventListener("click", async () => {
+  const btn = $("btn-vincular");
+  btn.disabled = true; $("erro-vincular").hidden = true;
+  try {
+    const d = await api("/api/v1/device/register", { invite_code: $("convite").value, label: "simulador" });
+    token = d.device_token;
+    $("ok-vincular").textContent = `Vinculado ao aparelho de ${d.user.display_name}.`;
+    $("ok-vincular").hidden = false;
+    $("c-disparar").hidden = false;
+    anotar(`aparelho vinculado · janela de cancelamento: ${d.cancel_window_s}s`);
+  } catch (e) {
+    $("erro-vincular").textContent = e.message;
+    $("erro-vincular").hidden = false;
+  } finally { btn.disabled = false; }
+});
+
+function posicaoInicial() {
+  if ($("origem").value !== "gps") return Promise.resolve({ ...LAGES, accuracy_m: 25 });
+  // geolocation só funciona em HTTPS ou localhost; se falhar, cai para a fixa.
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve({ ...LAGES, accuracy_m: 25 });
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy_m: Math.round(p.coords.accuracy) }),
+      () => { anotar("GPS negado ou indisponível — usando a posição fixa"); resolve({ ...LAGES, accuracy_m: 25 }); },
+      { enableHighAccuracy: true, timeout: 5000 });
+  });
+}
+
+$("btn-disparar").addEventListener("click", async () => {
+  const btn = $("btn-disparar");
+  btn.disabled = true; $("erro-disparar").hidden = true;
+  try {
+    pos = await posicaoInicial();
+    const d = await api("/api/v1/alerts", {
+      client_alert_id: crypto.randomUUID(),
+      trigger: "voice",
+      battery_pct: 41,
+      location: { ...pos, recorded_at: new Date().toISOString() }
+    }, true);
+    alertaId = d.alert_id;
+    fimJanela = new Date(d.cancel_until).getTime();
+    $("c-ativo").hidden = false;
+    $("c-disparar").hidden = true;
+    anotar(`ALERTA ABERTO · ${alertaId.slice(0, 8)}…`);
+    clearInterval(cronometro);
+    cronometro = setInterval(tique, 1000);
+    tique();
+  } catch (e) {
+    $("erro-disparar").textContent = e.message;
+    $("erro-disparar").hidden = false;
+  } finally { btn.disabled = false; }
+});
+
+function tique() {
+  const resta = Math.max(0, Math.ceil((fimJanela - Date.now()) / 1000));
+  $("janela").textContent = resta
+    ? `Janela de cancelamento: ${resta}s. Depois disso, só a central encerra.`
+    : "Janela encerrada — o alerta está confirmado.";
+  $("btn-cancelar").disabled = !resta;
+}
+
+$("btn-andar").addEventListener("click", async () => {
+  // ~40 m numa direção que varia de leve, para a trilha do painel não sair reta demais.
+  rumo += (Math.random() - 0.5) * 0.8;
+  pos = {
+    lat: pos.lat + Math.cos(rumo) * 0.00036,
+    lng: pos.lng + Math.sin(rumo) * 0.00040,
+    accuracy_m: 14 + Math.round(Math.random() * 20)
+  };
+  await api(`/api/v1/alerts/${alertaId}/locations`,
+    { points: [{ ...pos, recorded_at: new Date().toISOString() }] }, true);
+  anotar(`posição enviada · ±${pos.accuracy_m} m`);
+});
+
+$("btn-cancelar").addEventListener("click", async () => {
+  try {
+    await api(`/api/v1/alerts/${alertaId}/cancel`, { reason: "false_alarm" }, true);
+    anotar("cancelado pela usuária — falso alarme");
+    clearInterval(cronometro);
+    $("btn-andar").disabled = true;
+    $("btn-cancelar").disabled = true;
+  } catch (e) { anotar(`não deu para cancelar: ${e.message}`); }
+});
+</script>
+</body>
+</html>

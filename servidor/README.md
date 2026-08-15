@@ -154,3 +154,107 @@ sudo systemctl restart pesquisa         # reiniciar
 # Backup — rode antes do pitch de domingo
 mysqldump -u root mulheres_em_risco > backup-$(date +%F).sql
 ```
+
+---
+---
+
+# Alertas — a central, os Anjos e o aparelho
+
+O mesmo processo Node serve duas coisas independentes: a **pesquisa de campo** (acima) e o
+**subsistema de alertas** (daqui para baixo). Eles compartilham a porta e o login de admin,
+e mais nada — nem pool de banco, nem usuário de banco, nem tabela.
+
+## Subir
+
+```bash
+sudo mysql < schema_alerts.sql     # troque TROQUE_ESTA_SENHA_TAMBEM antes
+nano .env                          # preencha DB_ALERTS_PASSWORD e PUBLIC_BASE_URL
+sudo systemctl restart pesquisa
+curl localhost:3000/api/v1/health  # deve devolver {"ok":true,"db":true,...}
+```
+
+Se `DB_ALERTS_PASSWORD` ficar vazia, o servidor **sobe do mesmo jeito** e as rotas de alerta
+respondem 503. A pesquisa de campo, que já está coletando, nunca cai por causa disto.
+
+No bloco do nginx, acrescente ao `location /` — sem isso o alerta chega atrasado na tela,
+porque o nginx segura o fluxo de eventos:
+
+```nginx
+proxy_buffering off;
+proxy_read_timeout 3600s;
+```
+
+## Endereços
+
+| Endereço | Quem usa | O que é |
+|---|---|---|
+| `/central` | a central | Fila de ocorrências ao vivo, localização, Anjos, status |
+| `/cadastro` | a central | Cadastra a usuária e os Anjos dela, e gera o código de vínculo |
+| `/anjo/<token>` | o Anjo | Link que chega por WhatsApp: onde ela está e "Estou a caminho" |
+| `/simulador` | o time | Finge ser o aplicativo. Só com `DEMO_MODE=1`, e só depois do login |
+| `/app` | o celular | Baixa o APK. Só com `DEMO_MODE=1` e `APK_PATH` preenchido |
+
+`/central` e `/cadastro` usam o **mesmo login do `/admin`** — mesma sessão, mesmo cookie.
+Não existe autenticação nova em lugar nenhum.
+
+## O fluxo
+
+```
+palavra falada → app Android → POST /api/v1/alerts → central vê em menos de 1s
+                                                   → Anjo recebe link no WhatsApp
+                                                   → "Estou a caminho" volta para a central
+```
+
+Três decisões que valem entender antes de mexer:
+
+- **A palavra-chave nunca chega ao servidor.** Não há rota que a receba nem coluna onde
+  guardá-la. O aparelho manda "fui acionado" e mais nada.
+- **O alerta abre sem GPS.** Recusar um alerta por falta de coordenada seria trocar vida por
+  completude de dado — a central ainda chega nela pelo telefone.
+- **A janela de 15 segundos não atrasa a central.** O alerta vai para a tela na hora, com a
+  contagem correndo à vista. Se ela cancelar, o card fica cinza como falso alarme. Segurar o
+  alerta "para ter certeza" é o tipo de otimização que mata gente.
+
+## O código de vínculo
+
+Oito caracteres, uso único, validade de 24 horas, guardado no banco só como hash.
+
+**Ele não vai por mensagem para a usuária.** Aparece na tela do `/cadastro` para ela digitar
+presencialmente, na delegacia. No modelo de ameaça deste produto o agressor lê o celular
+dela — e um código lido entrega o aplicativo inteiro.
+
+O link do WhatsApp existe só para o **Anjo**, cujo celular está fora do alcance dele.
+
+## Privacidade, além do que já vale para a pesquisa
+
+- **Usuário de banco separado.** `mer_alerts` não tem permissão nenhuma sobre `respostas`, e
+  `mer_app` continua sem permissão nenhuma sobre as tabelas de alerta. As duas metades são
+  cegas uma para a outra: quem invadir um lado não lê o outro.
+- **Nenhum `DELETE`, `DROP` ou `ALTER` em lugar nenhum.** Apagar dado aqui é *redação*
+  (`UPDATE ... SET lat=NULL`), e é por isso que toda coluna pessoal aceita `NULL`. O
+  `schema_alerts.sql` traz as consultas prontas no rodapé.
+- **`alert_event` só aceita `SELECT` e `INSERT`.** A linha do tempo da ocorrência é imutável
+  por construção, que é o que se espera de um registro de atendimento.
+- **Todo token vai ao banco como sha256.** O valor legível existe uma única vez: na resposta
+  que o cria.
+- **Toda coluna com dado pessoal tem a justificativa escrita ao lado, no DDL.** Se alguém
+  acrescentar uma coluna sem justificar, está fora do padrão do arquivo.
+
+## Se o banco cair no meio da demo
+
+O caminho de emergência não depende do MariaDB. Os alertas abertos vivem em memória e o
+banco é gravado em best-effort: o aparelho recebe `201` mesmo com o banco fora, e o painel
+continua inteiro, mostrando a faixa "sem banco de dados". O custo, dito em voz alta: um
+alerta criado durante a queda existe só em RAM até o próximo restart.
+
+Ao reiniciar, o servidor recarrega os 50 alertas mais recentes do banco — o painel não
+nasce vazio.
+
+## Manutenção dos alertas
+
+```bash
+# Redação por retenção — o mecanismo existe, rode quando fizer sentido
+mysql -u root mulheres_em_risco -e "
+  UPDATE alert_location SET lat=NULL, lng=NULL, accuracy_m=NULL
+   WHERE received_at < NOW() - INTERVAL 30 DAY;"
+```
