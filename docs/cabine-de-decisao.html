@@ -1,0 +1,823 @@
+<title>Cabine de Decisão</title>
+<style>
+  :root {
+    color-scheme: light;
+    /* Base creme quente — laranja muito diluído. */
+    --cream:        #FAF1E1;
+    --cream-deep:   #F1E2CA;
+    --surface:      #FFFBF3;
+    --line:         #E4D2B7;
+    --line-soft:    #EFE0C9;
+
+    /* Primária: azul-petróleo. Tem verde dentro, o que a aproxima do
+       complementar do creme — por isso as duas se seguram em vez de brigar. */
+    --petrol-deep:  #155E63;
+    --petrol-mid:   #3E8A8F;
+    --petrol-soft:  #9CC5C7;
+    --petrol-wash:  #E4F0EF;
+
+    /* Acento quente. Um por tela, senão vira alarme visual.
+       Escurecido até passar AA sobre creme (5,15:1) E sobre pêssego (4,54:1) —
+       ele é usado como texto nos dois fundos. */
+    --coral:        #AE432B;
+    --peach:        #F9DFD1;
+    --peach-deep:   #EFC4A8;
+
+    /* Sucesso precisa ser VERDE, não outro azul-esverdeado: perto da primária,
+       "time alinhado" e "botão" virariam a mesma cor. */
+    --good:         #387043;
+    --mint:         #DCEDE2;
+
+    /* Tinta levemente esverdeada, para acompanhar a primária. */
+    --ink:          #1F2A2B;
+    --ink-soft:     #55605F;
+    --shadow:       rgba(35, 70, 70, .10);
+
+    --f-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  /* Tema único, claro, por decisão de projeto: a identidade do produto é
+     ilustração vetorial sobre creme quente. A página não segue a preferência
+     de tema do aparelho — renderiza creme para todo mundo. */
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--cream); color: var(--ink);
+    font-family: var(--f-body); font-size: 16.5px; line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 1.4rem 1.1rem 6rem; }
+
+  header { padding-top: .8rem; }
+  .eyebrow { font-size: .71rem; letter-spacing: .15em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: 0 0 .5rem; }
+  h1 { font-family: var(--f-display); font-size: clamp(2rem,7.5vw,2.9rem); line-height: 1.06; margin: 0 0 .55rem; letter-spacing: -.022em; text-wrap: balance; color: var(--petrol-deep); }
+  .lede { font-size: 1.04rem; color: var(--ink-soft); margin: 0 0 1.4rem; max-width: 34rem; }
+
+  .modes { display: flex; gap: .3rem; background: var(--cream-deep); padding: .28rem; border-radius: 999px; margin-bottom: 1.8rem; border: 1px solid var(--line); }
+  .modes button { flex: 1; border: 0; background: transparent; color: var(--ink-soft); font-family: var(--f-body); font-size: .9rem; font-weight: 650; padding: .58rem .4rem; border-radius: 999px; cursor: pointer; transition: background .15s,color .15s; }
+  .modes button[aria-selected="true"] { background: var(--petrol-deep); color: var(--surface); }
+  .modes button:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 1.05rem; padding: 1.35rem 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 3px var(--shadow); }
+  .card > h2 { font-family: var(--f-display); font-size: 1.28rem; margin: 0 0 .7rem; letter-spacing: -.014em; text-wrap: balance; line-height: 1.2; }
+  .card > h3 { font-family: var(--f-display); font-size: 1.04rem; margin: 1.7rem 0 .6rem; letter-spacing: -.01em; }
+  .card p { margin: 0 0 .9rem; }
+  .card p:last-child { margin-bottom: 0; }
+  .sub { font-size: .89rem; color: var(--ink-soft); margin: -.35rem 0 1.1rem !important; }
+
+  /* --- estatísticas --- */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(8.5rem,1fr)); gap: .65rem; margin-bottom: 1.1rem; }
+  .stat { background: var(--cream); border: 1px solid var(--line-soft); border-radius: .85rem; padding: .8rem .85rem; }
+  .stat .num { font-family: var(--f-display); font-size: 1.45rem; font-weight: 750; line-height: 1.1; color: var(--petrol-deep); font-variant-numeric: tabular-nums; display: block; letter-spacing: -.02em; }
+  .stat .num.alarm { color: var(--coral); }
+  .stat .cap { font-size: .8rem; color: var(--ink-soft); display: block; margin-top: .25rem; line-height: 1.4; }
+
+  /* --- elos da corrente --- */
+  .elo { border: 1px solid var(--line-soft); border-radius: .95rem; padding: 1rem 1.05rem; margin-bottom: .75rem; background: var(--cream); }
+  .elo:last-of-type { margin-bottom: 0; }
+  .elo-head { display: flex; gap: .75rem; align-items: baseline; margin-bottom: .6rem; }
+  .elo-n { font-family: var(--f-display); font-size: .95rem; font-weight: 750; color: var(--surface); background: var(--petrol-deep); width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-items: center; flex: none; align-self: flex-start; font-variant-numeric: tabular-nums; }
+  .elo-head h4 { font-family: var(--f-display); font-size: 1.04rem; margin: 0; line-height: 1.3; letter-spacing: -.01em; }
+  .elo p { font-size: .93rem; margin: 0 0 .7rem; }
+  .verdict { font-size: .89rem; font-weight: 600; margin: 0 !important; padding: .55rem .75rem; border-radius: .55rem; background: var(--peach); color: var(--coral); }
+  .verdict.ok { background: var(--mint); color: var(--good); }
+
+  /* --- jornada --- */
+  .journey-track { display: grid; grid-template-columns: repeat(5,1fr); gap: .3rem; text-align: center; font-size: .75rem; margin-bottom: .45rem; }
+  .journey-track span { color: var(--ink-soft); font-weight: 650; line-height: 1.25; }
+  .journey-bar { display: grid; grid-template-columns: repeat(5,1fr); gap: .3rem; }
+  .journey-bar i { height: 2.4rem; border-radius: .5rem; background: var(--cream-deep); border: 1px solid var(--line-soft); display: block; }
+  .journey-bar i.packed { background: var(--petrol-deep); border-color: var(--petrol-deep); }
+
+  /* --- tabelas --- */
+  .tbl-wrap { overflow-x: auto; margin: 0 0 .9rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .89rem; min-width: 24rem; }
+  th, td { text-align: left; padding: .6rem .6rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th { font-weight: 700; color: var(--ink-soft); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+  tr:last-child td { border-bottom: 0; }
+  td .lead { font-weight: 650; display: block; margin-bottom: .15rem; }
+
+  /* --- listas e destaques --- */
+  ol.errs { counter-reset: e; list-style: none; padding: 0; margin: 0; }
+  ol.errs li { counter-increment: e; position: relative; padding-left: 2.15rem; margin-bottom: .9rem; font-size: .93rem; }
+  ol.errs li::before { content: counter(e); position: absolute; left: 0; top: .05rem; width: 1.55rem; height: 1.55rem; border-radius: 50%; background: var(--peach); color: var(--coral); font-size: .82rem; font-weight: 750; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+  ol.errs li:last-child { margin-bottom: 0; }
+
+  .qa { margin-bottom: 1.15rem; }
+  .qa:last-child { margin-bottom: 0; }
+  .qa .ask { font-weight: 650; margin: 0 0 .3rem; }
+  .qa .ans { margin: 0; font-size: .91rem; color: var(--ink-soft); padding-left: .85rem; border-left: 2.5px solid var(--petrol-soft); }
+
+  .pull { background: var(--mint); border-radius: .85rem; padding: .95rem 1rem; font-size: .95rem; margin: 0 0 .9rem; border: 1px solid var(--line-soft); }
+  .pull:last-child { margin-bottom: 0; }
+  .pull strong { color: var(--good); }
+  .pull.warn { background: var(--peach); }
+  .pull.warn strong { color: var(--coral); }
+
+  /* --- territórios --- */
+  .terr { border-left: 3px solid var(--petrol-mid); padding-left: .95rem; margin-bottom: 1.5rem; }
+  .terr:last-child { margin-bottom: 0; }
+  .terr h4 { font-family: var(--f-display); font-size: 1.06rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
+  .terr h4 .tag { font-family: var(--f-mono); font-size: .78rem; color: var(--petrol-deep); background: var(--petrol-wash); padding: .1rem .45rem; border-radius: .35rem; margin-right: .4rem; }
+  .terr p { font-size: .92rem; margin: 0 0 .6rem; }
+  .terr .defect { font-size: .88rem; color: var(--coral); margin: 0; }
+  .terr .defect strong { font-weight: 700; }
+
+  /* --- cédula --- */
+  label.field { display: block; }
+  input[type="text"], textarea { width: 100%; font-family: var(--f-body); font-size: 1rem; padding: .7rem .85rem; border-radius: .7rem; border: 1.5px solid var(--line); background: var(--cream); color: var(--ink); resize: vertical; }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--petrol-deep); box-shadow: 0 0 0 3px var(--petrol-wash); }
+  .opts { display: flex; flex-direction: column; gap: .5rem; }
+  .opt { display: flex; gap: .75rem; align-items: flex-start; padding: .78rem .85rem; border: 1.5px solid var(--line); border-radius: .8rem; cursor: pointer; background: var(--cream); transition: border-color .15s, background .15s; }
+  .opt:hover { border-color: var(--petrol-mid); }
+  .opt:has(input:checked) { border-color: var(--petrol-deep); background: var(--petrol-wash); }
+  .opt:has(input:focus-visible) { outline: 3px solid var(--coral); outline-offset: 2px; }
+  .opt input { margin: .28rem 0 0; accent-color: var(--petrol-deep); flex: none; width: 1.05rem; height: 1.05rem; }
+  .opt .body { min-width: 0; }
+  .opt .name { font-weight: 650; display: block; }
+  .opt .why { font-size: .855rem; color: var(--ink-soft); display: block; margin-top: .18rem; }
+  .opt .flag { font-size: .8rem; color: var(--coral); display: block; margin-top: .35rem; font-weight: 600; padding-top: .35rem; border-top: 1px dashed var(--peach-deep); }
+  .inline-sug { margin-top: .7rem; }
+
+  .scale { display: flex; gap: .35rem; }
+  .scale label { flex: 1; text-align: center; padding: .65rem .2rem; border-radius: .6rem; border: 1.5px solid var(--line); cursor: pointer; background: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; position: relative; }
+  .scale label:has(input:checked) { border-color: var(--petrol-deep); background: var(--petrol-deep); color: var(--surface); }
+  .scale label:has(input:focus-visible) { outline: 3px solid var(--coral); outline-offset: 2px; }
+  .scale input { position: absolute; opacity: 0; pointer-events: none; }
+  .scale-ends { display: flex; justify-content: space-between; font-size: .78rem; color: var(--ink-soft); margin-top: .45rem; }
+
+  .btn { font-family: var(--f-body); font-size: 1rem; font-weight: 650; padding: .85rem 1.4rem; border-radius: .8rem; border: 0; cursor: pointer; background: var(--petrol-deep); color: var(--surface); width: 100%; }
+  .btn:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+  .btn.ghost { background: transparent; color: var(--petrol-deep); border: 1.5px solid var(--line); }
+  .btn-row { display: flex; gap: .6rem; margin-top: .8rem; }
+  .code-box { font-family: var(--f-mono); font-size: .8rem; line-height: 1.5; background: var(--petrol-wash); border: 1.5px dashed var(--petrol-mid); border-radius: .8rem; padding: .9rem; overflow-wrap: anywhere; color: var(--ink); user-select: all; }
+  .form-error { background: var(--peach); color: var(--coral); font-size: .9rem; font-weight: 600; padding: .7rem .85rem; border-radius: .7rem; margin: .7rem 0 0; }
+
+  /* --- apuração --- */
+  .tally { margin-bottom: 1.5rem; }
+  .tally:last-child { margin-bottom: 0; }
+  .tally h3 { font-family: var(--f-display); font-size: 1.02rem; margin: 0 0 .75rem; }
+  .bar-row { margin-bottom: .65rem; }
+  .bar-head { display: flex; justify-content: space-between; gap: 1rem; font-size: .89rem; margin-bottom: .22rem; }
+  .bar-head .n { font-variant-numeric: tabular-nums; color: var(--ink-soft); flex: none; }
+  .bar-track { height: .5rem; background: var(--cream-deep); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--petrol-mid); border-radius: 999px; transition: width .4s ease; }
+  .bar-fill.win { background: var(--good); }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip { background: var(--petrol-wash); border: 1px solid var(--line-soft); border-radius: 999px; padding: .25rem .7rem; font-size: .85rem; }
+  .quote { border-left: 3px solid var(--petrol-mid); padding: .1rem 0 .1rem .8rem; margin: 0 0 .9rem; font-size: .93rem; }
+  .quote cite { display: block; font-style: normal; font-size: .8rem; color: var(--ink-soft); margin-top: .2rem; }
+  .empty { color: var(--ink-soft); font-size: .92rem; font-style: italic; }
+  .src { font-size: .8rem; color: var(--ink-soft); }
+
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Startup Weekend Women · Lages 2026</p>
+    <h1>Cabine de Decisão</h1>
+    <p class="lede">Leia a pesquisa, vote no próprio celular e gere um código. Quem apurar cola todos os códigos e vê o resultado do time.</p>
+  </header>
+
+  <div class="modes" role="tablist">
+    <button role="tab" id="tab-pesquisa" aria-selected="true" aria-controls="p-pesquisa">Pesquisa</button>
+    <button role="tab" id="tab-votar" aria-selected="false" aria-controls="p-votar">Votar</button>
+    <button role="tab" id="tab-apurar" aria-selected="false" aria-controls="p-apurar">Apurar</button>
+  </div>
+
+  <!-- ==================== PESQUISA ==================== -->
+  <section id="p-pesquisa" role="tabpanel" aria-labelledby="tab-pesquisa">
+
+    <div class="card" style="background:var(--petrol-wash)">
+      <h2>O que você precisa saber antes de votar</h2>
+      <p>Nosso time vai construir um produto de software para proteger mulheres em situação de vulnerabilidade — violência doméstica. Temos 54 horas e nenhum componente eletrônico, então é software puro.</p>
+      <p>Antes de decidir <em>o quê</em>, fizemos uma varredura do que já existe no Brasil, Estados Unidos, Europa e Ásia: o que foi tentado, o que funcionou, o que morreu e por quê. Esta página é o resumo dessa pesquisa.</p>
+      <p><strong>Leia antes de votar.</strong> A conclusão mais importante é contraintuitiva, e se metade do time não entender por que ela é verdadeira, a discussão de sábado vai girar em falso.</p>
+      <p class="pull warn"><strong>A conclusão, adiantada:</strong> botão de pânico não é ideia nova — é política pública brasileira em expansão, com decreto federal publicado 16 dias antes deste evento. E não existe evidência científica de que esse tipo de app reduza violência. O gargalo não é o alarme.</p>
+    </div>
+
+    <div class="card">
+      <h2>1. O tamanho do problema</h2>
+      <p class="sub">Brasil, dados de 2024 a 2026.</p>
+      <div class="stats">
+        <div class="stat"><span class="num alarm">1.568</span><span class="cap">feminicídios em 2025 — recorde histórico, alta de 4,7%</span></div>
+        <div class="stat"><span class="num">64%</span><span class="cap">das vítimas são mulheres negras</span></div>
+        <div class="stat"><span class="num">8 em 10</span><span class="cap">foram mortas pelo parceiro ou ex</span></div>
+        <div class="stat"><span class="num">64%</span><span class="cap">foram mortas dentro da própria casa</span></div>
+        <div class="stat"><span class="num alarm">61%</span><span class="cap">é a subnotificação estimada</span></div>
+        <div class="stat"><span class="num">3,7 mi</span><span class="cap">de mulheres sofreram violência doméstica em 12 meses</span></div>
+      </div>
+      <p>Duas coisas desses números mudam completamente o desenho de qualquer produto.</p>
+      <p><strong>A primeira:</strong> isso não é violência de rua. Em oito de cada dez feminicídios o autor é o parceiro ou o ex, e quase dois terços acontecem dentro da casa dela. Ou seja, o agressor não é um desconhecido numa esquina escura — é alguém que dorme do lado, tem a senha do celular dela e às vezes paga a conta do telefone. Boa parte da indústria de "segurança feminina" que existe hoje — mapa de rota segura, alarme sonoro, botão para chamar ajuda na rua — foi desenhada para o problema errado.</p>
+      <p><strong>A segunda:</strong> 61% dos casos nunca chegam à polícia. Isso significa que a maioria absoluta das mulheres em risco não tem medida protetiva, não tem boletim de ocorrência, e não está no radar de nenhum sistema oficial. E quase todos os apps de governo do Brasil só liberam o botão de pânico para quem <em>já tem</em> medida protetiva concedida.</p>
+    </div>
+
+    <div class="card">
+      <h2>2. A corrente que o botão de pânico pressupõe</h2>
+      <p class="sub">Para um botão de emergência salvar alguém, cinco coisas precisam dar certo em sequência. Vale olhar uma por uma.</p>
+
+      <div class="elo">
+        <div class="elo-head"><span class="elo-n">1</span><h4>“Ela vai reconhecer que está em perigo e pedir ajuda”</h4></div>
+        <p>Para apertar um botão, a mulher precisa antes ter reconhecido que o que vive é violência, ter decidido pedir ajuda e ter aceitado que aquilo vai virar um caso de polícia. O Mapa Nacional da Violência de Gênero, do Senado, mediu essa distância: 48% das brasileiras já sofreram violência no convívio familiar, mas só 30% declaram ter sofrido. Os motivos que elas mesmas dão para não denunciar não têm nada a ver com falta de ferramenta — 17% citam preocupação com os filhos, 14% descrença na punição e 13% a esperança de que aquela tenha sido a última agressão.</p>
+        <p class="verdict"><strong>Elo quebrado.</strong> A maioria das mulheres em risco não está no ponto de apertar botão nenhum, e nenhum recurso técnico muda isso.</p>
+      </div>
+
+      <div class="elo">
+        <div class="elo-head"><span class="elo-n">2</span><h4>“No momento do perigo, ela vai conseguir acionar”</h4></div>
+        <p>Uma revisão sistemática publicada em 2023 analisou 621 aplicativos de prevenção à violência doméstica e examinou 136 em profundidade. Nenhum deles usa qualquer automação: todo alerta depende de a vítima pegar o telefone, desbloquear e acionar com a própria mão. Isso pressupõe mãos livres, telefone por perto e capacidade de agir — exatamente as três coisas que faltam durante uma agressão.</p>
+        <p class="verdict"><strong>Elo quebrado.</strong> O produto exige da vítima justamente o que a situação tira dela.</p>
+      </div>
+
+      <div class="elo">
+        <div class="elo-head"><span class="elo-n">3</span><h4>“Do outro lado, alguém vai responder”</h4></div>
+        <p>Em Goiânia, uma advogada com medida protetiva ativa acionou o botão do pânico <strong>50 vezes</strong> ao longo do processo e foi atendida <strong>uma única vez</strong>. Ela esperou quase dez dias para receber o aparelho depois da decisão judicial, e as violações da medida foram arquivadas com a justificativa de que o agressor estava “em trânsito”. Naquele momento, Goiás tinha 600 dispositivos para o estado inteiro.</p>
+        <p class="verdict"><strong>Elo quebrado.</strong> O botão só vale o que vale a capacidade operacional atrás dele.</p>
+      </div>
+
+      <div class="elo">
+        <div class="elo-head"><span class="elo-n">4</span><h4>“A resposta vai chegar a tempo”</h4></div>
+        <p>Na França, a central que monitora as pulseiras de aproximação recebe entre 5 e 7 mil alertas por dia com cerca de 10 funcionários. Um magistrado relatou receber de 30 a 40 relatórios diários referentes a apenas dez pulseiras ativas. A maioria dispara porque o agressor simplesmente passou perto da zona no trajeto normal da vida dele. O efeito tem nome na literatura francesa: <em>cri au loup</em>, o grito de lobo. Quanto mais alarme falso o operador vê, menos ele acredita no verdadeiro — e o tempo de resposta ao alerta real aumenta.</p>
+        <p class="verdict"><strong>Elo quebrado.</strong> Alarme demais é o mesmo que alarme nenhum.</p>
+      </div>
+
+      <div class="elo">
+        <div class="elo-head"><span class="elo-n">5</span><h4>“E isso resolve o problema”</h4></div>
+        <p>2025 foi o ano com mais feminicídios já registrados no Brasil: 1.568 mulheres. Esse número subiu no mesmo período em que o botão do pânico se expandiu como política pública. E a revisão dos 621 aplicativos citada acima não encontrou <strong>nenhum estudo de efetividade</strong> — não existe evidência publicada de que esse tipo de app reduza violência.</p>
+        <p class="verdict"><strong>Não comprovado.</strong> Existe uma única exceção no mundo inteiro, e ela está na seção 7.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3. Onde o mercado inteiro se amontoa</h2>
+      <p>A vida de uma mulher que sai de uma relação violenta tem pelo menos cinco etapas. Ela precisa reconhecer o que está acontecendo, decidir sair, se preparar, efetivamente sair, e depois se sustentar do lado de fora.</p>
+      <div class="journey-track"><span>Reconhecer</span><span>Decidir</span><span>Preparar</span><span>Sair</span><span>Sustentar</span></div>
+      <div class="journey-bar"><i></i><i></i><i></i><i class="packed"></i><i></i></div>
+      <p style="margin-top:.9rem">A barra azul mostra onde está tudo: o dinheiro, a política pública e as startups que mapeamos em quatro continentes estão empilhadas numa única etapa — o instante da emergência. Que é o mais curto de todos, o mais caro de atender, e aquele onde a intervenção tem menos evidência de funcionar.</p>
+      <p class="pull"><strong>As outras quatro etapas estão quase vazias.</strong> É ali que provavelmente está a nossa oportunidade.</p>
+    </div>
+
+    <div class="card">
+      <h2>4. O que já existe no Brasil</h2>
+      <p class="sub">Se alguém do time achar que “app com botão de pânico” é ideia original, esta tabela resolve.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Iniciativa</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lead">Decreto 13.084</span>Federal, 29/07/2026</td><td>Criou o Programa Alerta Mulher Segura: tornozeleira no agressor e rastreador para a vítima, custeado por fundo federal e gratuito. <strong>Publicado 16 dias antes deste evento.</strong></td></tr>
+            <tr><td><span class="lead">Lei 15.383/2026</span>Sancionada 09/04/2026</td><td>Monitoração eletrônica virou medida protetiva autônoma — o delegado pode decretar sem ordem judicial em caso de risco.</td></tr>
+            <tr><td><span class="lead">Rede Catarina</span>Polícia Militar de SC</td><td>Ativa em todo o estado. Cerca de <strong>14 mil mulheres</strong> já têm acesso ao botão do pânico em Santa Catarina — inclusive aqui na região.</td></tr>
+            <tr><td><span class="lead">SP Mulher Segura</span>Governo de São Paulo</td><td>Boletim de ocorrência remoto, pedido de medida protetiva e botão de pânico — mas o botão <strong>só funciona para quem já tem medida ativa</strong>.</td></tr>
+            <tr><td><span class="lead">Todas por Uma</span>Startup, São Paulo</td><td>Viva e crescendo: mais de 20 mil usuárias, app gratuito sustentado por parcerias institucionais, e um dispositivo que funciona mesmo sem celular.</td></tr>
+            <tr><td><span class="lead">PenhaS</span>ONG AzMina</td><td>Ativo e <strong>de código aberto</strong>. Tem “Manual de Fuga” personalizado, botão de pânico, gravação de áudio como prova e chat com especialistas.</td></tr>
+            <tr><td><span class="lead">Malalai</span>Startup, Minas Gerais</td><td><strong>Provavelmente morta.</strong> Link da App Store retorna erro, LinkedIn parado desde 2023, site com copyright de 2019. Tinha metodologia validada com 2 mil mulheres.</td></tr>
+            <tr><td><span class="lead">Lages</span>Nossa cidade</td><td>Tem delegacia especializada e casa-abrigo, mas <strong>nenhuma iniciativa tecnológica municipal própria</strong>. A proteção depende inteiramente da cobertura estadual.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="pull warn"><strong>O que isso significa para o pitch:</strong> se apresentarmos “um app com botão de pânico”, estaremos competindo com um programa federal recém-lançado, com orçamento público e infraestrutura de Estado. Algum jurado vai levantar isso.</p>
+    </div>
+
+    <div class="card">
+      <h2>5. O gargalo é o mesmo no mundo inteiro — e não é técnico</h2>
+      <p>Esta foi a descoberta mais forte da pesquisa, porque o mesmo padrão apareceu em seis lugares diferentes, por caminhos independentes.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Onde</th><th>O que está parado</th></tr></thead>
+          <tbody>
+            <tr><td>São Paulo</td><td><strong>1.250 tornozeleiras</strong> disponíveis e apenas <strong>189 agressores monitorados</strong></td></tr>
+            <tr><td>Goiás</td><td>600 dispositivos no estado; uma vítima acionou 50 vezes e foi atendida 1</td></tr>
+            <tr><td>França</td><td>5 a 7 mil alertas por dia para cerca de 10 funcionários</td></tr>
+            <tr><td>França</td><td>Em 2019, <strong>dois terços dos telefones de emergência estavam parados em estoque</strong>, sem serem entregues</td></tr>
+            <tr><td>Índia</td><td>Fundo nacional de quase US$ 1 bilhão com apenas <strong>31% de execução</strong></td></tr>
+            <tr><td>Reino Unido</td><td>Uma polícia respondeu <strong>5% dos 1.940 pedidos</strong> de consulta em dois anos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Em nenhum desses casos faltou tecnologia, dispositivo ou orçamento. O equipamento foi comprado, a lei foi aprovada, o dinheiro foi alocado — e aí travou no processo entre a polícia, o judiciário e a vítima.</p>
+      <p class="pull"><strong>Ninguém está construindo software para esse gargalo.</strong> Existem centenas de apps de botão de pânico e praticamente nenhum sistema para fazer o recurso que já existe chegar em quem precisa.</p>
+    </div>
+
+    <div class="card">
+      <h2>6. O algoritmo espanhol que decide quem recebe proteção</h2>
+      <p>A Espanha tem o maior sistema de avaliação algorítmica de risco de violência de gênero do mundo, o <strong>VioGén</strong>, com mais de 3 milhões de casos desde 2007. Quando uma mulher denuncia, o policial preenche um formulário e o sistema devolve uma nota de risco. Essa nota determina quantos recursos de proteção ela recebe.</p>
+      <div class="stats">
+        <div class="stat"><span class="num alarm">247</span><span class="cap">mulheres assassinadas depois de avaliadas pelo sistema</span></div>
+        <div class="stat"><span class="num alarm">56%</span><span class="cap">delas tinham sido classificadas como risco baixo ou insignificante</span></div>
+        <div class="stat"><span class="num">95%</span><span class="cap">dos casos: o policial mantém a nota automática sem alterar</span></div>
+        <div class="stat"><span class="num">35%</span><span class="cap">apenas das vítimas souberam a própria nota</span></div>
+      </div>
+      <p>O sistema foi desenhado para ser apenas uma recomendação, com a decisão final humana. Na prática, o policial concorda com a máquina em 95% dos casos — então a “sugestão” virou a decisão.</p>
+      <p>O governo espanhol recusou uma auditoria independente e negou acesso ao código-fonte. Lançou uma versão corrigida, o <strong>VioGén 2, em agosto de 2025</strong>. Em outubro do mesmo ano, já sob o sistema novo, uma mulher de 21 anos classificada como baixo risco, com medida protetiva ativa e denúncias anteriores, foi assassinada.</p>
+      <p class="pull warn"><strong>Se o nosso produto tiver qualquer nota de risco automatizada, essa é a pergunta que vem do júri.</strong> E a resposta não pode ser “o nosso algoritmo é melhor”.</p>
+    </div>
+
+    <div class="card">
+      <h2>7. O que funcionou — e o que isso ensina</h2>
+      <p>Em toda a varredura, uma única iniciativa tem redução de mortes comprovada.</p>
+      <p class="pull"><strong>Maryland, Estados Unidos.</strong> O Lethality Assessment Program está associado a uma queda de cerca de <strong>40% nos homicídios de parceiro íntimo</strong>. A diferença é que ele não entrega uma pontuação e vai embora: quando o policial identifica risco alto, ele coloca a mulher <strong>ao telefone com um serviço de apoio na mesma hora</strong>, ainda na ocorrência. O score não era o produto. A ponte era.</p>
+      <p>Os outros casos de sucesso ensinam coisas parecidas:</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Caso</th><th>O que fez diferente</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lead">myPlan</span>Johns Hopkins, EUA</td><td>Tem só 12 mil usuárias por ano, mas está vivo há mais de uma década. É construído sobre o Danger Assessment, um instrumento clínico validado cientificamente, e tem 11 publicações revisadas por pares. <strong>Validação acadêmica virou estratégia de sobrevivência.</strong></td></tr>
+            <tr><td><span class="lead">Digi Police</span>Polícia de Tóquio</td><td>470 mil downloads e nenhuma inovação técnica: o app só toca um grito alto e mostra “há um assediador, por favor ajude” em tela cheia. <strong>Resolve a paralisia e a vergonha</strong>, que era o problema real.</td></tr>
+            <tr><td><span class="lead">Help Me Bell</span>Prefeitura de Seul</td><td>Um chaveiro de US$ 5 conectado às câmeras municipais <strong>que já existiam</strong>. 110 mil distribuídos gratuitamente para grupos vulneráveis. Resposta local escala melhor que nacional.</td></tr>
+            <tr><td><span class="lead">Safetipin</span>Índia</td><td>Não é botão de pânico: é coleta de dados sobre iluminação e segurança das ruas, <strong>vendida para prefeituras</strong> melhorarem a cidade. Não depende de resposta policial.</td></tr>
+            <tr><td><span class="lead">Grab e Gojek</span>Sudeste Asiático</td><td>Colocaram segurança dentro de um app que as pessoas <strong>já usam todo dia</strong>. Adesão muito maior que app dedicado, que exige a mulher baixar algo acusatório.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>8. O que morreu — e por quê</h2>
+      <p>Esta é a seção mais útil para nós, porque mostra como projetos com boas intenções acabam.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Produto</th><th>Causa da morte</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lead">Circle of 6</span>EUA</td><td>Venceu um desafio do governo federal americano e chegou a <strong>200 mil usuárias em 33 países</strong>. Os criadores recusaram monetizar por princípio: “é importante não monetizar segurança”. Acabou o dinheiro, acabou o app.</td></tr>
+            <tr><td><span class="lead">Garbo</span>EUA</td><td>Checagem de antecedentes de parceiros, com investimento do dono do Tinder. Morreu porque <strong>a maior parte da violência doméstica nunca é denunciada nem condenada</strong> — então dado público tem pouco poder de prever.</td></tr>
+            <tr><td><span class="lead">Ask for ANI</span>Reino Unido</td><td>Palavra-código dita no balcão da farmácia. Encerrado em novembro de 2024 com apenas <strong>186 encaminhamentos em três anos</strong>.</td></tr>
+            <tr><td><span class="lead">Athena / ROAR</span>EUA</td><td>Financiamento coletivo 566% acima da meta. O fabricante não deu conta, atrasou dois anos, e o produto foi descontinuado.</td></tr>
+            <tr><td><span class="lead">Mandato indiano</span>Índia</td><td>O governo obrigou botão de pânico em todo celular vendido no país. <strong>O número de emergência não estava funcionando na data do lançamento.</strong></td></tr>
+            <tr><td><span class="lead">Malalai</span>Brasil</td><td>Metodologia validada com 2 mil mulheres e boa imprensa. Morreu silenciosamente depois do financiamento coletivo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="pull warn"><strong>Nenhum caiu por falta de boa ideia.</strong> Caíram por falta de modelo de receita, por depender de uma estrutura operacional que a tecnologia não resolve, ou porque a instituição parou de bancar. Circle of 6 tinha 200 mil usuárias e morreu; myPlan tem 12 mil por ano e está vivo há dez anos.</p>
+    </div>
+
+    <div class="card">
+      <h2>9. Por que vazar dado aqui é pior do que não existir</h2>
+      <p>Em qualquer outro produto, um vazamento é problema de LGPD. Aqui é risco de morte: um banco de dados vazado entrega endereços de mulheres a quem quer machucá-las.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Caso</th><th>O que aconteceu</th></tr></thead>
+          <tbody>
+            <tr><td><span class="lead">App Tea</span>EUA, 2025</td><td>Deixou um servidor aberto. Vazaram 72 mil imagens, 13 mil selfies com documento de identidade e 1,1 milhão de mensagens privadas. <strong>Horas depois, publicaram um mapa cruzando as fotos com a localização das mulheres.</strong></td></tr>
+            <tr><td><span class="lead">Aspire News</span>EUA, 2020</td><td>Mais de <strong>4.000 gravações de voz de vítimas</strong> expostas num servidor sem proteção desde 2017 — com nomes, endereços, telefones e ao menos uma gravação nomeando o agressor.</td></tr>
+            <tr><td><span class="lead">Pulseiras</span>Espanha, 2024</td><td>Na troca de fornecedor, o histórico de localização se perdeu. Sem prova de que o agressor violou o perímetro, <strong>dezenas foram absolvidos na Justiça</strong>. O governo soube em janeiro de 2024 e só admitiu em setembro de 2025.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="pull warn"><strong>Regra que sai daqui:</strong> retenção de dado é risco, não recurso. Se o dado não existe, ele não vaza. E vale saber: esses dados podem ser requisitados judicialmente pela defesa do agressor — ou seja, usados contra a própria vítima no processo.</p>
+    </div>
+
+    <div class="card">
+      <h2>10. A ferramenta vira arma do agressor</h2>
+      <p>Este é o ponto mais contraintuitivo da pesquisa, e o que mais muda o desenho do produto.</p>
+      <p>A ONG britânica <strong>Refuge</strong>, a maior do setor no Reino Unido, registra alta de <strong>258%</strong> em casos de abuso por tecnologia. O arsenal documentado inclui rastreadores GPS a partir de £35 escondidos em roupas e carros, AirTags, câmeras ocultas, carros conectados, campainhas inteligentes e até anéis de monitoramento de fertilidade usados para vigiar a parceira.</p>
+      <p>Nos Estados Unidos, uma investigação da Forbes documentou <strong>pelo menos 9 casos em tribunais federais</strong> em que traficantes de pessoas obrigaram vítimas a manter um app de localização familiar instalado, usando-o como coleira digital.</p>
+      <p class="pull warn"><strong>O modelo de ameaça é incomum:</strong> o agressor tem acesso físico e recorrente ao celular dela, conhece as senhas e às vezes paga a conta do telefone. Todo recurso que a gente desenhar precisa assumir que ele pode descobrir o app, se instalar nele, ou obrigá-la a usá-lo contra si mesma.</p>
+      <p>Consequência prática: as duas maiores organizações do mundo no assunto — a NNEDV americana e a Coalition Against Stalkerware — <strong>não recomendam app disfarçado</strong> como estratégia principal. O motivo é técnico: mesmo apagando o app, o histórico de download continua no aparelho, no backup e na conta da loja de aplicativos. Elas recomendam usar um dispositivo separado, que o agressor nunca tenha tocado.</p>
+    </div>
+
+    <div class="card">
+      <h2>11. As cinco ideias que sobraram</h2>
+      <p class="sub">São as cinco direções que a pesquisa sustenta. Cada uma tem um defeito conhecido — leia os dois lados antes de votar.</p>
+
+      <div class="terr">
+        <h4><span class="tag">A</span>Fluxo operacional</h4>
+        <p>Software para destravar o gargalo da seção 5. Um sistema de triagem e acompanhamento entre delegacia, judiciário e vítima, para que as 1.061 tornozeleiras paradas em São Paulo cheguem a quem precisa. É o achado mais bem documentado da pesquisa e literalmente ninguém está nele. Venderia para governo.</p>
+        <p class="defect"><strong>Defeito:</strong> não temos acesso a dado real de polícia neste fim de semana, então a demonstração seria simulada. E vender para o Estado leva anos, não meses.</p>
+      </div>
+
+      <div class="terr">
+        <h4><span class="tag">B</span>Preparação antes da denúncia</h4>
+        <p>É a ideia voltada para os 61% que nunca denunciam. Em vez de esperar a emergência, ajudar a mulher a construir um plano de saída antes: o que separar, para onde ir, com quem contar, quais documentos guardar. O myPlan, do Johns Hopkins, prova que funciona — está vivo há uma década usando o Danger Assessment, instrumento científico validado, gratuito e de uso público.</p>
+        <p class="defect"><strong>Defeito:</strong> o PenhaS já faz um “Manual de Fuga” e é de código aberto. Precisamos de um ângulo que não seja simplesmente refazer o PenhaS.</p>
+      </div>
+
+      <div class="terr">
+        <h4><span class="tag">C</span>Cofre econômico</h4>
+        <p>Dependência econômica é um dos principais motivos pelos quais mulheres permanecem na relação — sair custa dinheiro que ela muitas vezes não controla. Nenhum produto no mundo ataca isso. Tecnicamente é viável: o Pix tem ambiente de testes que funciona de verdade, e a ideia de aplicar uma senha de coação ao <em>saldo</em> — mostrar saldo zero sob a senha falsa — é genuinamente original.</p>
+        <p class="defect"><strong>Defeito:</strong> guardar dinheiro de vítima tem risco regulatório sério. E se o agressor descobre o cofre, ela perde o dinheiro e a saída de uma vez só.</p>
+      </div>
+
+      <div class="terr">
+        <h4><span class="tag">D</span>Digitalizar o Sinal Vermelho</h4>
+        <p>O Sinal Vermelho é um protocolo nacional em que a mulher desenha um X vermelho na palma da mão e mostra num estabelecimento credenciado para pedir ajuda sem falar. O CNJ afirma que a campanha conta com <strong>“cerca de 15 mil farmácias, prefeituras, órgãos do Judiciário e agências do Banco do Brasil”</strong> — os quinze mil são o total somado, não só farmácias, e a página não informa a data desse número.</p>
+        <p>Não existe camada digital nenhuma: nem mapa em tempo real, nem confirmação de que o ponto está aberto, nem verificação de que a equipe foi treinada. <strong>E na própria página do CNJ, o link “clique aqui para acessar a lista de farmácias parceiras” está quebrado</strong> — é texto em negrito sem destino. Verificado no navegador em 15/08/2026.</p>
+        <p class="defect"><strong>Defeito:</strong> o Ask for ANI britânico era exatamente isso e foi encerrado com 186 encaminhamentos em três anos. Precisamos entender por que falhou antes de repetir.</p>
+      </div>
+
+      <div class="terr">
+        <h4><span class="tag">E</span>Contra-vigilância</h4>
+        <p>Atacar o problema da seção 10: ajudar a mulher a descobrir se está sendo vigiada. Detectar rastreadores escondidos, apps de espionagem instalados no celular dela, contas e dispositivos que o agressor ainda controla. A alta de 258% documentada pela Refuge mostra que a demanda existe, e nenhuma solução estatal europeia endereça isso.</p>
+        <p class="defect"><strong>Defeito:</strong> é difícil de demonstrar num palco, e Android e iOS já embutiram detecção de AirTag no sistema.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>12. Os sete erros que não podemos cometer</h2>
+      <ol class="errs">
+        <li><strong>Presumir eficácia sem evidência.</strong> Não existe estudo mostrando que app de segurança reduz violência. Não podemos prometer isso no palco.</li>
+        <li><strong>Ignorar que a ferramenta pode virar arma.</strong> Desenhar assumindo que o agressor pode descobrir o app, se instalar nele, ou coagi-la a usá-lo.</li>
+        <li><strong>Prometer resposta policial sem parceria assinada.</strong> Sem acordo formal sobre tempo de resposta, é a promessa vazia de Goiânia e da Índia.</li>
+        <li><strong>Construir mais um app sem plano de sustentabilidade.</strong> Todos os que morreram tinham usuárias; faltou receita.</li>
+        <li><strong>Fazer nota de risco sem auditoria externa e sem explicar à vítima.</strong> O VioGén é o alerta: 247 mortes, 56% classificadas como baixo risco.</li>
+        <li><strong>Negligenciar segurança de dados.</strong> Um vazamento é pior do que não ter produto, porque expõe exatamente quem deveríamos proteger.</li>
+        <li><strong>Desenhar só para quem tem celular privado e seguro.</strong> Presumir isso é presumir que ela não está no pior momento do abuso.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>13. As perguntas que o júri vai fazer</h2>
+      <p class="sub">Vale cada pessoa do time saber responder estas seis.</p>
+      <div class="qa"><p class="ask">“Existe evidência de que apps de segurança reduzem violência?”</p><p class="ans">Honestamente, não. A revisão de 2023, com 136 apps analisados em profundidade, não encontrou nenhum estudo de efetividade. Por isso não prometemos reduzir violência — resolvemos um gargalo específico e mensurável.</p></div>
+      <div class="qa"><p class="ask">“Isso já não é o SP Mulher Segura, ou o programa federal de julho?”</p><p class="ans">Todas as soluções oficiais exigem medida protetiva já concedida. A subnotificação no Brasil é de 61% — a mulher que ainda não denunciou está completamente descoberta, e ela é a maioria.</p></div>
+      <div class="qa"><p class="ask">“E se o agressor encontrar isso no celular dela?”</p><p class="ans">Desenhamos assumindo esse cenário desde o começo. Os casos reais mostram que essa é a falha mais comum do setor inteiro.</p></div>
+      <div class="qa"><p class="ask">“Como vocês evitam virar mais um VioGén?”</p><p class="ans">Nenhuma decisão automática sem revisão humana — ou, mais simples: decidimos não fazer classificação de risco automatizada nesta fase.</p></div>
+      <div class="qa"><p class="ask">“Quando o botão é acionado, quem responde, e em quanto tempo?”</p><p class="ans">Essa é exatamente a lacuna que encontramos. Em Goiânia uma advogada acionou 50 vezes e foi atendida uma. Por isso nosso produto foca em outra coisa, em vez de prometer uma resposta que não podemos garantir.</p></div>
+      <div class="qa"><p class="ask">“O que acontece quando a energia do Startup Weekend acabar?”</p><p class="ans">É a pergunta que matou Circle of 6, Athena e Malalai. Precisamos de uma resposta concreta de receita ou de parceria institucional.</p></div>
+    </div>
+
+    <div class="card">
+      <h2>14. O que dá e o que não dá para construir em 54 horas</h2>
+      <p class="sub">Verificado na documentação oficial das plataformas. Serve para não perdermos sábado numa ideia impossível.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Recurso</th><th>Viável?</th></tr></thead>
+          <tbody>
+            <tr><td>Senha de coação — uma senha falsa abre uma tela inofensiva</td><td><strong style="color:var(--good)">Sim</strong> · é lógica simples, poucas horas</td></tr>
+            <tr><td>Danger Assessment como autoavaliação de risco</td><td><strong style="color:var(--good)">Sim</strong> · instrumento validado, gratuito e público</td></tr>
+            <tr><td>WhatsApp como canal do produto</td><td><strong style="color:var(--good)">Sim</strong> · número de teste em minutos, e o Ligue 180 já atende por lá</td></tr>
+            <tr><td>Cofre em Pix</td><td><strong style="color:var(--good)">Sim, em sandbox</strong> · dá para prototipar de verdade, não é tela falsa</td></tr>
+            <tr><td>Detecção de grito ou som de violência no próprio celular</td><td><strong style="color:var(--good)">Sim, parcial</strong> · modelo pronto do Google, mas só com o app aberto</td></tr>
+            <tr><td>Usar o botão físico do celular como gatilho secreto</td><td><strong style="color:var(--coral)">Não</strong> · bloqueado nos dois sistemas; burlar viola a política da loja</td></tr>
+            <tr><td>Detecção de queda do smartwatch</td><td><strong style="color:var(--coral)">Não</strong> · a Apple e o Google não abrem essa função a terceiros</td></tr>
+            <tr><td>Enviar alerta por satélite quando não há sinal</td><td><strong style="color:var(--coral)">Não</strong> · não cobre a América do Sul e não tem API pública</td></tr>
+            <tr><td>App web com botão funcionando de tela bloqueada no iPhone</td><td><strong style="color:var(--coral)">Não</strong> · a localização para quando a tela apaga</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="src">Pesquisa completa no repositório, em <code>docs/benchmark/</code>: Brasil, EUA, Europa, Ásia, fracassos e críticas, tecnologia emergente. Fontes principais: Fórum Brasileiro de Segurança Pública, DataSenado, IBGE, Cornell Tech, Fundación Éticas, Refuge, NNEDV e imprensa citada em cada documento.</p>
+    </div>
+
+    <div class="card" style="background:var(--petrol-wash)">
+      <h2>Agora vote</h2>
+      <p>São cinco ideias, seis opções de nome e um espaço para você escrever o que quiser. Leva uns três minutos.</p>
+      <button class="btn" id="btn-ir-votar">Ir para a cédula</button>
+    </div>
+  </section>
+
+  <!-- ==================== VOTAR ==================== -->
+  <section id="p-votar" role="tabpanel" aria-labelledby="tab-votar" hidden>
+    <div class="card" style="background:var(--cream-deep)">
+      <p style="margin:0;font-size:.9rem;color:var(--ink-soft)"><strong style="color:var(--ink)">Sem servidor, de propósito.</strong> Esta página não guarda nada de ninguém e funciona offline. Você vota, gera um código e cola no grupo. Quem apurar junta tudo.</p>
+    </div>
+
+    <div class="card">
+      <h2>Quem está respondendo</h2>
+      <p class="sub">Só para saber de quem é cada voto na hora de discutir.</p>
+      <label class="field"><input type="text" id="f-nome" placeholder="Seu nome" autocomplete="name"></label>
+      <div class="inline-sug"><div class="opts" id="f-area"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>O que a gente vai construir?</h2>
+      <p class="sub">Escolha uma. Cada opção tem o problema dela escrito em vermelho — leia os dois lados.</p>
+      <div class="opts" id="f-terr"></div>
+    </div>
+
+    <div class="card">
+      <h2>Se essa não der certo, qual seria a segunda?</h2>
+      <p class="sub">Pode deixar em branco se não tiver preferência.</p>
+      <div class="opts" id="f-terr2"></div>
+    </div>
+
+    <div class="card">
+      <h2>Que nome o produto deve ter?</h2>
+      <p class="sub">Cuidado: esse nome vai aparecer na tela do celular dela. Se o agressor pegar o telefone e ler, ele descobre.</p>
+      <div class="opts" id="f-nomes"></div>
+      <label class="field inline-sug"><input type="text" id="f-nome-sug" placeholder="Ou escreva um nome que você pensou"></label>
+    </div>
+
+    <div class="card">
+      <h2>Você concorda com esta frase?</h2>
+      <p class="sub">“Apertar um botão de emergência não resolve, porque quase nunca alguém chega a tempo.”</p>
+      <div class="scale" id="f-escala"></div>
+      <div class="scale-ends"><span>1 · Discordo</span><span>Concordo · 5</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Tem alguma coisa te incomodando?</h2>
+      <p class="sub">Dúvida, discordância, ideia que ninguém falou ainda. Pode escrever do seu jeito.</p>
+      <label class="field"><textarea id="f-livre" rows="4" placeholder="Escreva à vontade"></textarea></label>
+    </div>
+
+    <button class="btn" id="btn-gerar">Gerar meu código</button>
+    <p class="form-error" id="gerar-erro" role="alert" hidden></p>
+
+    <div id="out" hidden style="margin-top:1.2rem">
+      <div class="card">
+        <h2>Pronto — cole isso no grupo</h2>
+        <p class="sub" id="out-msg"></p>
+        <div class="code-box" id="out-code"></div>
+        <div class="btn-row">
+          <button class="btn" id="btn-copiar">Copiar código</button>
+          <button class="btn ghost" id="btn-editar">Editar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== APURAR ==================== -->
+  <section id="p-apurar" role="tabpanel" aria-labelledby="tab-apurar" hidden>
+    <div class="card">
+      <h2>Cole os códigos do time</h2>
+      <p class="sub">Um por linha, ou cole o bloco inteiro copiado do WhatsApp — a página ignora o que não for código. Se a mesma pessoa aparecer duas vezes, vale a última.</p>
+      <label class="field"><textarea id="f-codigos" rows="6" placeholder="MR1-..."></textarea></label>
+      <div class="btn-row"><button class="btn" id="btn-apurar">Apurar</button></div>
+      <p class="sub" id="apurar-msg" style="margin-top:.8rem !important"></p>
+    </div>
+    <div id="resultado"></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var AREAS = [
+    { id: "criativa", name: "Criativa" },
+    { id: "tecnica",  name: "Técnica" },
+    { id: "negocios", name: "Negócios" }
+  ];
+
+  var TERRITORIOS = [
+    { id: "A", name: "Fazer a ajuda que já existe chegar em quem precisa",
+      why: "Hoje o equipamento existe, mas fica parado numa gaveta: São Paulo comprou 1.250 tornozeleiras e só 189 estão em uso. A gente faria um sistema para a delegacia e a justiça não perderem esses casos no meio do caminho.",
+      flag: "O problema: não temos acesso aos dados da polícia neste fim de semana, então a demonstração seria fingida. E vender para governo demora anos." },
+    { id: "B", name: "Ajudar ela a se preparar antes de denunciar",
+      why: "Seis em cada dez mulheres nunca denunciam. Em vez de esperar a emergência, a gente ajuda ela a montar um plano de saída com calma: o que separar, para onde ir, com quem contar, que documento guardar.",
+      flag: "O problema: o aplicativo PenhaS já faz algo parecido, e o código dele é aberto. Precisamos de uma ideia que não seja só refazer o que já existe." },
+    { id: "C", name: "Ajudar ela a juntar dinheiro para conseguir sair",
+      why: "Não ter dinheiro próprio é um dos maiores motivos para ela ficar. Ninguém no mundo ataca isso. Daria para fazer um cofre escondido no celular, com uma senha falsa que mostra saldo zero se ele obrigar ela a abrir.",
+      flag: "O problema: guardar dinheiro dos outros tem regra séria. E se ele achar o cofre, ela perde o dinheiro e a saída de uma vez." },
+    { id: "D", name: "Fazer o pedido de ajuda na farmácia funcionar de verdade",
+      why: "Já existe um combinado nacional: ela desenha um X vermelho na mão e mostra numa farmácia, que chama a polícia por ela. Mas não tem mapa, nem como saber se aquela farmácia está aberta ou se treinaram a equipe. No site do CNJ, até o link da lista de farmácias está quebrado.",
+      flag: "O problema: o Reino Unido tentou exatamente isso e desistiu — em três anos, só 186 mulheres chegaram a ser encaminhadas." },
+    { id: "E", name: "Descobrir se ele está espionando o celular dela",
+      why: "Muita violência hoje passa por rastreador escondido na bolsa ou no carro, aplicativo espião no celular e contas que ele ainda controla. Casos assim cresceram 258% na maior organização do assunto na Inglaterra.",
+      flag: "O problema: é difícil mostrar isso funcionando num palco, e o próprio celular já avisa sobre alguns rastreadores." }
+  ];
+
+  var NOMES = [
+    { id: "plano-a", name: "Plano A",
+      why: "Passa a ideia de ter um plano, não de ser vítima. Na tela do celular parece um aplicativo comum de organização." },
+    { id: "aurora", name: "Aurora",
+      why: "Ninguém desconfia ao ver na tela. Fala de recomeço sem usar a palavra violência em lugar nenhum." },
+    { id: "passo", name: "Passo",
+      why: "Um passo de cada vez. Curto e discreto, combina com um produto que ajuda a se preparar." },
+    { id: "bem-antes", name: "Bem Antes",
+      why: "Já diz para que serve: agir antes de a situação piorar." },
+    { id: "rota", name: "Rota",
+      why: "O caminho de saída. Na tela do celular parece aplicativo de mapa." },
+    { id: "manter", name: "Manter “Mulheres em Risco”",
+      why: "Forte e direto para jurado e imprensa.",
+      flag: "Mas fala da vítima, e não da saída. E se ele pegar o celular dela e ler esse nome na tela, entrega tudo." }
+  ];
+
+  var STORE = "mr-cabine-v3";
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function encode(obj) {
+    var bytes = new TextEncoder().encode(JSON.stringify(obj)), bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function decode(str) {
+    var s = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    var bin = atob(s), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  function radioOpt(group, o, withFlag) {
+    var flag = withFlag && o.flag ? '<span class="flag">' + esc(o.flag) + "</span>" : "";
+    var why = o.why ? '<span class="why">' + esc(o.why) + "</span>" : "";
+    return '<label class="opt"><input type="radio" name="' + group + '" value="' + esc(o.id) + '">' +
+      '<span class="body"><span class="name">' + esc(o.name) + "</span>" + why + flag + "</span></label>";
+  }
+
+  el("f-area").innerHTML = AREAS.map(function (a) { return radioOpt("area", a, false); }).join("");
+  el("f-terr").innerHTML = TERRITORIOS.map(function (t) {
+    return radioOpt("terr", { id: t.id, name: t.id + " · " + t.name, why: t.why, flag: t.flag }, true);
+  }).join("");
+  el("f-terr2").innerHTML = TERRITORIOS.map(function (t) {
+    return radioOpt("terr2", { id: t.id, name: t.id + " · " + t.name }, false);
+  }).join("");
+  el("f-nomes").innerHTML = NOMES.map(function (n) { return radioOpt("nomep", n, true); }).join("");
+
+  var escala = "";
+  for (var i = 1; i <= 5; i++) escala += '<label><input type="radio" name="escala" value="' + i + '">' + i + "</label>";
+  el("f-escala").innerHTML = escala;
+
+  var TABS = [["tab-pesquisa", "p-pesquisa"], ["tab-votar", "p-votar"], ["tab-apurar", "p-apurar"]];
+  function setMode(activeId) {
+    TABS.forEach(function (t) {
+      var on = t[0] === activeId;
+      el(t[0]).setAttribute("aria-selected", on ? "true" : "false");
+      el(t[1]).hidden = !on;
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  TABS.forEach(function (t) { el(t[0]).addEventListener("click", function () { setMode(t[0]); }); });
+  el("btn-ir-votar").addEventListener("click", function () { setMode("tab-votar"); });
+
+  function radioVal(name) {
+    var n = document.querySelector('input[name="' + name + '"]:checked');
+    return n ? n.value : "";
+  }
+  function coletar() {
+    return {
+      n: el("f-nome").value.trim(), a: radioVal("area"), t: radioVal("terr"),
+      t2: radioVal("terr2"), p: radioVal("nomep"), ps: el("f-nome-sug").value.trim(),
+      e: radioVal("escala"), c: el("f-livre").value.trim()
+    };
+  }
+  (function restaurar() {
+    var raw;
+    try { raw = localStorage.getItem(STORE); } catch (err) { return; }
+    if (!raw) return;
+    var d;
+    try { d = JSON.parse(raw); } catch (err) { return; }
+    el("f-nome").value = d.n || "";
+    el("f-nome-sug").value = d.ps || "";
+    el("f-livre").value = d.c || "";
+    [["area", d.a], ["terr", d.t], ["terr2", d.t2], ["nomep", d.p], ["escala", d.e]].forEach(function (p) {
+      if (!p[1]) return;
+      var n = document.querySelector('input[name="' + p[0] + '"][value="' + p[1] + '"]');
+      if (n) n.checked = true;
+    });
+  })();
+
+  function erro(txt, focoId) {
+    var box = el("gerar-erro");
+    if (!txt) { box.hidden = true; box.textContent = ""; return; }
+    box.textContent = txt;
+    box.hidden = false;
+    if (focoId) { el(focoId).focus(); }
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  // A faixa de erro some assim que a pessoa começa a corrigir o que faltava.
+  el("f-nome").addEventListener("input", function () { erro(""); });
+  el("f-terr").addEventListener("change", function () { erro(""); });
+
+  el("btn-gerar").addEventListener("click", function () {
+    var d = coletar();
+    if (!d.n) { erro("Escreva seu nome antes de gerar o código.", "f-nome"); return; }
+    if (!d.t) { erro("Escolha uma das cinco ideias — é a pergunta que decide o produto."); return; }
+    erro("");
+    try { localStorage.setItem(STORE, JSON.stringify(d)); } catch (err) { /* modo privado */ }
+    el("out-code").textContent = "MR1-" + encode(d);
+    el("out-msg").textContent = "Voto de " + d.n + " registrado. Mande este código no grupo do time.";
+    el("out").hidden = false;
+    el("out").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  el("btn-editar").addEventListener("click", function () {
+    el("out").hidden = true;
+    el("f-nome").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  el("btn-copiar").addEventListener("click", function () {
+    var txt = el("out-code").textContent, btn = el("btn-copiar");
+    function done() { btn.textContent = "Copiado ✓"; setTimeout(function () { btn.textContent = "Copiar código"; }, 4000); }
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var copiou = false;
+      try { copiou = document.execCommand("copy"); } catch (err) { copiou = false; }
+      document.body.removeChild(ta);
+      if (copiou) { done(); return; }
+      // Nem a API nem o execCommand funcionaram: seleciona o código na tela
+      // para a pessoa copiar com o gesto normal do aparelho.
+      try {
+        var r = document.createRange();
+        r.selectNodeContents(el("out-code"));
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(r);
+      } catch (err) { /* sem seleção programática */ }
+      btn.textContent = "Código selecionado — copie manualmente";
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallback);
+    else fallback();
+  });
+
+  function barras(titulo, itens, total) {
+    if (!total) return "";
+    var max = 0;
+    itens.forEach(function (i) { if (i.n > max) max = i.n; });
+    var linhas = itens.filter(function (i) { return i.n > 0; })
+      .sort(function (a, b) { return b.n - a.n; })
+      .map(function (i) {
+        var pct = Math.round((i.n / total) * 100);
+        return '<div class="bar-row"><div class="bar-head"><span>' + esc(i.name) +
+          '</span><span class="n">' + i.n + " · " + pct + '%</span></div>' +
+          '<div class="bar-track"><div class="bar-fill' + (i.n === max ? " win" : "") +
+          '" style="width:' + pct + '%"></div></div></div>';
+      }).join("");
+    return linhas ? '<div class="tally"><h3>' + esc(titulo) + "</h3>" + linhas + "</div>" : "";
+  }
+
+  el("btn-apurar").addEventListener("click", function () {
+    var achados = (el("f-codigos").value.match(/MR1-[A-Za-z0-9_-]+/g) || []);
+    var porPessoa = {}, ruins = 0, colisoes = [];
+    achados.forEach(function (c) {
+      var d;
+      try { d = decode(c.slice(4)); } catch (err) { ruins++; return; }
+      if (!d || !d.n) { ruins++; return; }
+      var chave = d.n.trim().toLowerCase();
+      var antes = porPessoa[chave];
+      // Voto substituído por outro com o mesmo nome mas conteúdo diferente:
+      // ou a pessoa mudou de ideia, ou são duas pessoas homônimas. Avisar.
+      if (antes && (antes.t !== d.t || antes.p !== d.p || antes.c !== d.c)) {
+        if (colisoes.indexOf(d.n) === -1) colisoes.push(d.n);
+      }
+      porPessoa[chave] = d;
+    });
+    var votos = Object.keys(porPessoa).map(function (k) { return porPessoa[k]; });
+    var msg = el("apurar-msg");
+
+    if (!votos.length) {
+      msg.textContent = achados.length
+        ? "Encontrei " + achados.length + " código(s), mas nenhum pôde ser lido. Confira se foram colados inteiros."
+        : "Nenhum código encontrado. Cole ao menos um que comece com MR1-.";
+      el("resultado").innerHTML = "";
+      return;
+    }
+    msg.textContent = votos.length + " voto(s) apurado(s)" + (ruins ? " · " + ruins + " ilegível(is) ignorado(s)" : "") + ".";
+
+    var total = votos.length, html = "";
+
+    html += '<div class="card"><h2>Quem votou</h2><div class="chips">' +
+      votos.map(function (v) {
+        var a = AREAS.filter(function (x) { return x.id === v.a; })[0];
+        return '<span class="chip">' + esc(v.n) + (a ? " · " + esc(a.name) : "") + "</span>";
+      }).join("") + "</div>" +
+      (colisoes.length
+        ? '<p class="pull warn" style="margin-top:1rem"><strong>Confira ' +
+          esc(colisoes.join(", ")) + '.</strong> Apareceu mais de um voto com esse nome e com respostas diferentes. ' +
+          "Se a pessoa votou duas vezes, está certo: valeu a última. Mas se são duas pessoas com o mesmo nome, " +
+          "um voto foi perdido — peça para uma delas votar de novo usando nome e sobrenome.</p>"
+        : "") + "</div>";
+
+    var tPrim = TERRITORIOS.map(function (t) {
+      return { name: t.id + " · " + t.name, n: votos.filter(function (v) { return v.t === t.id; }).length };
+    });
+    var tSeg = TERRITORIOS.map(function (t) {
+      return { name: t.id + " · " + t.name, n: votos.filter(function (v) { return v.t2 === t.id; }).length };
+    });
+    var segTotal = votos.filter(function (v) { return v.t2; }).length;
+    html += '<div class="card">' + barras("O que construir — primeira escolha", tPrim, total) +
+      barras("O que construir — segunda escolha", tSeg, segTotal) + "</div>";
+
+    var nCount = NOMES.map(function (n) {
+      return { name: n.name, n: votos.filter(function (v) { return v.p === n.id; }).length };
+    });
+    var sug = votos.filter(function (v) { return v.ps; });
+    html += '<div class="card">' + barras("Nome do produto", nCount, total) +
+      '<h3 style="font-family:var(--f-display);font-size:1.02rem;margin:1.3rem 0 .6rem">Nomes sugeridos pelo time</h3>' +
+      (sug.length
+        ? '<div class="chips">' + sug.map(function (v) { return '<span class="chip">' + esc(v.ps) + " · " + esc(v.n) + "</span>"; }).join("") + "</div>"
+        : '<p class="empty">Ninguém sugeriu outro nome.</p>') + "</div>";
+
+    var comE = votos.filter(function (v) { return v.e; });
+    if (comE.length) {
+      var notas = comE.map(function (v) { return Number(v.e); });
+      var media = (notas.reduce(function (s, x) { return s + x; }, 0) / notas.length).toFixed(1);
+      var min = Math.min.apply(null, notas), maxN = Math.max.apply(null, notas);
+      html += '<div class="card"><h2>Sobre a frase do botão de emergência</h2>' +
+        '<p class="sub">Média ' + media + " de 5 · notas de " + min + " a " + maxN + ".</p>" +
+        ((maxN - min) <= 1
+          ? '<p class="pull">O time <strong>pensa parecido</strong> sobre isso.</p>'
+          : '<p class="pull warn">O time está <strong>dividido</strong> sobre isso. Vale conversar antes de escolher o que construir — essa frase é a base de todo o resto.</p>') +
+        "</div>";
+    }
+
+    var coment = votos.filter(function (v) { return v.c; });
+    html += '<div class="card"><h2>O que está incomodando</h2>' +
+      (coment.length
+        ? coment.map(function (v) { return '<blockquote class="quote">' + esc(v.c) + "<cite>" + esc(v.n) + "</cite></blockquote>"; }).join("")
+        : '<p class="empty">Ninguém escreveu nada aqui — o que provavelmente significa que ninguém leu a pergunta.</p>') +
+      "</div>";
+
+    el("resultado").innerHTML = html;
+    el("resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+})();
+</script>

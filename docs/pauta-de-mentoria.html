@@ -1,0 +1,445 @@
+<title>Pauta de Mentoria</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --peach-deep:#EFC4A8;
+    --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:16.5px; line-height:1.62; -webkit-text-size-adjust:100%; }
+  .wrap { max-width:44rem; margin:0 auto; padding:1.4rem 1.1rem 6rem; }
+
+  .eyebrow { font-size:.71rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:.8rem 0 .5rem; }
+  h1 { font-family:var(--f-display); font-size:clamp(2rem,7.5vw,2.9rem); line-height:1.06; margin:0 0 .55rem;
+       letter-spacing:-.022em; text-wrap:balance; color:var(--petrol-deep); }
+  .lede { font-size:1.04rem; color:var(--ink-soft); margin:0 0 1.4rem; max-width:34rem; }
+
+  .modes { display:flex; gap:.3rem; background:var(--cream-deep); padding:.28rem; border-radius:999px;
+           margin-bottom:1.8rem; border:1px solid var(--line); }
+  .modes button { flex:1; border:0; background:transparent; color:var(--ink-soft); font-family:var(--f-body);
+                  font-size:.9rem; font-weight:650; padding:.58rem .4rem; border-radius:999px; cursor:pointer;
+                  transition:background .15s,color .15s; }
+  .modes button[aria-selected="true"] { background:var(--petrol-deep); color:var(--surface); }
+  .modes button:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1.05rem;
+          padding:1.3rem 1.15rem; margin-bottom:1rem; box-shadow:0 1px 3px var(--shadow); }
+  .card > h2 { font-family:var(--f-display); font-size:1.24rem; margin:0 0 .6rem; letter-spacing:-.014em;
+               text-wrap:balance; line-height:1.2; }
+  .card p { margin:0 0 .85rem; }
+  .card p:last-child { margin-bottom:0; }
+  .sub { font-size:.89rem; color:var(--ink-soft); margin:-.3rem 0 1rem !important; }
+
+  .pitch { background:var(--petrol-wash); border:1px solid var(--petrol-soft); }
+  .pitch h2 { color:var(--petrol-deep); }
+  .flow { display:grid; grid-template-columns:repeat(auto-fit,minmax(7rem,1fr)); gap:.5rem; margin:.9rem 0; }
+  .flow div { background:var(--surface); border:1px solid var(--line-soft); border-radius:.7rem;
+              padding:.6rem .65rem; font-size:.82rem; line-height:1.35; }
+  .flow b { display:block; font-family:var(--f-mono); font-size:.68rem; color:var(--petrol-deep);
+            letter-spacing:.06em; margin-bottom:.2rem; }
+
+  .bloco-tag { display:inline-block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+               font-weight:750; color:var(--surface); background:var(--petrol-mid);
+               padding:.2rem .6rem; border-radius:999px; margin-bottom:.7rem; }
+  .bloco-tag.quente { background:var(--coral); }
+
+  .q { border-top:1px solid var(--line-soft); padding-top:1rem; margin-top:1rem; }
+  .q:first-of-type { border-top:0; padding-top:0; margin-top:0; }
+  .q .ask { font-family:var(--f-display); font-size:1.03rem; font-weight:650; margin:0 0 .35rem; line-height:1.32; }
+  .q .why { font-size:.85rem; color:var(--ink-soft); margin:0 0 .6rem; padding-left:.75rem;
+            border-left:2.5px solid var(--petrol-soft); }
+  .q .why b { color:var(--coral); font-weight:650; }
+  textarea, input[type="text"] { width:100%; font-family:var(--f-body); font-size:.95rem; padding:.6rem .75rem;
+    border-radius:.65rem; border:1.5px solid var(--line); background:var(--cream); color:var(--ink); resize:vertical; }
+  textarea:focus, input[type="text"]:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
+
+  .opts { display:flex; flex-wrap:wrap; gap:.45rem; }
+  .opt { display:flex; gap:.5rem; align-items:center; padding:.5rem .8rem; border:1.5px solid var(--line);
+         border-radius:999px; cursor:pointer; background:var(--cream); font-size:.88rem; font-weight:600; }
+  .opt:has(input:checked) { border-color:var(--petrol-deep); background:var(--petrol-wash); }
+  .opt:has(input:focus-visible) { outline:3px solid var(--coral); outline-offset:2px; }
+  .opt input { accent-color:var(--petrol-deep); margin:0; }
+
+  .btn { font-family:var(--f-body); font-size:1rem; font-weight:650; padding:.85rem 1.4rem; border-radius:.8rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .btn-row { display:flex; gap:.6rem; margin-top:.8rem; }
+  .form-error { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
+                padding:.7rem .85rem; border-radius:.7rem; margin:.7rem 0 0; }
+  .code-box { font-family:var(--f-mono); font-size:.78rem; line-height:1.5; background:var(--petrol-wash);
+              border:1.5px dashed var(--petrol-mid); border-radius:.8rem; padding:.9rem;
+              overflow-wrap:anywhere; user-select:all; }
+
+  .pull { background:var(--mint); border-radius:.85rem; padding:.9rem 1rem; font-size:.93rem;
+          border:1px solid var(--line-soft); margin:0 0 .85rem; }
+  .pull strong { color:var(--good); }
+  .pull.warn { background:var(--peach); }
+  .pull.warn strong { color:var(--coral); }
+
+  .resp { margin-bottom:1.4rem; }
+  .resp h3 { font-family:var(--f-display); font-size:1rem; margin:0 0 .5rem; }
+  .quote { border-left:3px solid var(--petrol-mid); padding:.1rem 0 .1rem .8rem; margin:0 0 .8rem; font-size:.92rem; }
+  .quote cite { display:block; font-style:normal; font-size:.79rem; color:var(--ink-soft); margin-top:.2rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .chip { background:var(--petrol-wash); border:1px solid var(--line-soft); border-radius:999px;
+          padding:.25rem .7rem; font-size:.85rem; }
+  .empty { color:var(--ink-soft); font-size:.9rem; font-style:italic; }
+  [hidden] { display:none !important; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Startup Weekend Women · Lages 2026 · Mulheres em Risco</p>
+  <h1>Pauta de Mentoria</h1>
+  <p class="lede">As perguntas que valem os 20 minutos de um mentor — e um lugar para anotar o que ele responder.</p>
+
+  <div class="modes" role="tablist">
+    <button role="tab" id="tab-pauta" aria-selected="true" aria-controls="p-pauta">Perguntar</button>
+    <button role="tab" id="tab-apurar" aria-selected="false" aria-controls="p-apurar">Juntar respostas</button>
+  </div>
+
+  <section id="p-pauta" role="tabpanel" aria-labelledby="tab-pauta">
+
+    <div class="card pitch">
+      <h2>Nossa ideia, em 30 segundos</h2>
+      <p>Não é um botão. É um <strong>gatilho de voz</strong>: a mulher fala uma palavra combinada e o celular pede socorro sozinho — mesmo largado na bolsa, mesmo com ela sem poder pegá-lo.</p>
+      <div class="flow">
+        <div><b>1 · GATILHO</b>Ela fala a palavra combinada</div>
+        <div><b>2 · ENVIO</b>O celular manda alerta por internet ou SMS</div>
+        <div><b>3 · CENTRAL</b>Recebe localização, cadastro e áudio ao vivo</div>
+        <div><b>4 · RESPOSTA</b>Despacha a polícia durante a agressão</div>
+        <div><b>5 · PROVA</b>O áudio fica para o processo</div>
+      </div>
+      <p>O aplicativo fica <strong>disfarçado</strong> no celular — algo como uma calculadora. E o modelo é vender para o poder público: a Secretaria de Segurança instala em mulheres já identificadas como em risco.</p>
+      <p class="pull"><strong>O que muda em relação a tudo que existe:</strong> hoje o socorro chega depois da violência. A aposta é chegar durante.</p>
+    </div>
+
+    <div class="card">
+      <h2>Quem está anotando</h2>
+      <p class="sub">Uma pauta por mentor. Se dois de vocês conversarem com o mesmo mentor, preencham separado.</p>
+      <label><input type="text" id="f-quem" placeholder="Seu nome"></label>
+      <p class="sub" style="margin:.8rem 0 .4rem !important">Nome do mentor</p>
+      <label><input type="text" id="f-mentor" placeholder="Nome do mentor"></label>
+      <p class="sub" style="margin:.8rem 0 .4rem !important">Área dele</p>
+      <div class="opts" id="f-area"></div>
+    </div>
+
+    <div class="card">
+      <span class="bloco-tag quente">Faça estas três com qualquer mentor</span>
+      <h2>As perguntas que derrubam ou salvam a ideia</h2>
+      <div id="b-criticas"></div>
+    </div>
+
+    <div class="card">
+      <span class="bloco-tag">Mentor de tecnologia</span>
+      <h2>O celular consegue mesmo fazer isso?</h2>
+      <div id="b-tech"></div>
+    </div>
+
+    <div class="card">
+      <span class="bloco-tag">Mentor de segurança pública ou governo</span>
+      <h2>Quem responde do outro lado?</h2>
+      <div id="b-gov"></div>
+    </div>
+
+    <div class="card">
+      <span class="bloco-tag">Mentor jurídico</span>
+      <h2>Isso é legal, e a prova serve?</h2>
+      <div id="b-juridico"></div>
+    </div>
+
+    <div class="card">
+      <span class="bloco-tag">Mentor de negócio</span>
+      <h2>Quem paga, e em quanto tempo</h2>
+      <div id="b-negocio"></div>
+    </div>
+
+    <div class="card">
+      <h2>Alguma coisa que ele falou e não cabia em nenhuma pergunta?</h2>
+      <p class="sub">Muitas vezes é aqui que vem a coisa mais útil da conversa.</p>
+      <label><textarea id="f-extra" rows="4" placeholder="Anote do jeito que ele falou"></textarea></label>
+    </div>
+
+    <div class="card">
+      <h2>No fim: ele acha que a gente deve seguir com essa ideia?</h2>
+      <div class="opts" id="f-veredito"></div>
+    </div>
+
+    <button class="btn" id="btn-gerar">Gerar código desta conversa</button>
+    <p class="form-error" id="gerar-erro" role="alert" hidden></p>
+
+    <div id="out" hidden style="margin-top:1.2rem">
+      <div class="card">
+        <h2>Pronto — cole no grupo</h2>
+        <p class="sub" id="out-msg"></p>
+        <div class="code-box" id="out-code"></div>
+        <div class="btn-row">
+          <button class="btn" id="btn-copiar">Copiar código</button>
+          <button class="btn ghost" id="btn-editar">Editar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-apurar" role="tabpanel" aria-labelledby="tab-apurar" hidden>
+    <div class="card">
+      <h2>Cole os códigos das mentorias</h2>
+      <p class="sub">Um por linha, ou o bloco inteiro do WhatsApp. Cada conversa com mentor vira uma ficha.</p>
+      <label><textarea id="f-codigos" rows="6" placeholder="MEN1-..."></textarea></label>
+      <div class="btn-row"><button class="btn" id="btn-apurar">Juntar</button></div>
+      <p class="sub" id="apurar-msg" style="margin-top:.8rem !important"></p>
+    </div>
+    <div id="resultado"></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var AREAS = [
+    { id:"tec",  name:"Tecnologia" },
+    { id:"gov",  name:"Segurança pública / governo" },
+    { id:"jur",  name:"Jurídico" },
+    { id:"neg",  name:"Negócio" },
+    { id:"soc",  name:"Social / atendimento a vítimas" },
+    { id:"out",  name:"Outra" }
+  ];
+
+  // As perguntas. `why` é o contexto que mostra ao mentor que fizemos a lição de casa.
+  var BLOCOS = {
+    "b-criticas": [
+      { id:"c1",
+        ask:"Uma mulher sendo agredida consegue falar uma palavra?",
+        why:"Perguntamos porque o gatilho depende da voz dela. Se ele está com a mão no pescoço dela, ou se o medo trava, a palavra não sai. No Japão, um aplicativo parecido resolveu isso <b>gritando pela vítima</b> em vez de esperar que ela gritasse." },
+      { id:"c2",
+        ask:"Se a central receber 300 alertas por dia e 290 forem engano, o que acontece com os 10 verdadeiros?",
+        why:"Perguntamos porque na França a central de pulseiras recebe <b>5 a 7 mil alertas por dia com cerca de 10 funcionários</b>. Os operadores deixam de acreditar no alarme — a literatura chama isso de grito de lobo." },
+      { id:"c3",
+        ask:"São Paulo tem 1.250 tornozeleiras compradas e só 189 em uso. Por que o equipamento fica parado, e o nosso cairia no mesmo buraco?",
+        why:"Perguntamos porque esse padrão se repete em seis lugares que pesquisamos, no Brasil e fora. O recurso existe e não chega. Se o problema for esse, mais alerta não resolve." }
+    ],
+    "b-tech": [
+      { id:"t1",
+        ask:"O celular consegue ficar ouvindo uma palavra-chave com a tela apagada e o aplicativo fechado, sem acabar com a bateria?",
+        why:"Perguntamos porque nossa checagem indicou que reconhecimento de palavra roda bem <b>só com o aplicativo aberto na frente</b>, e o iPhone é mais restritivo que o Android com microfone em segundo plano. Se isso for verdade, o coração da ideia precisa de outra solução." },
+      { id:"t2",
+        ask:"Se o celular não puder escutar sempre, um aparelhinho separado resolve? Quanto custaria cada um?",
+        why:"Perguntamos porque um prêmio internacional de segurança feminina definiu como meta um dispositivo <b>abaixo de 40 dólares que funcione sem sinal de celular</b> — então existe referência de preço." },
+      { id:"t3",
+        ask:"Como a gente evita que a palavra dispare sem querer — na TV, numa conversa, com criança brincando?",
+        why:"Perguntamos porque cada engano consome um operador da central e desgasta a confiança no sistema." },
+      { id:"t4",
+        ask:"E se ela estiver sem internet e sem crédito no celular?",
+        why:"Perguntamos porque satélite não é opção no Brasil hoje, e SMS depende de crédito. Em zona rural da serra isso é comum." }
+    ],
+    "b-gov": [
+      { id:"g1",
+        ask:"Existe hoje uma central preparada para receber esse alerta, ou teríamos que criar uma?",
+        why:"Perguntamos porque a nossa ideia entrega o alerta, mas quem atende é o Estado. Em Santa Catarina, a Rede Catarina da Polícia Militar já opera botão do pânico para cerca de 14 mil mulheres." },
+      { id:"g2",
+        ask:"Quanto tempo leva, na prática, entre o alerta chegar e a viatura estar na porta?",
+        why:"Perguntamos porque em Goiânia uma advogada com medida protetiva acionou o botão <b>50 vezes e foi atendida uma</b>. Precisamos saber o número real daqui." },
+      { id:"g3",
+        ask:"Quem decidiria quais mulheres recebem o aplicativo? E a que não for escolhida, fica sem nada?",
+        why:"Perguntamos porque na Espanha um sistema decide o nível de risco de cada vítima, e <b>56% das mulheres assassinadas tinham sido classificadas como risco baixo</b>." },
+      { id:"g4",
+        ask:"Se a gente quisesse testar em Lages, com quem eu preciso falar?",
+        why:"Perguntamos porque Lages não tem nenhuma iniciativa de tecnologia própria para isso — só a cobertura estadual. É a nossa chance de piloto." }
+    ],
+    "b-juridico": [
+      { id:"j1",
+        ask:"Transmitir o áudio do ambiente ao vivo para um órgão de segurança, sem o agressor saber, é permitido?",
+        why:"Perguntamos porque gravar a própria conversa é uma coisa, e transmitir som ambiente continuamente pode ser outra. Não sabemos onde fica a linha." },
+      { id:"j2",
+        ask:"Esse áudio serve como prova no processo, ou o advogado dele derruba?",
+        why:"Perguntamos porque existe uma regra de cadeia de custódia de prova digital no Código de Processo Penal, e não sabemos o que ela exige de nós." },
+      { id:"j3",
+        ask:"Os dados dela — localização, áudio, cadastro — podem ser pedidos pela defesa do agressor no processo?",
+        why:"Perguntamos porque organizações especializadas alertam que dados guardados <b>podem ser usados contra a própria vítima</b>." },
+      { id:"j4",
+        ask:"Se o Estado instala no celular dela, ela pode desligar quando quiser? E se falhar, quem responde?",
+        why:"Perguntamos porque a diferença entre proteção e vigilância está no consentimento — e porque queremos saber de quem é a responsabilidade se o sistema não funcionar." }
+    ],
+    "b-negocio": [
+      { id:"n1",
+        ask:"Numa Secretaria de Segurança, quem assina um contrato desses? E quanto tempo leva de verdade?",
+        why:"Perguntamos porque nosso modelo é vender para governo, e a gente não sabe o caminho nem o prazo." },
+      { id:"n2",
+        ask:"Existe um caminho mais rápido para startup vender para o poder público, ou é licitação normal?",
+        why:"Perguntamos porque ouvimos falar de regras específicas para contratação de solução inovadora, mas não sabemos se valem aqui." },
+      { id:"n3",
+        ask:"Quem paga a internet e o SMS do celular dela — o Estado, a operadora, ou ela?",
+        why:"Perguntamos porque muitas mulheres têm o telefone controlado pelo agressor, inclusive a conta." },
+      { id:"n4",
+        ask:"Depois do fim de semana, o que faz esse projeto continuar existindo?",
+        why:"Perguntamos porque quase todos os produtos parecidos que pesquisamos morreram quando o dinheiro inicial acabou — inclusive um que tinha 200 mil usuárias." }
+    ]
+  };
+
+  var VEREDITOS = [
+    { id:"segue",   name:"Sim, seguir assim" },
+    { id:"ajusta",  name:"Sim, mas mudando algo importante" },
+    { id:"repensa", name:"Acha que devemos repensar" },
+    { id:"nada",    name:"Não deu opinião" }
+  ];
+
+  var STORE = "men-pauta-v1";
+
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function encode(o){ var b=new TextEncoder().encode(JSON.stringify(o)),s="";
+    for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]);
+    return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+  function decode(str){ var s=str.replace(/-/g,"+").replace(/_/g,"/");
+    while(s.length%4) s+="="; var bin=atob(s), b=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(b)); }
+
+  // Monta os blocos de pergunta
+  var TODAS = [];
+  Object.keys(BLOCOS).forEach(function(alvo){
+    el(alvo).innerHTML = BLOCOS[alvo].map(function(q){
+      TODAS.push(q);
+      return '<div class="q"><p class="ask">' + esc(q.ask) + '</p>' +
+             '<p class="why">' + q.why + '</p>' +
+             '<textarea id="r-' + q.id + '" rows="3" placeholder="O que ele respondeu"></textarea></div>';
+    }).join("");
+  });
+
+  el("f-area").innerHTML = AREAS.map(function(a){
+    return '<label class="opt"><input type="radio" name="area" value="'+a.id+'">'+esc(a.name)+'</label>'; }).join("");
+  el("f-veredito").innerHTML = VEREDITOS.map(function(v){
+    return '<label class="opt"><input type="radio" name="ver" value="'+v.id+'">'+esc(v.name)+'</label>'; }).join("");
+
+  var TABS = [["tab-pauta","p-pauta"],["tab-apurar","p-apurar"]];
+  function setMode(id){ TABS.forEach(function(t){ var on=t[0]===id;
+    el(t[0]).setAttribute("aria-selected", on?"true":"false"); el(t[1]).hidden=!on; });
+    window.scrollTo({top:0,behavior:"smooth"}); }
+  TABS.forEach(function(t){ el(t[0]).addEventListener("click", function(){ setMode(t[0]); }); });
+
+  function radioVal(n){ var e=document.querySelector('input[name="'+n+'"]:checked'); return e?e.value:""; }
+
+  function coletar(){
+    var r = {};
+    TODAS.forEach(function(q){ var v = el("r-"+q.id).value.trim(); if (v) r[q.id] = v; });
+    return { q: el("f-quem").value.trim(), m: el("f-mentor").value.trim(), a: radioVal("area"),
+             v: radioVal("ver"), x: el("f-extra").value.trim(), r: r };
+  }
+
+  (function restaurar(){
+    var raw; try { raw = localStorage.getItem(STORE); } catch(e){ return; }
+    if (!raw) return;
+    var d; try { d = JSON.parse(raw); } catch(e){ return; }
+    el("f-quem").value = d.q||""; el("f-mentor").value = d.m||""; el("f-extra").value = d.x||"";
+    Object.keys(d.r||{}).forEach(function(k){ var n = el("r-"+k); if (n) n.value = d.r[k]; });
+    [["area",d.a],["ver",d.v]].forEach(function(p){ if(!p[1]) return;
+      var n = document.querySelector('input[name="'+p[0]+'"][value="'+p[1]+'"]'); if(n) n.checked = true; });
+  })();
+
+  function erro(t, foco){
+    var b = el("gerar-erro");
+    if (!t) { b.hidden = true; b.textContent = ""; return; }
+    b.textContent = t; b.hidden = false;
+    if (foco) el(foco).focus();
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  el("f-quem").addEventListener("input", function(){ erro(""); });
+  el("f-mentor").addEventListener("input", function(){ erro(""); });
+
+  el("btn-gerar").addEventListener("click", function(){
+    var d = coletar();
+    if (!d.q) { erro("Escreva seu nome.", "f-quem"); return; }
+    if (!d.m) { erro("Escreva o nome do mentor.", "f-mentor"); return; }
+    if (!Object.keys(d.r).length && !d.x) { erro("Anote ao menos uma resposta antes de gerar o código."); return; }
+    erro("");
+    try { localStorage.setItem(STORE, JSON.stringify(d)); } catch(e){}
+    el("out-code").textContent = "MEN1-" + encode(d);
+    el("out-msg").textContent = "Conversa com " + d.m + ", anotada por " + d.q + ".";
+    el("out").hidden = false;
+    el("out").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+
+  el("btn-editar").addEventListener("click", function(){
+    el("out").hidden = true; el("f-quem").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+
+  el("btn-copiar").addEventListener("click", function(){
+    var txt = el("out-code").textContent, btn = el("btn-copiar");
+    function done(){ btn.textContent="Copiado ✓"; setTimeout(function(){ btn.textContent="Copiar código"; },4000); }
+    function fb(){
+      var ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select(); var ok=false;
+      try { ok=document.execCommand("copy"); } catch(e){}
+      document.body.removeChild(ta);
+      if (ok) { done(); return; }
+      try { var r=document.createRange(); r.selectNodeContents(el("out-code"));
+            var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch(e){}
+      btn.textContent = "Código selecionado — copie manualmente";
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fb);
+    else fb();
+  });
+
+  el("btn-apurar").addEventListener("click", function(){
+    var achados = (el("f-codigos").value.match(/MEN1-[A-Za-z0-9_-]+/g) || []);
+    var fichas = [], ruins = 0;
+    achados.forEach(function(c){
+      var d; try { d = decode(c.slice(5)); } catch(e){ ruins++; return; }
+      if (!d || !d.m) { ruins++; return; }
+      fichas.push(d);
+    });
+    var msg = el("apurar-msg");
+    if (!fichas.length) {
+      msg.textContent = achados.length ? "Encontrei " + achados.length + " código(s) ilegível(is)."
+                                       : "Nenhum código encontrado. Cole ao menos um que comece com MEN1-.";
+      el("resultado").innerHTML = ""; return;
+    }
+    msg.textContent = fichas.length + " mentoria(s) juntada(s)" + (ruins ? " · " + ruins + " ilegível(is)" : "") + ".";
+
+    var html = '<div class="card"><h2>Mentores ouvidos</h2><div class="chips">' +
+      fichas.map(function(f){
+        var a = AREAS.filter(function(x){ return x.id===f.a; })[0];
+        return '<span class="chip">' + esc(f.m) + (a ? " · " + esc(a.name) : "") + "</span>"; }).join("") +
+      "</div>";
+
+    var vc = VEREDITOS.map(function(v){
+      return { name:v.name, n: fichas.filter(function(f){ return f.v===v.id; }).length }; })
+      .filter(function(x){ return x.n; });
+    if (vc.length) {
+      html += '<h3 style="font-family:var(--f-display);font-size:1rem;margin:1.2rem 0 .5rem">O que eles acharam</h3><div class="chips">' +
+        vc.map(function(x){ return '<span class="chip">' + esc(x.name) + " · " + x.n + "</span>"; }).join("") + "</div>";
+    }
+    html += "</div>";
+
+    // Respostas agrupadas por pergunta — é assim que o padrão aparece
+    TODAS.forEach(function(q){
+      var com = fichas.filter(function(f){ return f.r && f.r[q.id]; });
+      if (!com.length) return;
+      html += '<div class="card"><h2 style="font-size:1.05rem">' + esc(q.ask) + "</h2>" +
+        com.map(function(f){
+          return '<blockquote class="quote">' + esc(f.r[q.id]) + "<cite>" + esc(f.m) + "</cite></blockquote>"; }).join("") +
+        "</div>";
+    });
+
+    var extras = fichas.filter(function(f){ return f.x; });
+    html += '<div class="card"><h2>O que não cabia nas perguntas</h2>' +
+      (extras.length ? extras.map(function(f){
+        return '<blockquote class="quote">' + esc(f.x) + "<cite>" + esc(f.m) + "</cite></blockquote>"; }).join("")
+        : '<p class="empty">Nada anotado aqui ainda.</p>') + "</div>";
+
+    el("resultado").innerHTML = html;
+    el("resultado").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+})();
+</script>

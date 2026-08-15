@@ -1,0 +1,311 @@
+<title>Pesquisa com Mulheres</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --peach-deep:#EFC4A8;
+    --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:17px; line-height:1.6; -webkit-text-size-adjust:100%; }
+  .wrap { max-width:40rem; margin:0 auto; padding:1.5rem 1.1rem 5rem; }
+
+  .eyebrow { font-size:.71rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-soft);
+             font-weight:700; margin:.5rem 0 .5rem; }
+  h1 { font-family:var(--f-display); font-size:clamp(1.9rem,6.5vw,2.5rem); line-height:1.08; margin:0 0 .6rem;
+       letter-spacing:-.02em; text-wrap:balance; color:var(--petrol-deep); }
+  .lede { font-size:1.05rem; color:var(--ink-soft); margin:0 0 1.5rem; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1.05rem;
+          padding:1.3rem 1.15rem; margin-bottom:1rem; box-shadow:0 1px 3px var(--shadow); }
+  .card > h2 { font-family:var(--f-display); font-size:1.18rem; margin:0 0 .6rem; letter-spacing:-.014em;
+               text-wrap:balance; line-height:1.24; }
+  .card p { margin:0 0 .8rem; }
+  .card p:last-child { margin-bottom:0; }
+
+  .abertura { background:var(--petrol-wash); border-color:var(--petrol-soft); }
+  .abertura h2 { color:var(--petrol-deep); }
+  .abertura strong { color:var(--petrol-deep); }
+
+  .bloco-tag { display:inline-block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+               font-weight:750; color:var(--surface); background:var(--petrol-mid);
+               padding:.2rem .65rem; border-radius:999px; margin-bottom:.8rem; }
+
+  .q { border-top:1px solid var(--line-soft); padding-top:1.05rem; margin-top:1.05rem; }
+  .q:first-of-type { border-top:0; padding-top:0; margin-top:0; }
+  .q .ask { font-family:var(--f-display); font-size:1.03rem; font-weight:650; margin:0 0 .6rem; line-height:1.32; }
+
+  textarea, input[type="text"] { width:100%; font-family:var(--f-body); font-size:1rem; padding:.7rem .8rem;
+    border-radius:.65rem; border:1.5px solid var(--line); background:var(--cream); color:var(--ink); resize:vertical; }
+  textarea:focus, input[type="text"]:focus { outline:none; border-color:var(--petrol-deep);
+    box-shadow:0 0 0 3px var(--petrol-wash); }
+
+  .campo { margin-bottom:1.25rem; }
+  .campo:last-child { margin-bottom:0; }
+  .campo > .rotulo { display:block; font-size:.95rem; font-weight:650; margin-bottom:.5rem; }
+
+  .opts { display:flex; flex-wrap:wrap; gap:.45rem; }
+  .opt { display:flex; gap:.45rem; align-items:center; padding:.55rem .85rem; border:1.5px solid var(--line);
+         border-radius:999px; cursor:pointer; background:var(--cream); font-size:.92rem; font-weight:600; }
+  .opt:has(input:checked) { border-color:var(--petrol-deep); background:var(--petrol-wash); }
+  .opt:has(input:focus-visible) { outline:3px solid var(--coral); outline-offset:2px; }
+  .opt input { accent-color:var(--petrol-deep); margin:0; }
+  .compl { margin-top:.6rem; }
+
+  .btn { font-family:var(--f-body); font-size:1.02rem; font-weight:650; padding:.95rem 1.4rem; border-radius:.8rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .btn-row { display:flex; gap:.6rem; margin-top:.8rem; }
+  .form-error { background:var(--peach); color:var(--coral); font-size:.92rem; font-weight:600;
+                padding:.75rem .9rem; border-radius:.7rem; margin:.8rem 0 0; }
+  .copia-ok { background:var(--good); color:#fff; border-radius:.7rem; padding:.8rem .9rem;
+              font-size:.94rem; font-weight:600; margin:.8rem 0 0; }
+  .copia-ok.erro { background:var(--coral); }
+
+  .fim { background:var(--mint); border-color:var(--good); text-align:center; }
+  .fim h2 { color:var(--good); font-size:1.4rem; }
+  .ajuda { background:var(--peach); border:1px solid var(--peach-deep); border-radius:.85rem;
+           padding:.9rem 1rem; font-size:.94rem; margin-top:1rem; text-align:left; }
+  .ajuda strong { color:var(--coral); }
+  .equipe { border-top:1px dashed var(--line); margin-top:1.4rem; padding-top:1.1rem; }
+  .equipe .rotulo-eq { font-size:.78rem; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
+                       color:var(--ink-soft); margin:0 0 .6rem; }
+  [hidden] { display:none !important; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+
+<div class="wrap" id="tela-form">
+  <p class="eyebrow">Startup Weekend Women · Lages · Agosto de 2026</p>
+  <h1>Pesquisa com Mulheres</h1>
+  <p class="lede">Sua opinião sobre segurança. Leva uns 3 minutos.</p>
+
+  <div class="card abertura">
+    <h2>Antes de começar</h2>
+    <p>Somos uma equipe de um evento de tecnologia aqui em Lages, criando uma ideia para segurança de mulheres. Queremos saber o que você pensa.</p>
+    <p><strong>Você não precisa se identificar.</strong> Não pedimos seu nome, seu telefone nem seu endereço, e não perguntamos nada sobre a sua vida pessoal.</p>
+    <p>Se alguma pergunta não fizer sentido para você, pode deixar em branco e seguir.</p>
+  </div>
+
+  <div class="card">
+    <span class="bloco-tag">Sobre você</span>
+    <div id="perfil"></div>
+  </div>
+
+  <div class="card"><span class="bloco-tag">1 · Para começar</span><div id="b1"></div></div>
+  <div class="card"><span class="bloco-tag">2 · O que você já conhece</span><div id="b2"></div></div>
+  <div class="card"><span class="bloco-tag">3 · Pedir ajuda sem poder falar</span><div id="b3"></div></div>
+  <div class="card"><span class="bloco-tag">4 · Seu celular</span><div id="b4"></div></div>
+  <div class="card"><span class="bloco-tag">5 · O que você acha da ideia</span><div id="b5"></div></div>
+
+  <button class="btn" id="btn-concluir">Concluir</button>
+  <p class="form-error" id="erro" role="alert" hidden></p>
+</div>
+
+<div class="wrap" id="tela-fim" hidden>
+  <div class="card fim">
+    <h2>Obrigado por responder</h2>
+    <p>Sua opinião vai ajudar a construir algo que sirva de verdade.</p>
+    <div class="ajuda">
+      <p style="margin:0"><strong>Se você ou alguém que você conhece estiver precisando de ajuda:</strong> ligue <strong>180</strong>. É gratuito, funciona 24 horas, não precisa dizer o nome, e também atende por WhatsApp no <strong>(61) 9610-0180</strong>.</p>
+    </div>
+    <div class="equipe">
+      <p class="rotulo-eq">Para a equipe</p>
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn" id="btn-copiar">Copiar respostas</button>
+        <button class="btn ghost" id="btn-voltar">Voltar</button>
+      </div>
+      <p class="copia-ok" id="copia-ok" role="status" hidden></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var PERFIL = [
+    { id:"idade", rotulo:"Sua idade",
+      opcoes:["Até 17","18 a 24","25 a 39","40 a 59","60 ou mais","Prefiro não dizer"] },
+    { id:"etnia", rotulo:"Cor ou raça",
+      opcoes:["Branca","Preta","Parda","Amarela","Indígena","Prefiro não dizer"] },
+    { id:"civil", rotulo:"Estado civil",
+      opcoes:["Solteira","Casada ou em união estável","Separada ou divorciada","Viúva","Prefiro não dizer"] },
+    { id:"renda", rotulo:"Renda da família por mês",
+      opcoes:["Sem renda própria","Até 1 salário mínimo","1 a 2 salários","2 a 5 salários","Mais de 5 salários","Prefiro não dizer"] },
+    { id:"religiao", rotulo:"Religião",
+      opcoes:["Católica","Evangélica","Espírita","Umbanda ou Candomblé","Outra","Não tenho religião","Prefiro não dizer"] },
+    { id:"cidade", rotulo:"Cidade onde você mora", tipo:"texto", placeholder:"Ex.: Lages" }
+  ];
+
+  var BLOCOS = {
+    "b1": [
+      { id:"p1", tipo:"texto", ask:"O que você entende por violência doméstica?" },
+      { id:"p2", tipo:"opcoes", ask:"Você conhece alguém que já passou por isso?",
+        opcoes:["Sim","Não","Prefiro não dizer"] },
+      { id:"p3", tipo:"texto", ask:"Na sua opinião, por que uma mulher demora tanto para pedir ajuda?" },
+      { id:"p4", tipo:"texto", ask:"Se uma amiga estivesse passando por isso, quem você indicaria para que ela procurasse?" }
+    ],
+    "b2": [
+      { id:"p5", tipo:"opcoes", ask:"Você já ouviu falar do Sinal Vermelho, o X vermelho na mão para pedir ajuda?",
+        opcoes:["Sim","Não"] },
+      { id:"p6", tipo:"opcoes", ask:"Se houvesse um botão de emergência a sua disposição, você acha que viria ajuda?",
+        opcoes:["Viria","Talvez","Não viria"] }
+    ],
+    "b3": [
+      { id:"p7", tipo:"texto", ask:"Se uma mulher precisasse pedir socorro e não pudesse pegar o celular, o que ela poderia fazer?" },
+      { id:"p8", tipo:"opcoes", ask:"Você falaria uma palavra secreta, escolhida por você, em voz alta, para pedir ajuda, se soubesse que isso acionaria um mecanismo de socorro, mesmo sabendo que o agressor poderia ouvir?",
+        opcoes:["Sim","Não","Depende"] },
+      { id:"p10", tipo:"opcoes", ask:"E se falar em voz alta pudesse deixar a pessoa mais brava, você ainda falaria?",
+        opcoes:["Sim","Não","Não sei"] },
+      { id:"p11", tipo:"texto", ask:"Que palavra você escolheria para pedir socorro sem ninguém desconfiar?" }
+    ],
+    "b4": [
+      { id:"p12", tipo:"opcoes", ask:"Seu celular fica com você o tempo todo?",
+        opcoes:["Sim, sempre","Quase sempre","Não"] },
+      { id:"p13", tipo:"opcoes", ask:"Alguém além de você mexe no seu celular?",
+        opcoes:["Não","Às vezes","Sim"] },
+      { id:"p14", tipo:"opcoes", ask:"Alguém sabe a sua senha?",
+        opcoes:["Não","Sim"] }
+    ],
+    "b5": [
+      { id:"p15", tipo:"opcoes", ask:"Você instalaria no seu celular um aplicativo dado pela polícia ou pela prefeitura?",
+        opcoes:["Sim","Não","Depende"] },
+      { id:"p16", tipo:"opcoes", ask:"Se esse aplicativo pudesse ouvir o som vindo de sua casa para chamar socorro, isso te daria segurança ou te incomodaria?",
+        opcoes:["Segurança","Incomoda","Os dois"] },
+      { id:"p17", tipo:"texto", ask:"Por quê?" },
+      { id:"p18", tipo:"opcoes", ask:"E se ele ficasse disfarçado de calculadora na tela, muda alguma coisa para você?",
+        opcoes:["Melhora","Não muda","Piora"] },
+      { id:"p19", tipo:"texto", ask:"Tem alguma coisa que você acha que a gente deixou de perguntar?" }
+    ]
+  };
+
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function encode(o){ var b=new TextEncoder().encode(JSON.stringify(o)),s="";
+    for(var i=0;i<b.length;i++) s+=String.fromCharCode(b[i]);
+    return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+  function radioVal(n){ var e=document.querySelector('input[name="'+n+'"]:checked'); return e?e.value:""; }
+
+  // ---- perfil ----
+  el("perfil").innerHTML = PERFIL.map(function(c){
+    if (c.tipo === "texto") {
+      return '<div class="campo"><span class="rotulo">' + esc(c.rotulo) + "</span>" +
+             '<input type="text" id="pf-' + c.id + '" placeholder="' + esc(c.placeholder||"") + '"></div>';
+    }
+    return '<div class="campo"><span class="rotulo">' + esc(c.rotulo) + '</span><div class="opts">' +
+      c.opcoes.map(function(o){
+        return '<label class="opt"><input type="radio" name="pf-' + c.id + '" value="' + esc(o) + '">' + esc(o) + "</label>";
+      }).join("") + "</div></div>";
+  }).join("");
+
+  // ---- perguntas ----
+  var TODAS = [];
+  Object.keys(BLOCOS).forEach(function(alvo){
+    el(alvo).innerHTML = BLOCOS[alvo].map(function(q){
+      TODAS.push(q);
+      var campo = q.tipo === "opcoes"
+        ? '<div class="opts">' + q.opcoes.map(function(o){
+            return '<label class="opt"><input type="radio" name="' + q.id + '" value="' + esc(o) + '">' + esc(o) + "</label>";
+          }).join("") + '</div><textarea class="compl" id="r-' + q.id + '" rows="2" placeholder="Quer explicar? (opcional)"></textarea>'
+        : '<textarea id="r-' + q.id + '" rows="3" placeholder="Escreva do seu jeito"></textarea>';
+      return '<div class="q"><p class="ask">' + esc(q.ask) + "</p>" + campo + "</div>";
+    }).join("");
+  });
+
+  function coletar(){
+    var perfil = {};
+    PERFIL.forEach(function(c){
+      var v = c.tipo === "texto" ? (el("pf-"+c.id).value.trim()) : radioVal("pf-"+c.id);
+      if (v) perfil[c.id] = v;
+    });
+    var r = {};
+    TODAS.forEach(function(q){
+      var t = el("r-"+q.id), livre = t ? t.value.trim() : "";
+      var op = q.tipo === "opcoes" ? radioVal(q.id) : "";
+      if (op || livre) r[q.id] = op ? (livre ? op + " — " + livre : op) : livre;
+    });
+    // Mesmo formato da aba Juntar da Pesquisa de Campo. Sem nome, sem contato.
+    return { k:"pub", q:"", l:perfil.cidade || "", i:perfil.idade || "", dm:perfil, r:r };
+  }
+
+  function textoSimples(d){
+    var t = "PESQUISA COM MULHERES — Mulheres em Risco\nStartup Weekend Women · Lages, agosto de 2026\n\nPERFIL\n";
+    PERFIL.forEach(function(c){ if (d.dm[c.id]) t += c.rotulo + ": " + d.dm[c.id] + "\n"; });
+    t += "\nRESPOSTAS\n";
+    Object.keys(BLOCOS).forEach(function(b){
+      BLOCOS[b].forEach(function(q){
+        if (d.r[q.id]) t += "\n" + q.ask + "\n" + d.r[q.id] + "\n";
+      });
+    });
+    return t + "\nCÓDIGO\nPUB1-" + encode(d) + "\n";
+  }
+
+  function erro(txt){
+    var b = el("erro");
+    if (!txt) { b.hidden = true; b.textContent = ""; return; }
+    b.textContent = txt; b.hidden = false;
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+
+  var ultimo = null;
+
+  el("btn-concluir").addEventListener("click", function(){
+    var d = coletar();
+    if (!Object.keys(d.r).length) { erro("Responda ao menos uma pergunta antes de concluir."); return; }
+    erro("");
+    ultimo = d;
+    el("tela-form").hidden = true;
+    el("tela-fim").hidden = false;
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
+
+  el("btn-voltar").addEventListener("click", function(){
+    el("tela-fim").hidden = true;
+    el("tela-form").hidden = false;
+    el("copia-ok").hidden = true;
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
+
+  el("btn-copiar").addEventListener("click", function(){
+    if (!ultimo) return;
+    var aviso = el("copia-ok"), txt = textoSimples(ultimo);
+
+    function confirmar(){
+      aviso.className = "copia-ok";
+      aviso.textContent = "Respostas copiadas. Cole no grupo do time.";
+      aviso.hidden = false;
+    }
+    function pedirManual(){
+      aviso.className = "copia-ok erro";
+      aviso.textContent = "Não foi possível copiar sozinho. Toque e segure no texto para copiar à mão.";
+      aviso.hidden = false;
+    }
+    function tentarAntigo(){
+      var ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var deu = false;
+      try { deu = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (deu) confirmar(); else pedirManual();
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      var decidido = false;
+      var relogio = setTimeout(function(){ if (!decidido) { decidido = true; tentarAntigo(); } }, 1500);
+      navigator.clipboard.writeText(txt).then(
+        function(){ if (!decidido) { decidido = true; clearTimeout(relogio); confirmar(); } },
+        function(){ if (!decidido) { decidido = true; clearTimeout(relogio); tentarAntigo(); } }
+      );
+    } else { tentarAntigo(); }
+  });
+})();
+</script>

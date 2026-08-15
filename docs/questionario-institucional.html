@@ -1,0 +1,398 @@
+<title>Questionário Institucional</title>
+<style>
+  :root {
+    color-scheme: light;
+    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
+    --line:#E4D2B7; --line-soft:#EFE0C9;
+    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
+    --coral:#AE432B; --peach:#F9DFD1; --peach-deep:#EFC4A8;
+    --good:#387043; --mint:#DCEDE2;
+    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
+    --f-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI Variable", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
+         font-size:16.5px; line-height:1.62; -webkit-text-size-adjust:100%; }
+  .wrap { max-width:44rem; margin:0 auto; padding:1.6rem 1.1rem 6rem; }
+
+  .eyebrow { font-size:.71rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-soft);
+             font-weight:700; margin:.6rem 0 .5rem; }
+  h1 { font-family:var(--f-display); font-size:clamp(1.9rem,6.5vw,2.6rem); line-height:1.08; margin:0 0 .6rem;
+       letter-spacing:-.02em; text-wrap:balance; color:var(--petrol-deep); }
+  .lede { font-size:1.03rem; color:var(--ink-soft); margin:0 0 1.6rem; max-width:34rem; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:1.05rem;
+          padding:1.35rem 1.2rem; margin-bottom:1rem; box-shadow:0 1px 3px var(--shadow); }
+  .card > h2 { font-family:var(--f-display); font-size:1.2rem; margin:0 0 .65rem; letter-spacing:-.014em;
+               text-wrap:balance; line-height:1.24; }
+  .card p { margin:0 0 .85rem; }
+  .card p:last-child { margin-bottom:0; }
+  .sub { font-size:.88rem; color:var(--ink-soft); margin:-.35rem 0 1rem !important; }
+
+  .abertura { background:var(--petrol-wash); border-color:var(--petrol-soft); }
+  .abertura h2 { color:var(--petrol-deep); }
+
+  .bloco-num { display:inline-block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+               font-weight:750; color:var(--surface); background:var(--petrol-mid);
+               padding:.2rem .65rem; border-radius:999px; margin-bottom:.75rem; }
+
+  .nota { background:var(--cream-deep); border-radius:.75rem; padding:.75rem .85rem;
+          font-size:.9rem; color:var(--ink-soft); margin:0 0 1.1rem; border:1px solid var(--line-soft); }
+
+  .q { border-top:1px solid var(--line-soft); padding-top:1.05rem; margin-top:1.05rem; }
+  .q:first-of-type { border-top:0; padding-top:0; margin-top:0; }
+  .q .ask { font-family:var(--f-display); font-size:1.02rem; font-weight:650; margin:0 0 .55rem; line-height:1.32; }
+  .q .ask span.n { font-family:var(--f-mono); font-size:.78rem; color:var(--petrol-mid); margin-right:.4rem; }
+  textarea, input[type="text"] { width:100%; font-family:var(--f-body); font-size:.96rem; padding:.65rem .8rem;
+    border-radius:.65rem; border:1.5px solid var(--line); background:var(--cream); color:var(--ink); resize:vertical; }
+  textarea:focus, input[type="text"]:focus { outline:none; border-color:var(--petrol-deep);
+    box-shadow:0 0 0 3px var(--petrol-wash); }
+  label.campo { display:block; margin-bottom:.85rem; }
+  label.campo:last-child { margin-bottom:0; }
+  label.campo span { display:block; font-size:.87rem; color:var(--ink-soft); margin-bottom:.3rem; }
+
+  .btn { font-family:var(--f-body); font-size:1rem; font-weight:650; padding:.9rem 1.4rem; border-radius:.8rem;
+         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
+  .btn:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
+  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
+  .btn-row { display:flex; gap:.6rem; margin-top:.8rem; }
+  .form-error { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
+                padding:.7rem .85rem; border-radius:.7rem; margin:.7rem 0 0; }
+  .code-box { font-family:var(--f-mono); font-size:.78rem; line-height:1.5; background:var(--petrol-wash);
+              border:1.5px dashed var(--petrol-mid); border-radius:.8rem; padding:.9rem;
+              overflow-wrap:anywhere; user-select:all; }
+  .copia-ok { background:var(--good); color:#fff; border-radius:.7rem; padding:.75rem .9rem;
+              font-size:.94rem; font-weight:600; margin:.8rem 0 0 !important; }
+  .copia-ok.erro { background:var(--coral); }
+  .passos { margin:0; padding-left:1.15rem; }
+  .passos li { margin-bottom:.45rem; font-size:.94rem; }
+  .passos li:last-child { margin-bottom:0; }
+  [hidden] { display:none !important; }
+  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
+
+  /* ---------- documento pronto para impressão / PDF ---------- */
+  .doc-cabecalho { border-bottom:2px solid var(--petrol-deep); padding-bottom:.9rem; margin-bottom:1.2rem; }
+  .doc-cabecalho h2 { margin:0 0 .2rem; font-size:1.35rem; color:var(--petrol-deep); }
+  .doc-cabecalho .evento { font-size:.88rem; color:var(--ink-soft); margin:0; }
+  .doc-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(12rem,1fr)); gap:.5rem 1.2rem; margin-bottom:1.4rem; }
+  .doc-meta div { font-size:.9rem; }
+  .doc-meta b { display:block; font-size:.74rem; letter-spacing:.07em; text-transform:uppercase;
+                color:var(--ink-soft); font-weight:700; margin-bottom:.1rem; }
+  .doc-bloco { font-size:.76rem; letter-spacing:.09em; text-transform:uppercase; font-weight:750;
+               color:var(--petrol-deep); margin:1.5rem 0 .7rem; padding-bottom:.25rem;
+               border-bottom:1px solid var(--line); }
+  .doc-q { margin-bottom:1rem; break-inside:avoid; }
+  .doc-q .p { font-weight:650; margin:0 0 .25rem; font-size:.97rem; }
+  .doc-q .r { margin:0; font-size:.95rem; white-space:pre-wrap; padding-left:.85rem;
+              border-left:2.5px solid var(--petrol-soft); }
+  .doc-q .r.vazia { color:var(--ink-soft); font-style:italic; border-left-color:var(--line); }
+  .doc-rodape { margin-top:1.6rem; padding-top:.8rem; border-top:1px solid var(--line);
+                font-size:.8rem; color:var(--ink-soft); }
+
+  @media print {
+    @page { margin:1.8cm; }
+    body { background:#fff !important; color:#000 !important; font-size:11.5pt; }
+    .wrap { max-width:none; padding:0; }
+    .nao-imprimir { display:none !important; }
+    .card { border:0 !important; box-shadow:none !important; background:#fff !important;
+            padding:0 !important; margin:0 !important; }
+    .doc-cabecalho { border-bottom:2px solid #000; }
+    .doc-cabecalho h2, .doc-bloco { color:#000 !important; }
+    .doc-q .r { border-left:2px solid #999; }
+    .doc-q .r.vazia { color:#666; }
+    a[href]:after { content:"" !important; }
+  }
+</style>
+
+<div class="wrap nao-imprimir" id="tela-form">
+  <p class="eyebrow">Startup Weekend Women · Lages · Agosto de 2026</p>
+  <h1>Questionário Institucional</h1>
+  <p class="lede">Dezoito perguntas sobre atendimento à mulher em situação de violência. Leva cerca de 15 minutos.</p>
+
+  <div class="card abertura">
+    <h2>Quem somos e por que estamos perguntando</h2>
+    <p>Somos uma equipe do <strong>Startup Weekend Women</strong>, evento de empreendedorismo realizado em Lages entre 14 e 16 de agosto de 2026, no Orion Parque Tecnológico.</p>
+    <p>Estamos desenvolvendo uma proposta de tecnologia para proteção de mulheres em situação de violência doméstica, e queremos construí-la a partir da realidade de quem atende essas mulheres todos os dias — e não a partir de suposições nossas.</p>
+    <p>Nenhuma pergunta pede dado pessoal de vítima, nome, endereço ou informação sigilosa de processo. Se alguma questão não puder ser respondida, deixe em branco sem problema.</p>
+    <p>Se preferir responder por telefone ou pessoalmente, é melhor ainda — nos avise e vamos até vocês.</p>
+  </div>
+
+  <div class="card">
+    <h2>Identificação</h2>
+    <label class="campo"><span>Órgão ou instituição</span><input type="text" id="f-orgao" placeholder="Ex.: Delegacia de Proteção à Mulher de Lages"></label>
+    <label class="campo"><span>Quem está respondendo</span><input type="text" id="f-pessoa" placeholder="Nome e cargo"></label>
+    <label class="campo"><span>Contato para retorno (opcional)</span><input type="text" id="f-contato" placeholder="Telefone ou e-mail"></label>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 1 · O atendimento hoje</span>
+    <div id="b1"></div>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 2 · Sobre um alerta automático</span>
+    <p class="nota">Para as perguntas deste bloco: estamos estudando um sistema em que o próprio celular da vítima envia um alerta automático — com localização e som do ambiente — para uma central, sem que ela precise ligar, digitar ou segurar o aparelho.</p>
+    <div id="b2"></div>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 3 · Quem seria atendida primeiro</span>
+    <div id="b3"></div>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 4 · O áudio como prova</span>
+    <div id="b4"></div>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 5 · A realidade da vítima</span>
+    <div id="b5"></div>
+  </div>
+
+  <div class="card">
+    <span class="bloco-num">Bloco 6 · Continuidade</span>
+    <div id="b6"></div>
+  </div>
+
+  <div class="card">
+    <h2>Algo que não perguntamos e o senhor ou a senhora considera importante?</h2>
+    <label class="campo"><textarea id="f-extra" rows="4" placeholder="Fique à vontade"></textarea></label>
+  </div>
+
+  <button class="btn" id="btn-gerar">Concluir e revisar respostas</button>
+  <p class="form-error" id="gerar-erro" role="alert" hidden></p>
+</div>
+
+<!-- ============ documento pronto ============ -->
+<div class="wrap" id="tela-doc" hidden>
+  <div class="card nao-imprimir" style="background:var(--mint);border-color:var(--good)">
+    <h2 style="color:var(--good)">Questionário concluído</h2>
+    <p class="sub" id="doc-msg"></p>
+    <ol class="passos">
+      <li>Toque em <strong>Copiar respostas</strong>.</li>
+      <li>Cole no WhatsApp ou responda o e-mail que lhe encaminhou este questionário.</li>
+    </ol>
+    <div class="btn-row">
+      <button class="btn" id="btn-copiar-texto">Copiar respostas</button>
+      <button class="btn ghost" id="btn-voltar">Voltar e revisar</button>
+    </div>
+    <p class="copia-ok" id="copia-ok" role="status" hidden></p>
+    <p class="sub" style="margin-top:1rem !important">Nada é enviado automaticamente e nada fica guardado em servidor — as respostas só saem daqui quando o senhor ou a senhora colar e enviar.</p>
+    <p class="sub" style="margin-top:.6rem !important">Se preferir um arquivo PDF, use a impressão do próprio navegador — <strong>Ctrl+P</strong> no Windows ou <strong>Cmd+P</strong> no Mac — e escolha “Salvar como PDF”. O documento abaixo já está formatado para isso.</p>
+  </div>
+
+  <div class="card" id="documento"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var BLOCOS = {
+    "b1": [
+      { id:"o1", ask:"Quantas mulheres o órgão atende por mês? E quantas estão com medida protetiva em vigor atualmente?" },
+      { id:"o2", ask:"Quando uma mulher está em perigo, no exato momento, o que ela deve fazer? Qual é o caminho mais indicado?" },
+      { id:"o3", ask:"Do pedido de socorro até alguém chegar à porta, quanto tempo costuma levar?" },
+      { id:"o4", ask:"Qual a falha mais acentuada durante o processo?" }
+    ],
+    "b2": [
+      { id:"o5", ask:"Se chegasse um alerta automático, com localização e áudio ao vivo, quem receberia? Existe alguém 24 horas?" },
+      { id:"o6", ask:"Quantos alertas por dia esse canal aguenta antes de virar problema?" },
+      { id:"o7", ask:"O que acontece hoje, quando o chamado é falso? Sobra alguma consequência para o(a) reclamante?" }
+    ],
+    "b3": [
+      { id:"o8", ask:"Se houvesse 50 aparelhos disponíveis para Lages, quem decidiria quais mulheres recebem, e com base em quê?" },
+      { id:"o9", ask:"Existe hoje alguma classificação de risco? Como ela é feita?" },
+      { id:"o10", ask:"Uma mulher sem boletim de ocorrência entraria nessa lista?" }
+    ],
+    "b4": [
+      { id:"o11", ask:"Um áudio gravado, no momento da agressão, com data e hora, ajuda no processo?" },
+      { id:"o12", ask:"O que costuma invalidar uma prova dessas?" },
+      { id:"o13", ask:"Guardar o áudio pode virar risco para a vítima em algum momento?" }
+    ],
+    "b5": [
+      { id:"o14", ask:"Na experiência do órgão, no momento da agressão a vítima consegue falar? Gritar? Pedir socorro em voz alta?" },
+      { id:"o15", ask:"Ela costuma estar com o celular por perto? O agressor controla o telefone dela?" },
+      { id:"o16", ask:"A vítima confiaria em algo instalado pela polícia ou pela prefeitura no celular dela?" }
+    ],
+    "b6": [
+      { id:"o17", ask:"Vocês topariam testar esse sistema conosco?" },
+      { id:"o18", ask:"Quem seriam as demais pessoas com quem deveríamos explanar tais questionamentos?" }
+    ]
+  };
+
+  var TITULOS = {
+    b1:"Bloco 1 · O atendimento hoje",
+    b2:"Bloco 2 · Sobre um alerta automático",
+    b3:"Bloco 3 · Quem seria atendida primeiro",
+    b4:"Bloco 4 · O áudio como prova",
+    b5:"Bloco 5 · A realidade da vítima",
+    b6:"Bloco 6 · Continuidade"
+  };
+
+  var STORE = "org-quest-v1";
+
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  var TODAS = [], n = 0;
+  Object.keys(BLOCOS).forEach(function(alvo){
+    el(alvo).innerHTML = BLOCOS[alvo].map(function(q){
+      TODAS.push(q); n++; q.n = n; q.bloco = alvo;
+      return '<div class="q"><p class="ask"><span class="n">' + n + '.</span>' + esc(q.ask) + '</p>' +
+             '<textarea id="r-' + q.id + '" rows="3" placeholder="Sua resposta"></textarea></div>';
+    }).join("");
+  });
+
+  function coletar(){
+    var r = {};
+    TODAS.forEach(function(q){ var v = el("r-"+q.id).value.trim(); if (v) r[q.id] = v; });
+    // Mesmo formato dos outros formulários do time, para juntar tudo no mesmo lugar.
+    return { k:"org", q:el("f-pessoa").value.trim(), o:el("f-orgao").value.trim(),
+             p:el("f-pessoa").value.trim(), ct:el("f-contato").value.trim(),
+             x:el("f-extra").value.trim(), r:r };
+  }
+
+  (function restaurar(){
+    var raw; try { raw = localStorage.getItem(STORE); } catch(e){ return; }
+    if (!raw) return;
+    var d; try { d = JSON.parse(raw); } catch(e){ return; }
+    el("f-orgao").value = d.o||""; el("f-pessoa").value = d.p||"";
+    el("f-contato").value = d.ct||""; el("f-extra").value = d.x||"";
+    Object.keys(d.r||{}).forEach(function(k){ var t = el("r-"+k); if (t) t.value = d.r[k]; });
+  })();
+
+  function erro(txt, foco){
+    var b = el("gerar-erro");
+    if (!txt) { b.hidden = true; b.textContent = ""; return; }
+    b.textContent = txt; b.hidden = false;
+    if (foco) el(foco).focus();
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  ["f-orgao","f-pessoa"].forEach(function(id){ el(id).addEventListener("input", function(){ erro(""); }); });
+
+  function dataHoje(){
+    var d = new Date();
+    var meses = ["janeiro","fevereiro","março","abril","maio","junho",
+                 "julho","agosto","setembro","outubro","novembro","dezembro"];
+    return d.getDate() + " de " + meses[d.getMonth()] + " de " + d.getFullYear();
+  }
+
+  function montarDocumento(d){
+    var h = '<div class="doc-cabecalho">' +
+      "<h2>Questionário Institucional</h2>" +
+      '<p class="evento">Mulheres em Risco · Startup Weekend Women · Lages, agosto de 2026</p></div>';
+
+    h += '<div class="doc-meta">' +
+      "<div><b>Órgão</b>" + esc(d.o) + "</div>" +
+      (d.p ? "<div><b>Respondido por</b>" + esc(d.p) + "</div>" : "") +
+      (d.ct ? "<div><b>Contato</b>" + esc(d.ct) + "</div>" : "") +
+      "<div><b>Data</b>" + esc(dataHoje()) + "</div></div>";
+
+    Object.keys(BLOCOS).forEach(function(bloco){
+      h += '<p class="doc-bloco">' + esc(TITULOS[bloco]) + "</p>";
+      BLOCOS[bloco].forEach(function(q){
+        var resp = d.r[q.id];
+        h += '<div class="doc-q"><p class="p">' + q.n + ". " + esc(q.ask) + "</p>" +
+             (resp ? '<p class="r">' + esc(resp) + "</p>"
+                   : '<p class="r vazia">Não respondida.</p>') + "</div>";
+      });
+    });
+
+    if (d.x) {
+      h += '<p class="doc-bloco">Observações adicionais</p>' +
+           '<div class="doc-q"><p class="r">' + esc(d.x) + "</p></div>";
+    }
+
+    h += '<p class="doc-rodape">Respondido em ' + esc(dataHoje()) +
+         ". Documento gerado no próprio aparelho — nenhum dado foi transmitido ou armazenado em servidor.</p>";
+    return h;
+  }
+
+  function textoSimples(d){
+    var t = "QUESTIONÁRIO INSTITUCIONAL\n" +
+            "Mulheres em Risco · Startup Weekend Women · Lages, agosto de 2026\n\n" +
+            "Órgão: " + d.o + "\n" +
+            (d.p ? "Respondido por: " + d.p + "\n" : "") +
+            (d.ct ? "Contato: " + d.ct + "\n" : "") +
+            "Data: " + dataHoje() + "\n";
+    Object.keys(BLOCOS).forEach(function(bloco){
+      t += "\n\n## " + TITULOS[bloco] + "\n";
+      BLOCOS[bloco].forEach(function(q){
+        t += "\n" + q.n + ". " + q.ask + "\n" + (d.r[q.id] || "(não respondida)") + "\n";
+      });
+    });
+    if (d.x) t += "\n\n## Observações adicionais\n\n" + d.x + "\n";
+    return t;
+  }
+
+  var ultimo = null;
+
+  el("btn-gerar").addEventListener("click", function(){
+    var d = coletar();
+    if (!d.o) { erro("Informe o órgão ou instituição.", "f-orgao"); return; }
+    if (!Object.keys(d.r).length && !d.x) { erro("Responda ao menos uma pergunta antes de concluir."); return; }
+    erro("");
+    try { localStorage.setItem(STORE, JSON.stringify(d)); } catch(e){}
+    ultimo = d;
+    el("documento").innerHTML = montarDocumento(d);
+    el("doc-msg").textContent = Object.keys(d.r).length + " de " + TODAS.length + " perguntas respondidas.";
+    el("tela-form").hidden = true;
+    el("tela-doc").hidden = false;
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
+
+  el("btn-voltar").addEventListener("click", function(){
+    el("tela-doc").hidden = true;
+    el("tela-form").hidden = false;
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
+
+  // Alternativa ao PDF: copiar tudo como texto, para colar num e-mail.
+  el("btn-copiar-texto").addEventListener("click", function(){
+    if (!ultimo) return;
+    var aviso = el("copia-ok"), txt = textoSimples(ultimo);
+
+    function confirmar(){
+      aviso.className = "copia-ok";
+      aviso.textContent = "Respostas copiadas. Agora cole no WhatsApp ou no e-mail e envie.";
+      aviso.hidden = false;
+    }
+    function pedirManual(){
+      // Sem area de transferencia: seleciona o documento para copia manual.
+      try {
+        var r = document.createRange(); r.selectNodeContents(el("documento"));
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      } catch (e) {}
+      aviso.className = "copia-ok erro";
+      aviso.textContent = "Selecionamos o documento abaixo. Copie com Ctrl+C (ou Cmd+C) e cole no e-mail.";
+      aviso.hidden = false;
+    }
+    function tentarAntigo(){
+      var ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var deu = false;
+      try { deu = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (deu) confirmar(); else pedirManual();
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      // Se a promessa nao resolver em 1,5s, cai para o metodo antigo.
+      var decidido = false;
+      var relogio = setTimeout(function(){ if (!decidido) { decidido = true; tentarAntigo(); } }, 1500);
+      navigator.clipboard.writeText(txt).then(
+        function(){ if (!decidido) { decidido = true; clearTimeout(relogio); confirmar(); } },
+        function(){ if (!decidido) { decidido = true; clearTimeout(relogio); tentarAntigo(); } }
+      );
+    } else {
+      tentarAntigo();
+    }
+  });
+})();
+</script>
