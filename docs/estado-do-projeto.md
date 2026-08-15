@@ -34,9 +34,24 @@ identificadas como em risco.
 | `docs/questionario-institucional.html` | Para enviar à Delegacia responder |
 | `docs/questionario-mulheres.html` | Anônimo, para responder no celular do time |
 | `servidor/` | Node + MariaDB: formulário, banco e painel em `/admin` |
+| `servidor/alerts.js` | API do aparelho, da central e do Anjo, montada com 2 linhas de diff |
+| `servidor/publico/dispatch.html` | Central ao vivo: fila, trajeto, Anjos, linha do tempo |
+| `servidor/publico/guardian.html` | A página que o Anjo abre no celular dele |
+| `servidor/publico/enroll.html` | Cadastro da usuária e dos Anjos, com o código de vínculo |
+| `servidor/publico/simulator.html` | Finge ser o app — o seguro da demonstração |
+| `app-android/` | APK Kotlin: calculadora de fachada, Vosk offline, alerta com localização |
 
 O servidor foi testado com banco real e está no GitHub, pronto para subir na VPS.
 O passo a passo está em `servidor/README.md`.
+
+**O fluxo inteiro foi verificado ponta a ponta no navegador**, com a central recebendo o
+alerta em menos de um segundo, o trajeto se movendo, o Anjo abrindo o link e o "estou a
+caminho" voltando: 7 segundos entre o acionamento e o Anjo confirmar.
+
+**O APK compila e empacota corretamente, mas ainda não rodou num celular de verdade.** É a
+única lacuna que importa, e é onde aparecem o fabricante que mata serviço em segundo plano,
+o Play Protect e a qualidade real do reconhecimento na sala. Instalar na noite anterior,
+nunca no palco.
 
 ---
 
@@ -59,15 +74,31 @@ a resposta. Nossa ideia aumenta o volume de alarme.
 
 ---
 
+## O quarto risco, que só apareceu ao construir
+
+**O ponto verde do microfone.** No Android 12+, qualquer captura contínua de áudio acende o
+indicador de privacidade na barra de status e registra o uso no Painel de Privacidade. Isso
+vale para o Vosk, para o reconhecedor do Google e para qualquer outra abordagem — não existe
+contorno legítimo para um aplicativo comum.
+
+Um app disfarçado de calculadora com o ponto verde permanente é um disfarce com um furo
+permanente. Há duas saídas, e é preciso escolher uma antes do júri perguntar: assumir ("o
+disfarce protege do olhar casual, não da perícia") ou passar a escutar em janelas
+intermitentes, o que degrada exatamente a função central.
+
 ## Próximos passos
 
-1. **Levar as três perguntas acima à Delegacia da Mulher.** É a fonte que ninguém mais
+1. **Instalar o APK num celular Android de verdade e rodar o fluxo inteiro.** É a lacuna
+   que sobrou, e nenhuma outra validação a substitui.
+2. **Levar as três perguntas acima à Delegacia da Mulher.** É a fonte que ninguém mais
    tem, e um "sim, topamos testar" vale mais que qualquer slide.
-2. **Subir o servidor na VPS** e trocar o link do questionário pelo endereço próprio.
-3. **Aplicar a pesquisa com mulheres** — o painel destaca sozinho o percentual que não
+3. **Subir o servidor na VPS** e trocar o link do questionário pelo endereço próprio.
+   O `schema_alerts.sql` roda depois do `schema.sql`, e o nginx precisa de
+   `proxy_buffering off` para o alerta não chegar atrasado na tela.
+4. **Aplicar a pesquisa com mulheres** — o painel destaca sozinho o percentual que não
    falaria a palavra em voz alta. Acima de 40%, o gatilho de voz precisa ser repensado.
-4. **Decidir o nome de fachada** do app — o rótulo neutro que aparece na tela dela.
-   "Mulheres em Risco" é forte para o júri e perigoso para a tela inicial.
+5. **Decidir o nome de fachada** do app. Por ora está "Calculadora", que é o que a doc já
+   apontava; falta o logotipo e a decisão formal do time.
 
 ---
 
