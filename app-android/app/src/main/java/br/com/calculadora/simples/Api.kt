@@ -96,6 +96,32 @@ class Api(private val context: Context, private val settings: Settings) {
         post("/api/v1/alerts/$alertId/cancel", JSONObject().put("reason", "false_alarm")) != null
 
     /**
+     * Current status as the server sees it: open, in_progress, resolved or
+     * cancelled. Null when the answer could not be obtained.
+     *
+     * The device has to ask, because closing an occurrence happens on the
+     * console and nothing pushes that back down to the handset.
+     */
+    fun alertStatus(alertId: String): String? {
+        val request = Request.Builder()
+            .url(settings.serverUrl + "/api/v1/alerts/$alertId")
+            .apply { settings.deviceToken?.let { header("Authorization", "Bearer $it") } }
+            .build()
+        return try {
+            client.newCall(request).execute().use { response ->
+                // A vanished or foreign occurrence is as good as closed: either
+                // way this handset should stop considering itself blocked.
+                if (response.code == 404 || response.code == 403) return "resolved"
+                if (!response.isSuccessful) return null
+                JSONObject(response.body?.string().orEmpty()).optString("status").ifEmpty { null }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "status do alerta falhou: ${e.javaClass.simpleName}")
+            null
+        }
+    }
+
+    /**
      * Sends positions, queueing them on disk when the network is gone.
      *
      * Every point carries the instant it was recorded, so a batch that only

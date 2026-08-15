@@ -26,6 +26,9 @@ private const val SAMPLE_RATE = 16000
 interface KeywordDetector {
     fun start(phrase: String, onDetected: () -> Unit)
     fun stop()
+
+    /** Clears the anti-repeat window so the next phrase fires immediately. */
+    fun rearm()
 }
 
 /**
@@ -51,6 +54,8 @@ class VoskKeywordDetector(private val context: Context) : KeywordDetector {
         if (running.getAndSet(true)) return
         thread = Thread { loop(phrase, onDetected) }.apply { isDaemon = true; start() }
     }
+
+    override fun rearm() { lastFired = 0L }
 
     override fun stop() {
         running.set(false)

@@ -13,6 +13,8 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "calc"
 private const val CHANNEL_ID = "sync"
@@ -33,6 +35,8 @@ class ListenerService : Service() {
     private lateinit var tracker: LocationTracker
     private var detector: KeywordDetector? = null
     private val worker = Executors.newSingleThreadExecutor()
+    private val monitor = Executors.newSingleThreadScheduledExecutor()
+    private var watcher: ScheduledFuture<*>? = null
     private var alert: AlertHandle? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -52,6 +56,7 @@ class ListenerService : Service() {
         }
         startForegroundListening()
         if (settings.isReady && detector == null) startDetector()
+        resumeIfOpen()
         return START_STICKY
     }
 
@@ -138,18 +143,61 @@ class ListenerService : Service() {
             promoteToLocation()
             broadcastState()
             tracker.start { position -> worker.execute { api.sendPositions(handle.id, listOf(position)) } }
+            watchUntilClosed(handle.id)
         }
+    }
+
+    /**
+     * Asks the server whether the occurrence is still open.
+     *
+     * The console is what closes an occurrence, and nothing pushes that back
+     * down here. Without this the handset stays convinced an alert is still
+     * running and refuses to open the next one — she says the phrase again
+     * and nothing happens, which is the worst possible failure for this
+     * product.
+     */
+    private fun watchUntilClosed(alertId: String) {
+        watcher?.cancel(false)
+        watcher = monitor.scheduleWithFixedDelay({
+            val status = api.alertStatus(alertId)
+            if (status == "resolved" || status == "cancelled") clearAlert()
+        }, 10, 10, TimeUnit.SECONDS)
+    }
+
+    private fun clearAlert() {
+        alert = null
+        settings.activeAlertId = null
+        settings.cancelUntil = 0
+        watcher?.cancel(false)
+        watcher = null
+        tracker.stop()
+        // Frees the anti-repeat window too: once an occurrence is closed, the
+        // next cry for help must not wait on a timer meant to swallow echoes
+        // of the previous one.
+        detector?.rearm()
+        broadcastState()
+        Log.i(TAG, "ocorrência encerrada; escutando de novo")
     }
 
     private fun cancelAlert() {
         val current = alert ?: return
+        worker.execute { if (api.cancelAlert(current.id)) clearAlert() }
+    }
+
+    /** Recovers after the app was killed with an occurrence still open. */
+    private fun resumeIfOpen() {
+        val pending = settings.activeAlertId ?: return
+        if (alert != null) return
         worker.execute {
-            if (api.cancelAlert(current.id)) {
-                alert = null
-                settings.activeAlertId = null
-                settings.cancelUntil = 0
-                tracker.stop()
-                broadcastState()
+            when (api.alertStatus(pending)) {
+                "open", "in_progress" -> {
+                    alert = AlertHandle(pending, settings.cancelUntil)
+                    promoteToLocation()
+                    tracker.start { p -> worker.execute { api.sendPositions(pending, listOf(p)) } }
+                    watchUntilClosed(pending)
+                }
+                null -> Unit                 // sem resposta: tenta de novo no próximo start
+                else -> clearAlert()
             }
         }
     }
@@ -168,6 +216,8 @@ class ListenerService : Service() {
         detector?.stop()
         detector = null
         tracker.stop()
+        watcher?.cancel(false)
+        monitor.shutdownNow()
         worker.shutdown()
         super.onDestroy()
     }
