@@ -56,14 +56,14 @@
      precisa descer um degrau, senão vira quatro linhas de 4.5rem e o leitor
      perde a frase no meio. */
   --text-display:   clamp(2.75rem, 6.2vw, 4.5rem);
-  --text-display-s: clamp(1.3rem, 1.9vw, 1.6rem);
+  --text-display-s: clamp(1.85rem, 3.2vw, 2.6rem);
   /* Precisa ficar abaixo de --text-display-s: o título do herói é o maior
      da página, e uma seção maior que ele inverte a hierarquia. */
-  --text-h2:        clamp(1.1rem, 1.45vw, 1.3rem);
+  --text-h2:        clamp(1.5rem, 2.3vw, 2.05rem);
   --text-h3:        1.125rem;
   /* precisa ficar acima de --text-body, senão o parágrafo de abertura
      fica menor que o corpo comum e a leitura desanda */
-  --text-lead:      clamp(1rem, 1.3vw, 1.15rem);
+  --text-lead:      clamp(1.05rem, 1.4vw, 1.2rem);
   --text-body:      1rem;
   --text-label:     0.75rem;
 
