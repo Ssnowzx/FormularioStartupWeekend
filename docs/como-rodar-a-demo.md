@@ -20,8 +20,8 @@ Só na primeira vez, aplique os dois esquemas e crie os usuários:
 
 ```bash
 cd servidor
-docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < schema.sql
-docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < schema_alerts.sql
+docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < modules/survey/schema.sql
+docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < modules/alert/schema.sql
 ```
 
 O `schema.sql` cria usuários `@'localhost'`, que é o certo na VPS, onde o Node e o banco
@@ -74,7 +74,7 @@ assim". **Instale na noite anterior, nunca no palco.**
 
 ## 5. Cadastrar e vincular
 
-Abra `http://SEU_IP:3100/cadastro` (login `ADMIN_USER` / `ADMIN_PASSWORD` do `.env`),
+Abra `http://SEU_IP:3100/cadastro` (login `OPERATOR_USER` / `OPERATOR_PASSWORD` do `.env`),
 cadastre a usuária e ao menos um Anjo com telefone, e gere o código.
 
 No celular, o app abre como **Calculadora**. Digite o código, confirme o servidor, escolha
@@ -84,12 +84,12 @@ esse teste é o critério de aceitação.
 Se precisar de um código novo para alguém já cadastrada, sem criar duplicata:
 
 ```bash
-curl -s -b cookie.txt -X POST http://localhost:3100/api/panel/users/ID/invite
+curl -s -b cookie.txt -X POST http://localhost:3100/api/console/users/ID/invite
 ```
 
 ## 6. Demonstrar
 
-Deixe `http://SEU_IP:3100/central` aberto no telão. Fale a frase perto do celular.
+Deixe `http://SEU_IP:3100/central` aberto no telão (entre com o papel `OPERATOR_*`). Fale a frase perto do celular.
 
 O alerta entra na fila em menos de um segundo, com a barra de 15 segundos correndo.
 Clique no card para ver o trajeto e avisar o Anjo pelo WhatsApp.
@@ -107,6 +107,7 @@ Para reabrir as configurações no celular: digite **`271828`** e aperte **`=`**
 | "Código inválido" | Cada código serve uma vez. Gere outro |
 | Falou e não aconteceu nada | Ocorrência anterior ainda aberta, ou menos de 60s desde o último acionamento. Resolva no painel e espere um pouco |
 | Painel pede login de novo | O servidor reiniciou. As sessões vivem em memória, de propósito |
+| 403 numa tela que sempre funcionou | Você entrou com o papel errado. A pesquisa usa `RESEARCHER_*`, a central usa `OPERATOR_*` |
 | "Muitas tentativas" no login | 8 por hora. Reinicie o servidor para zerar |
 | Alerta demora a aparecer | Falta `proxy_buffering off` no nginx da VPS |
 
