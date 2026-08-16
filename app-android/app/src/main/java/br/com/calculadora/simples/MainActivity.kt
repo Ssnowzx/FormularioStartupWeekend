@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
     private var testing by mutableStateOf(false)
     private var heard by mutableStateOf(false)
     private var alertActive by mutableStateOf(false)
+    private var serverUrl by mutableStateOf("")
 
     private val stateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) { refreshAlertState() }
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
 
         settings = Settings(this)
         api = Api(this, settings)
+        serverUrl = settings.serverUrl
         screen = when {
             !settings.isPaired -> Screen.PAIR
             settings.secretPhrase.isEmpty() -> Screen.PHRASE
@@ -58,7 +60,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 when (screen) {
-                    Screen.PAIR -> PairScreen(settings.serverUrl, busy, pairError, ::pair)
+                    Screen.PAIR -> PairScreen(serverUrl, busy, pairError, ::pair)
                     Screen.PHRASE -> PhraseScreen(testing, heard, ::testPhrase, ::confirmPhrase)
                     Screen.CALCULATOR -> CalculatorScreen(
                         alertActive = alertActive,
@@ -68,10 +70,11 @@ class MainActivity : ComponentActivity() {
                     Screen.SETTINGS -> SettingsScreen(
                         userName = settings.userName,
                         phrase = settings.secretPhrase,
-                        server = settings.serverUrl,
+                        server = serverUrl,
                         listening = settings.isReady,
                         alertActive = alertActive,
                         onChangePhrase = { heard = false; screen = Screen.PHRASE },
+                        onChangeServer = ::changeServer,
                         onWipe = ::wipe,
                         onClose = { screen = Screen.CALCULATOR }
                     )
@@ -173,6 +176,17 @@ class MainActivity : ComponentActivity() {
         if (!alertActive) return
         if (System.currentTimeMillis() > settings.cancelUntil) return
         ListenerService.send(this, ListenerService.ACTION_CANCEL)
+    }
+
+    /**
+     * The device token stays valid: it belongs to the occurrence server, not to
+     * the address used to reach it. Changing the address is how the app follows
+     * the team from one network to another without being paired again.
+     */
+    private fun changeServer(url: String) {
+        if (url.isBlank()) return
+        settings.serverUrl = url
+        serverUrl = settings.serverUrl
     }
 
     private fun wipe() {

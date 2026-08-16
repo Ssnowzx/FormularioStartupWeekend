@@ -151,9 +151,12 @@ fun SettingsScreen(
     listening: Boolean,
     alertActive: Boolean,
     onChangePhrase: () -> Unit,
+    onChangeServer: (String) -> Unit,
     onWipe: () -> Unit,
     onClose: () -> Unit
 ) {
+    var endereco by remember(server) { mutableStateOf(server) }
+
     Column(
         modifier = Modifier.fillMaxSize().background(Background)
             .verticalScroll(rememberScrollState()).padding(24.dp),
@@ -162,9 +165,26 @@ fun SettingsScreen(
         Text("Configurações", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Petrol)
         Linha("Vinculada a", userName.ifEmpty { "—" })
         Linha("Sua frase", phrase.ifEmpty { "não definida" })
-        Linha("Servidor", server)
         Linha("Escutando", if (listening) "sim" else "não")
         if (alertActive) Text("Há um alerta em andamento.", color = Coral, fontWeight = FontWeight.Bold)
+
+        // Editável porque o endereço da rede muda a cada lugar onde o time se
+        // conecta, e refazer o APK para isso é como se perde uma demonstração.
+        OutlinedTextField(
+            value = endereco,
+            onValueChange = { endereco = it },
+            label = { Text("Servidor") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
+        )
+        if (endereco.trim().trimEnd('/') != server) {
+            Button(
+                onClick = { onChangeServer(endereco.trim()) },
+                colors = ButtonDefaults.buttonColors(containerColor = Petrol),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Salvar endereço", fontSize = 15.sp) }
+        }
 
         OutlinedButton(
             onClick = onChangePhrase, shape = RoundedCornerShape(12.dp),
