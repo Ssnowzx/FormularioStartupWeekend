@@ -5,66 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Painel · Mulheres em Risco</title>
+<link rel="stylesheet" href="/shared/theme.css">
 <style>
-  :root {
-    color-scheme: light;
-    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
-    --line:#E4D2B7; --line-soft:#EFE0C9;
-    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
-    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
-    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
-    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
-    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  * { box-sizing:border-box; }
-  /* Precisa vir antes das classes de tela: sem isto, .login-tela { display:grid }
+/* Precisa vir antes das classes de tela: sem isto, .login-tela { display:grid }
      vence o display:none que o atributo hidden aplica, e a tela de login fica
      por cima do painel mesmo estando "escondida". */
   [hidden] { display:none !important; }
-  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
-         font-size:16px; line-height:1.6; }
-
-  /* ---------- login ---------- */
-  .login-tela { min-height:100vh; display:grid; place-items:center; padding:1.2rem; }
-  .login-caixa { background:var(--surface); border:1px solid var(--line); border-radius:1.1rem;
-                 padding:2rem 1.7rem; width:100%; max-width:24rem; box-shadow:0 2px 12px var(--shadow); }
-  .login-caixa h1 { font-family:var(--f-display); font-size:1.6rem; margin:0 0 .2rem;
-                    color:var(--petrol-deep); letter-spacing:-.02em; }
-  .login-caixa .sub { color:var(--ink-soft); font-size:.9rem; margin:0 0 1.5rem; }
-  label.campo { display:block; margin-bottom:1rem; }
-  label.campo span { display:block; font-size:.88rem; font-weight:600; margin-bottom:.35rem; }
-  input { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
-          border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
-  input:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
-  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
-         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
-  .btn:disabled { opacity:.55; cursor:progress; }
-  .btn.pequeno { width:auto; font-size:.88rem; padding:.5rem 1rem; }
-  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
-  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
-           padding:.7rem .85rem; border-radius:.65rem; margin-top:.9rem; }
-
-  /* ---------- painel ---------- */
-  .topo { background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
-  .topo-int { max-width:64rem; margin:0 auto; padding:.9rem 1.1rem; display:flex; align-items:center;
-              gap:1rem; flex-wrap:wrap; }
-  .topo h1 { font-family:var(--f-display); font-size:1.15rem; margin:0; color:var(--petrol-deep);
-             letter-spacing:-.01em; flex:1; min-width:12rem; }
-  .vivo { display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; color:var(--ink-soft); }
-  .pulso { width:.5rem; height:.5rem; border-radius:50%; background:var(--good); }
-  @keyframes bater { 0%,100%{opacity:1} 50%{opacity:.25} }
-  .pulso.ativo { animation:bater 2s ease-in-out infinite; }
-
-  .wrap { max-width:64rem; margin:0 auto; padding:1.4rem 1.1rem 5rem; }
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
-          padding:1.15rem 1.1rem; margin-bottom:1rem; }
-  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .9rem; letter-spacing:-.01em; }
-
-  .numeros { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.8rem; margin-bottom:1rem; }
-  .num { background:var(--surface); border:1px solid var(--line); border-radius:1rem; padding:1rem 1.05rem; }
-  .num b { font-family:var(--f-display); font-size:2.1rem; font-weight:750; color:var(--petrol-deep);
-           display:block; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
-  .num span { font-size:.82rem; color:var(--ink-soft); display:block; margin-top:.3rem; }
 
   .destaque { background:var(--mint); border:1px solid var(--line-soft); border-radius:1rem;
               padding:1rem 1.1rem; margin-bottom:1rem; font-size:.95rem; }
@@ -78,14 +24,6 @@
   .bar-track { height:.45rem; background:var(--cream-deep); border-radius:99px; overflow:hidden; }
   .bar-fill { height:100%; background:var(--petrol-mid); border-radius:99px; transition:width .4s ease; }
   .bar-fill.win { background:var(--good); }
-
-  .quote { border-left:3px solid var(--petrol-mid); padding-left:.8rem; margin:0 0 .7rem; font-size:.92rem; }
-  .quote:last-child { margin-bottom:0; }
-  .quote cite { display:block; font-style:normal; font-size:.76rem; color:var(--ink-soft); margin-top:.15rem; }
-  .vazio { color:var(--ink-soft); font-style:italic; }
-  .acoes { display:flex; gap:.6rem; flex-wrap:wrap; }
-  a.btn { text-decoration:none; display:inline-block; text-align:center; }
-  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
@@ -153,7 +91,7 @@ $("form-login").addEventListener("submit", async (ev) => {
   erro.hidden = true;
   botao.disabled = true; botao.textContent = "Entrando…";
   try {
-    const r = await fetch("/api/login", {
+    const r = await fetch("/api/auth/login", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usuario: $("usuario").value, senha: $("senha").value })
     });
@@ -168,7 +106,7 @@ $("form-login").addEventListener("submit", async (ev) => {
 });
 
 $("btn-sair").addEventListener("click", async () => {
-  await fetch("/api/sair", { method: "POST" }).catch(() => {});
+  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
   clearInterval(relogio);
   $("tela-painel").hidden = true;
   $("tela-login").hidden = false;
@@ -202,7 +140,7 @@ function quando(iso) {
 async function carregar() {
   let d;
   try {
-    const r = await fetch("/api/resultados");
+    const r = await fetch("/api/survey/results");
     if (r.status === 401) { $("tela-painel").hidden = true; $("tela-login").hidden = false; clearInterval(relogio); return; }
     d = await r.json();
   } catch (e) {
@@ -255,7 +193,7 @@ async function carregar() {
   }
 
   html += `<div class="card"><h2>Ações</h2><div class="acoes">
-    <a class="btn pequeno" href="/api/exportar.csv">Baixar planilha CSV</a>
+    <a class="btn pequeno" href="/api/survey/export.csv">Baixar planilha CSV</a>
     <button class="btn ghost pequeno" onclick="carregar()">Atualizar agora</button>
   </div></div>`;
 
@@ -298,7 +236,7 @@ function mostrarPainel() {
 
 (async () => {
   try {
-    const { ok } = await (await fetch("/api/sessao")).json();
+    const { ok } = await (await fetch("/api/auth/session")).json();
     if (ok) { mostrarPainel(); return; }
   } catch (e) { /* sem servidor */ }
   $("tela-login").hidden = false;

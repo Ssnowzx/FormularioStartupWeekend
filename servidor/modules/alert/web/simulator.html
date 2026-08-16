@@ -5,51 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Simulador do aparelho</title>
+<link rel="stylesheet" href="/shared/theme.css">
 <style>
-  :root {
-    color-scheme: light;
-    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
-    --line:#E4D2B7; --line-soft:#EFE0C9;
-    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-wash:#E4F0EF;
-    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
-    --ink:#1F2A2B; --ink-soft:#55605F;
-    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
-    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  * { box-sizing:border-box; }
-  [hidden] { display:none !important; }
-  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body); line-height:1.6; }
-  .wrap { max-width:34rem; margin:0 auto; padding:1.3rem 1.1rem 4rem; }
-  h1 { font-family:var(--f-display); font-size:1.4rem; margin:0 0 .2rem; color:var(--petrol-deep);
+h1 { font-family:var(--f-display); font-size:1.4rem; margin:0 0 .2rem; color:var(--petrol-deep);
        letter-spacing:-.02em; }
   .sub { color:var(--ink-soft); font-size:.9rem; margin:0 0 1.3rem; }
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
-          padding:1.15rem 1.1rem; margin-bottom:1rem; }
-  .card h2 { font-family:var(--f-display); font-size:1rem; margin:0 0 .8rem; }
-  label.campo { display:block; margin-bottom:.9rem; }
-  label.campo span { display:block; font-size:.86rem; font-weight:600; margin-bottom:.3rem; }
   input, select { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
           border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
-  input:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
-  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
-         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
-  .btn.perigo { background:var(--coral); font-size:1.15rem; padding:1.15rem; font-weight:750; }
-  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
-  .btn:disabled { opacity:.5; cursor:not-allowed; }
-  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
-           padding:.7rem .85rem; border-radius:.65rem; margin-top:.8rem; }
-  .ok { background:var(--mint); color:var(--good); font-size:.9rem; font-weight:600;
-        padding:.7rem .85rem; border-radius:.65rem; margin-top:.8rem; }
   .log { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.8rem; color:var(--ink-soft);
          background:var(--cream); border-radius:.6rem; padding:.7rem .8rem; max-height:11rem; overflow:auto;
          white-space:pre-wrap; }
   .nota { font-size:.85rem; color:var(--ink-soft); }
-  .acoes { display:grid; gap:.6rem; }
-  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap estreita">
   <h1>Simulador do aparelho</h1>
   <p class="sub">Finge ser o app no celular da usuária. Serve para testar o fluxo inteiro
      sem depender do aparelho — e é o plano B se o microfone falhar no palco.</p>

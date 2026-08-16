@@ -1,29 +1,11 @@
 <title>Pesquisa com Mulheres</title>
+<link rel="stylesheet" href="/shared/theme.css">
 <style>
-  :root {
-    color-scheme: light;
-    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
-    --line:#E4D2B7; --line-soft:#EFE0C9;
-    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
-    --coral:#AE432B; --peach:#F9DFD1; --peach-deep:#EFC4A8;
-    --good:#387043; --mint:#DCEDE2;
-    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
-    --f-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Segoe UI Variable", system-ui, sans-serif;
-    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
-         font-size:17px; line-height:1.6; -webkit-text-size-adjust:100%; }
-  .wrap { max-width:40rem; margin:0 auto; padding:1.5rem 1.1rem 5rem; }
-
-  .eyebrow { font-size:.71rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-soft);
+.eyebrow { font-size:.71rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-soft);
              font-weight:700; margin:.5rem 0 .5rem; }
   h1 { font-family:var(--f-display); font-size:clamp(1.9rem,6.5vw,2.5rem); line-height:1.08; margin:0 0 .6rem;
        letter-spacing:-.02em; text-wrap:balance; color:var(--petrol-deep); }
   .lede { font-size:1.05rem; color:var(--ink-soft); margin:0 0 1.5rem; }
-
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:1.05rem;
-          padding:1.3rem 1.15rem; margin-bottom:1rem; box-shadow:0 1px 3px var(--shadow); }
   .card > h2 { font-family:var(--f-display); font-size:1.18rem; margin:0 0 .6rem; letter-spacing:-.014em;
                text-wrap:balance; line-height:1.24; }
   .card p { margin:0 0 .8rem; }
@@ -57,11 +39,7 @@
   .opt:has(input:focus-visible) { outline:3px solid var(--coral); outline-offset:2px; }
   .opt input { accent-color:var(--petrol-deep); margin:0; }
   .compl { margin-top:.6rem; }
-
-  .btn { font-family:var(--f-body); font-size:1.02rem; font-weight:650; padding:.95rem 1.4rem; border-radius:.8rem;
-         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
   .btn:focus-visible { outline:3px solid var(--coral); outline-offset:2px; }
-  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
   .btn-row { display:flex; gap:.6rem; margin-top:.8rem; }
   .form-error { background:var(--peach); color:var(--coral); font-size:.92rem; font-weight:600;
                 padding:.75rem .9rem; border-radius:.7rem; margin:.8rem 0 0; }
@@ -77,11 +55,9 @@
   .equipe { border-top:1px dashed var(--line); margin-top:1.4rem; padding-top:1.1rem; }
   .equipe .rotulo-eq { font-size:.78rem; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
                        color:var(--ink-soft); margin:0 0 .6rem; }
-  [hidden] { display:none !important; }
-  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 
-<div class="wrap" id="tela-form">
+<div class="wrap leitura" id="tela-form">
   <input type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true"
          style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
   <p class="eyebrow">Startup Weekend Women · Lages · Agosto de 2026</p>
@@ -110,7 +86,7 @@
   <p class="form-error" id="erro" role="alert" hidden></p>
 </div>
 
-<div class="wrap" id="tela-fim" hidden>
+<div class="wrap leitura" id="tela-fim" hidden>
   <div class="card fim">
     <h2>Obrigado por responder</h2>
     <p>Sua opinião vai ajudar a construir algo que sirva de verdade.</p>
@@ -211,7 +187,7 @@
     botao.textContent = "Enviando...";
 
     try {
-      var resp = await fetch("/api/responder", {
+      var resp = await fetch("/api/survey/answers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dm: d.dm, r: d.r, website: el("website").value })

@@ -8,52 +8,24 @@
 <!-- A aba não diz "Mulheres em Risco": o Anjo pode abrir isto em qualquer lugar,
      e o nome institucional na aba entrega a situação de outra pessoa. -->
 <title>Aviso urgente</title>
+<link rel="stylesheet" href="/shared/theme.css">
 <style>
-  :root {
-    color-scheme: light;
-    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
-    --line:#E4D2B7; --line-soft:#EFE0C9;
-    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-soft:#9CC5C7; --petrol-wash:#E4F0EF;
-    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
-    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
-    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
-    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  * { box-sizing:border-box; }
-  [hidden] { display:none !important; }
-  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
-         font-size:17px; line-height:1.6; }
-  .wrap { max-width:32rem; margin:0 auto; padding:1.1rem 1.1rem 4rem; }
-
-  .cabeca { background:var(--coral); color:#FFF6F0; border-radius:1rem; padding:1.3rem 1.2rem; margin-bottom:1rem; }
+.cabeca { background:var(--coral); color:#FFF6F0; border-radius:1rem; padding:1.3rem 1.2rem; margin-bottom:1rem; }
   .cabeca h1 { font-family:var(--f-display); font-size:1.7rem; margin:0 0 .2rem; letter-spacing:-.02em;
                line-height:1.2; }
   .cabeca p { margin:0; opacity:.92; font-size:.95rem; }
-
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
-          padding:1.15rem 1.1rem; margin-bottom:1rem; }
-  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .8rem; letter-spacing:-.01em; }
   .mapa { width:100%; height:15rem; background:var(--cream-deep); border-radius:.8rem; display:block; }
   .coords { font-variant-numeric:tabular-nums; font-size:.88rem; color:var(--ink-soft); margin:.6rem 0 0; }
-
-  .btn { font-family:inherit; font-size:1.1rem; font-weight:700; padding:1.1rem 1.3rem; border-radius:.85rem;
-         border:0; cursor:pointer; background:var(--coral); color:#FFF6F0; width:100%; display:block;
-         text-align:center; text-decoration:none; }
-  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line);
-               font-size:1rem; font-weight:650; padding:.9rem 1.2rem; margin-top:.7rem; }
-  .btn:disabled { opacity:.6; }
 
   .feito { background:var(--mint); border:1px solid var(--line-soft); border-radius:1rem;
            padding:1.2rem 1.1rem; text-align:center; }
   .feito b { display:block; font-family:var(--f-display); font-size:1.25rem; color:var(--good);
              margin-bottom:.2rem; }
-  .vazio { color:var(--ink-soft); font-style:italic; }
   .rodape { font-size:.85rem; color:var(--ink-soft); text-align:center; margin-top:1.5rem; }
-  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
-<div class="wrap" id="tela">
+<div class="wrap celular" id="tela">
   <p class="vazio">Carregando…</p>
 </div>
 

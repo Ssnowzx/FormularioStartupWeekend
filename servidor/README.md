@@ -1,4 +1,11 @@
-# Pesquisa de campo — subir na VPS
+# Servidor — subir na VPS
+
+Três produtos num processo: a landing page em `/`, a pesquisa de campo em
+`/pesquisa` e o sistema do produto em `/central`. A estrutura e as regras de
+fronteira estão em [`docs/arquitetura.md`](../docs/arquitetura.md) — leia antes
+de acrescentar coisa nova.
+
+## Pesquisa de campo
 
 Node.js + MariaDB, atrás do nginx com HTTPS. Do zero até o ar: cerca de 40 minutos.
 
@@ -9,10 +16,10 @@ Troque `pesquisa.seudominio.com.br` pelo seu domínio em todos os comandos.
 ## 1. Banco
 
 ```bash
-sudo mysql < schema.sql
+sudo mysql < modules/survey/schema.sql
 ```
 
-Antes de rodar, **abra o `schema.sql` e troque `TROQUE_ESTA_SENHA`**. O usuário criado
+Antes de rodar, **abra o `modules/survey/schema.sql` e troque `TROQUE_ESTA_SENHA`**. O usuário criado
 tem permissão só de `SELECT` e `INSERT` na tabela de respostas — não pode apagar nem
 alterar estrutura. Se a aplicação for invadida, o estrago é limitado.
 
@@ -22,12 +29,13 @@ alterar estrutura. Se a aplicação for invadida, o estrago é limitado.
 cd servidor
 npm install
 cp .env.example .env
-nano .env          # preencha DB_PASSWORD, ADMIN_USER e ADMIN_PASSWORD
-openssl rand -base64 24   # use isto como ADMIN_PASSWORD
+nano .env          # preencha as senhas de banco e os dois papéis de acesso
+openssl rand -base64 24   # uma para RESEARCHER_PASSWORD, outra para OPERATOR_PASSWORD
 npm start
 ```
 
-Teste local: `curl localhost:3000` deve devolver o HTML do formulário.
+Teste local: `curl localhost:3000` devolve a landing page, e
+`curl localhost:3000/pesquisa` o formulário.
 
 ## 3. Serviço que sobe sozinho
 
@@ -118,8 +126,8 @@ localhost. Confirme com `sudo ufw status`.
 
 | Endereço | O que é |
 |---|---|
-| `https://pesquisa.seudominio.com.br/` | O formulário. É este link que vai para as mulheres |
-| `https://pesquisa.seudominio.com.br/admin` | Painel de resultados. Pede `ADMIN_USER` e `ADMIN_PASSWORD` |
+| `https://pesquisa.seudominio.com.br/pesquisa` | O formulário. É este link que vai para as mulheres |
+| `https://pesquisa.seudominio.com.br/pesquisa/painel` | Painel de resultados. Pede `RESEARCHER_USER` e `RESEARCHER_PASSWORD` |
 
 O painel se atualiza sozinho a cada 30 segundos, então dá para deixar aberto num
 notebook durante a coleta e ver as respostas chegando. Ele destaca automaticamente
@@ -160,14 +168,14 @@ mysqldump -u root mulheres_em_risco > backup-$(date +%F).sql
 
 # Alertas — a central, os Anjos e o aparelho
 
-O mesmo processo Node serve duas coisas independentes: a **pesquisa de campo** (acima) e o
-**subsistema de alertas** (daqui para baixo). Eles compartilham a porta e o login de admin,
-e mais nada — nem pool de banco, nem usuário de banco, nem tabela.
+O mesmo processo Node serve três produtos independentes. Eles compartilham a porta e o
+núcleo em `core/`, e mais nada — nem pool de banco, nem usuário de banco, nem tabela,
+nem papel de acesso. Ver [`docs/arquitetura.md`](../docs/arquitetura.md).
 
 ## Subir
 
 ```bash
-sudo mysql < schema_alerts.sql     # troque TROQUE_ESTA_SENHA_TAMBEM antes
+sudo mysql < modules/alert/schema.sql   # troque TROQUE_ESTA_SENHA_TAMBEM antes
 nano .env                          # preencha DB_ALERTS_PASSWORD e PUBLIC_BASE_URL
 sudo systemctl restart pesquisa
 curl localhost:3000/api/v1/health  # deve devolver {"ok":true,"db":true,...}
@@ -194,8 +202,9 @@ proxy_read_timeout 3600s;
 | `/simulador` | o time | Finge ser o aplicativo. Só com `DEMO_MODE=1`, e só depois do login |
 | `/app` | o celular | Baixa o APK. Só com `DEMO_MODE=1` e `APK_PATH` preenchido |
 
-`/central` e `/cadastro` usam o **mesmo login do `/admin`** — mesma sessão, mesmo cookie.
-Não existe autenticação nova em lugar nenhum.
+`/central` e `/cadastro` exigem o papel `operator`. O painel da pesquisa exige
+`researcher`. Uma sessão de um recebe **403** nas rotas do outro — a mesma
+separação que já existia entre os dois usuários de banco.
 
 ## O fluxo
 
@@ -232,7 +241,7 @@ O link do WhatsApp existe só para o **Anjo**, cujo celular está fora do alcanc
   cegas uma para a outra: quem invadir um lado não lê o outro.
 - **Nenhum `DELETE`, `DROP` ou `ALTER` em lugar nenhum.** Apagar dado aqui é *redação*
   (`UPDATE ... SET lat=NULL`), e é por isso que toda coluna pessoal aceita `NULL`. O
-  `schema_alerts.sql` traz as consultas prontas no rodapé.
+  `modules/alert/schema.sql` traz as consultas prontas no rodapé.
 - **`alert_event` só aceita `SELECT` e `INSERT`.** A linha do tempo da ocorrência é imutável
   por construção, que é o que se espera de um registro de atendimento.
 - **Todo token vai ao banco como sha256.** O valor legível existe uma única vez: na resposta

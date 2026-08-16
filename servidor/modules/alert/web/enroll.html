@@ -5,48 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Cadastro · Mulheres em Risco</title>
+<link rel="stylesheet" href="/shared/theme.css">
 <style>
-  :root {
-    color-scheme: light;
-    --cream:#FAF1E1; --cream-deep:#F1E2CA; --surface:#FFFBF3;
-    --line:#E4D2B7; --line-soft:#EFE0C9;
-    --petrol-deep:#155E63; --petrol-mid:#3E8A8F; --petrol-wash:#E4F0EF;
-    --coral:#AE432B; --peach:#F9DFD1; --good:#387043; --mint:#DCEDE2;
-    --ink:#1F2A2B; --ink-soft:#55605F; --shadow:rgba(35,70,70,.10);
-    --f-display: ui-rounded, "SF Pro Rounded", "Segoe UI Variable", system-ui, sans-serif;
-    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  * { box-sizing:border-box; }
-  [hidden] { display:none !important; }
-  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--f-body);
-         font-size:16px; line-height:1.6; }
-
-  .topo { background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
-  .topo-int { max-width:48rem; margin:0 auto; padding:.9rem 1.1rem; display:flex; align-items:center;
-              gap:1rem; flex-wrap:wrap; }
-  .topo h1 { font-family:var(--f-display); font-size:1.15rem; margin:0; color:var(--petrol-deep);
-             letter-spacing:-.01em; flex:1; min-width:12rem; }
-  .wrap { max-width:48rem; margin:0 auto; padding:1.4rem 1.1rem 5rem; }
-  .card { background:var(--surface); border:1px solid var(--line); border-radius:1rem;
-          padding:1.15rem 1.1rem; margin-bottom:1rem; }
-  .card h2 { font-family:var(--f-display); font-size:1.05rem; margin:0 0 .3rem; letter-spacing:-.01em; }
-  .card .dica { font-size:.86rem; color:var(--ink-soft); margin:0 0 1rem; }
-
-  label.campo { display:block; margin-bottom:.9rem; }
-  label.campo span { display:block; font-size:.86rem; font-weight:600; margin-bottom:.3rem; }
-  label.campo em { font-style:normal; font-weight:400; color:var(--ink-soft); }
+.card .dica { font-size:.86rem; color:var(--ink-soft); margin:0 0 1rem; }
   input, select { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
           border:1.5px solid var(--line); background:var(--cream); color:var(--ink); }
-  input:focus, select:focus { outline:none; border-color:var(--petrol-deep); box-shadow:0 0 0 3px var(--petrol-wash); }
   .linha { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
   @media (max-width:34rem) { .linha { grid-template-columns:1fr; } }
-
-  .btn { font-family:inherit; font-size:1rem; font-weight:650; padding:.85rem 1.3rem; border-radius:.75rem;
-         border:0; cursor:pointer; background:var(--petrol-deep); color:var(--surface); width:100%; }
-  .btn.pequeno { width:auto; font-size:.88rem; padding:.5rem 1rem; }
-  .btn.ghost { background:transparent; color:var(--petrol-deep); border:1.5px solid var(--line); }
-  .btn:disabled { opacity:.55; cursor:progress; }
-  a.btn { text-decoration:none; display:inline-block; text-align:center; }
 
   .anjo-bloco { border:1px solid var(--line-soft); border-radius:.8rem; padding:.9rem; margin-bottom:.8rem;
                 background:var(--cream); }
@@ -54,9 +19,6 @@
   .anjo-topo b { font-size:.86rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
   .tirar { background:none; border:0; color:var(--coral); font:inherit; font-size:.86rem; cursor:pointer;
            padding:0; text-decoration:underline; }
-
-  .aviso { background:var(--peach); color:var(--coral); font-size:.9rem; font-weight:600;
-           padding:.7rem .85rem; border-radius:.65rem; margin-top:.9rem; }
   .cuidado { background:var(--peach); border-radius:.65rem; padding:.85rem .95rem; font-size:.9rem;
              margin:0 0 1rem; }
   .cuidado b { color:var(--coral); }
@@ -65,20 +27,18 @@
                   padding:1.6rem 1.2rem; text-align:center; }
   .codigo { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:2.6rem; font-weight:700;
             letter-spacing:.08em; color:var(--petrol-deep); margin:.3rem 0 .6rem; word-break:break-all; }
-  .vazio { color:var(--ink-soft); font-style:italic; }
-  @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
 
 <div class="topo">
-  <div class="topo-int">
+  <div class="topo-int media">
     <h1>Cadastro</h1>
     <a class="btn ghost pequeno" href="/central">Central</a>
   </div>
 </div>
 
-<div class="wrap">
+<div class="wrap media">
   <div id="tela-form">
     <div class="card">
       <h2>A usuária</h2>
@@ -166,7 +126,7 @@ $("btn-salvar").addEventListener("click", async () => {
   })).filter((g) => g.name && g.phone_e164);
 
   try {
-    const r = await fetch("/api/panel/users", {
+    const r = await fetch("/api/console/users", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         display_name: $("nome").value.trim(),
@@ -198,7 +158,7 @@ $("btn-copiar").addEventListener("click", () => {
 
 (async () => {
   try {
-    const { ok } = await (await fetch("/api/sessao")).json();
+    const { ok } = await (await fetch("/api/auth/session")).json();
     if (!ok) location.href = "/central";
   } catch (e) { /* sem servidor */ }
 })();
