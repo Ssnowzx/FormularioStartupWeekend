@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mulheres em Risco — socorro que chega durante a agressão</title>
+<meta name="description" content="Um gatilho de voz que aciona ajuda sem ela precisar pegar o celular, e uma rede de pessoas de confiança que chega antes da viatura.">
+<link rel="stylesheet" href="/shared/theme.css">
+<style>
+  /* Identidade institucional: é aqui que o produto se apresenta a um comprador
+     público e à imprensa. Nada desta estética vai para o celular da usuária. */
+
+  .faixa { max-width: 64rem; margin: 0 auto; padding: 0 1.4rem; }
+
+  header.topo-site { border-bottom: 1px solid var(--line); background: var(--surface); }
+  .topo-site .faixa { display: flex; align-items: center; gap: 1rem; padding-block: 1.1rem; flex-wrap: wrap; }
+  .marca { font-family: var(--f-display); font-weight: 750; font-size: 1.1rem; color: var(--petrol-deep);
+           letter-spacing: -.02em; flex: 1; }
+  .topo-site a { color: var(--petrol-deep); text-decoration: none; font-size: .92rem; font-weight: 600; }
+  .topo-site a:hover { text-decoration: underline; }
+
+  .heroi { padding: 5rem 0 4rem; }
+  .heroi h1 { font-family: var(--f-display); font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.08;
+              letter-spacing: -.03em; margin: 0 0 1.2rem; max-width: 18ch; color: var(--ink); }
+  .heroi h1 em { font-style: normal; color: var(--petrol-deep); }
+  .heroi .abre { font-size: 1.18rem; max-width: 46ch; color: var(--ink-soft); margin: 0 0 2rem; }
+
+  .secao { padding: 3.5rem 0; border-top: 1px solid var(--line); }
+  .secao > .faixa > h2 { font-family: var(--f-display); font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+                         letter-spacing: -.02em; margin: 0 0 .6rem; max-width: 22ch; }
+  .secao .intro { color: var(--ink-soft); max-width: 54ch; margin: 0 0 2rem; }
+
+  .numeros-site { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.4rem; }
+  .dado b { display: block; font-family: var(--f-display); font-size: 2.6rem; font-weight: 750;
+            color: var(--petrol-deep); line-height: 1; letter-spacing: -.03em;
+            font-variant-numeric: tabular-nums; }
+  .dado p { margin: .5rem 0 .2rem; font-size: .95rem; }
+  .dado cite { font-style: normal; font-size: .78rem; color: var(--ink-soft); }
+
+  .lacuna { background: var(--surface); border: 1px solid var(--line); border-radius: 1.2rem;
+            padding: 2rem 1.8rem; }
+  .lacuna ol { list-style: none; counter-reset: passo; padding: 0; margin: 0; display: grid;
+               grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1rem; }
+  .lacuna li { padding: .9rem 1rem; border-radius: .8rem; background: var(--cream);
+               border: 1px solid var(--line-soft); font-size: .95rem; }
+  .lacuna li.corte { background: var(--peach); border-color: var(--peach); }
+  .lacuna li b { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em;
+                 color: var(--ink-soft); margin-bottom: .2rem; }
+  .lacuna .conclusao { margin: 1.6rem 0 0; font-size: 1.05rem; }
+  .lacuna .conclusao strong { color: var(--coral); }
+
+  .passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.6rem; }
+  .passo { border-top: 3px solid var(--petrol-mid); padding-top: 1rem; }
+  .passo h3 { font-family: var(--f-display); font-size: 1.08rem; margin: 0 0 .4rem; }
+  .passo p { margin: 0; font-size: .95rem; color: var(--ink-soft); }
+
+  .limites { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.2rem; }
+  .limite { border-left: 3px solid var(--line); padding-left: 1rem; }
+  .limite h3 { font-size: .98rem; margin: 0 0 .3rem; }
+  .limite p { margin: 0; font-size: .92rem; color: var(--ink-soft); }
+
+  .chamada { background: var(--petrol-deep); color: var(--surface); border-radius: 1.2rem;
+             padding: 2.6rem 2rem; }
+  .chamada h2 { font-family: var(--f-display); font-size: clamp(1.5rem, 3.4vw, 2rem); margin: 0 0 .6rem;
+                letter-spacing: -.02em; max-width: 20ch; }
+  .chamada p { max-width: 48ch; margin: 0 0 1.8rem; opacity: .92; }
+  /* A única ação coral da página inteira. Se duas coisas estão coral,
+     nenhuma está. */
+  .chamada .btn { background: var(--coral); width: auto; font-size: 1.05rem; padding: 1rem 1.8rem; }
+
+  footer.rodape { border-top: 1px solid var(--line); padding: 2.5rem 0 4rem; font-size: .88rem;
+                  color: var(--ink-soft); }
+  footer.rodape a { color: var(--petrol-deep); }
+  .socorro { background: var(--peach); border-radius: .8rem; padding: 1rem 1.1rem; margin-bottom: 1.6rem;
+             color: var(--ink); }
+  .socorro b { color: var(--coral); }
+</style>
+</head>
+<body>
+
+<header class="topo-site">
+  <div class="faixa">
+    <span class="marca">Mulheres em Risco</span>
+    <a href="#como">Como funciona</a>
+    <a href="#limites">O que não fazemos</a>
+    <a href="#contato">Falar conosco</a>
+  </div>
+</header>
+
+<main>
+  <section class="heroi">
+    <div class="faixa">
+      <h1>O socorro precisa chegar <em>durante</em> a agressão.</h1>
+      <p class="abre">
+        Ela fala uma palavra que só ela conhece. O celular entende, mesmo largado na bolsa,
+        e aciona ao mesmo tempo a central e as pessoas de confiança que ela mesma escolheu.
+        Sem desbloquear a tela, sem procurar um botão, sem a mão livre.
+      </p>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="faixa">
+      <h2>O tamanho do problema</h2>
+      <p class="intro">
+        Números públicos, com fonte. Nenhum deles é nosso, e nenhum deles melhorou
+        no último ano.
+      </p>
+      <div class="numeros-site">
+        <div class="dado">
+          <b>1.568</b>
+          <p>feminicídios em 2025, o maior número já registrado</p>
+          <cite>Fórum Brasileiro de Segurança Pública, 2026</cite>
+        </div>
+        <div class="dado">
+          <b>64%</b>
+          <p>foram mortas dentro da própria casa</p>
+          <cite>Fórum Brasileiro de Segurança Pública, 2026</cite>
+        </div>
+        <div class="dado">
+          <b>61%</b>
+          <p>dos casos de violência nunca chegam a ser denunciados</p>
+          <cite>Mapa Nacional da Violência de Gênero</cite>
+        </div>
+        <div class="dado">
+          <b>1,06 mi</b>
+          <p>chamadas ao 190 por violência doméstica em 2024 — duas por minuto</p>
+          <cite>Fórum Brasileiro de Segurança Pública</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="faixa">
+      <h2>Onde as soluções existentes param</h2>
+      <p class="intro">
+        O botão do pânico já é política pública em vários estados, e funciona — para quem
+        chegou até ele. O caminho até lá é longo, e é aí que a maioria fica de fora.
+      </p>
+      <div class="lacuna">
+        <ol>
+          <li><b>Acontece</b> A violência</li>
+          <li class="corte"><b>Aqui param 61%</b> A denúncia</li>
+          <li><b>Depois</b> A medida protetiva</li>
+          <li><b>Só então</b> O botão do pânico</li>
+        </ol>
+        <p class="conclusao">
+          <strong>A mulher que ainda não denunciou está descoberta.</strong>
+          Não porque falte tecnologia, mas porque toda a proteção disponível hoje começa
+          depois de uma decisão judicial.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="como">
+    <div class="faixa">
+      <h2>Como funciona</h2>
+      <p class="intro">
+        Três partes, e a terceira é a que muda o resultado.
+      </p>
+      <div class="passos">
+        <div class="passo">
+          <h3>1 · A palavra</h3>
+          <p>
+            Uma frase escolhida por ela. O reconhecimento acontece dentro do próprio
+            aparelho, sem internet e sem enviar áudio para lugar nenhum. Nem nós sabemos
+            qual frase ela escolheu.
+          </p>
+        </div>
+        <div class="passo">
+          <h3>2 · A central</h3>
+          <p>
+            A ocorrência aparece em menos de um segundo, com localização atualizada
+            enquanto ela se move. Quinze segundos de janela para ela cancelar em silêncio,
+            se tiver sido engano — e a central já está vendo desde o primeiro instante.
+          </p>
+        </div>
+        <div class="passo">
+          <h3>3 · A rede de Anjos</h3>
+          <p>
+            Pessoas de confiança que ela aprovou, avisadas junto com a central.
+            Uma irmã a dois quarteirões chega antes de qualquer viatura, e sabe quem
+            vai encontrar do outro lado da porta.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="faixa">
+      <h2>Por que a ponte, e não o alarme</h2>
+      <p class="intro">
+        Levantamos o que existe em quatro continentes. O gargalo se repete em todos:
+        não falta alarme, falta quem responda.
+      </p>
+      <div class="numeros-site">
+        <div class="dado">
+          <b>189</b>
+          <p>de 1.250 tornozeleiras de monitoramento em uso efetivo em São Paulo</p>
+          <cite>Levantamento próprio, fontes públicas</cite>
+        </div>
+        <div class="dado">
+          <b>5 a 7 mil</b>
+          <p>alertas por dia na França, para cerca de dez pessoas atendendo</p>
+          <cite>Levantamento próprio, fontes públicas</cite>
+        </div>
+        <div class="dado">
+          <b>~40%</b>
+          <p>de queda em homicídios de parceiro íntimo em Maryland — a única iniciativa
+             com redução comprovada que encontramos</p>
+          <cite>Lethality Assessment Program</cite>
+        </div>
+      </div>
+      <p class="intro" style="margin-top:2rem;max-width:56ch">
+        O programa de Maryland não entrega uma pontuação de risco e vai embora: ele coloca
+        a mulher em contato com alguém que pode ajudar, ainda durante a ocorrência.
+        O produto não era o score. Era a ponte.
+      </p>
+    </div>
+  </section>
+
+  <section class="secao" id="limites">
+    <div class="faixa">
+      <h2>O que não fazemos</h2>
+      <p class="intro">
+        A pesquisa que fizemos é, em boa parte, um catálogo de projetos que prometeram
+        demais. Estas linhas existem para não repetirmos isso.
+      </p>
+      <div class="limites">
+        <div class="limite">
+          <h3>Não prometemos reduzir a violência</h3>
+          <p>Nenhum aplicativo tem essa evidência, e uma revisão de 621 apps não encontrou
+             um único estudo de efetividade.</p>
+        </div>
+        <div class="limite">
+          <h3>Não classificamos risco por algoritmo</h3>
+          <p>Na Espanha, 247 mulheres foram assassinadas depois de avaliadas por um sistema
+             de pontuação. Recusa, não falta de tempo.</p>
+        </div>
+        <div class="limite">
+          <h3>Não guardamos o que não precisamos</h3>
+          <p>A palavra secreta nunca sai do aparelho. Localização só existe atrelada a uma
+             ocorrência — não há rastreamento contínuo.</p>
+        </div>
+        <div class="limite">
+          <h3>Não prometemos resposta policial</h3>
+          <p>Despacho depende de parceria formal assinada com quem atende. Enquanto não
+             houver, dizemos exatamente isso.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="contato">
+    <div class="faixa">
+      <div class="chamada">
+        <h2>Para quem atende quem está em risco</h2>
+        <p>
+          Estamos procurando uma delegacia, uma patrulha ou uma secretaria disposta a testar
+          isto em campo com um grupo pequeno. Queremos as perguntas difíceis antes da escala:
+          quantos alertas por dia o canal aguenta, quem decide quem recebe, e o que acontece
+          com um chamado falso.
+        </p>
+        <a class="btn" href="mailto:contato@mulheresemrisco.org.br?subject=Teste%20em%20campo">
+          Conversar sobre um piloto
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="faixa">
+    <p class="socorro">
+      <b>Se você está em perigo agora:</b> ligue 190. Para orientação e acolhimento,
+      o Ligue 180 atende 24 horas, também por WhatsApp no (61) 9610-0180.
+    </p>
+    <p>
+      Mulheres em Risco · Startup Weekend Women Lages 2026 ·
+      <a href="/pesquisa">Responder à pesquisa</a>
+    </p>
+    <p>
+      Este é um protótipo em validação. Nenhuma das funcionalidades descritas está
+      em operação pública, e dizemos isso porque prometer o contrário é o erro mais
+      comum deste setor.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
