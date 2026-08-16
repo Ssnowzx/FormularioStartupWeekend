@@ -1,23 +1,28 @@
 # Estado do projeto
 
-> Fechamento da sessão de 15/08/2026. Para retomar sem reler tudo.
+> Fechamento da sessão de 16/08/2026. Para retomar sem reler tudo.
 
 ---
 
 ## O que está decidido
 
 **Produto:** *Mulheres em Risco* — nome institucional, para pitch e imprensa. No celular
-da usuária o app aparece disfarçado, tipo calculadora.
+da usuária o app aparece **disfarçado de calculadora**, e a calculadora funciona.
 
-**A ideia não é um botão, é um gatilho de voz.** A mulher fala uma palavra secreta
-escolhida por ela; o celular ouve mesmo largado na bolsa e envia alerta com localização
-e áudio ao vivo para uma central, que despacha a polícia durante a ocorrência. O áudio
-também vira prova.
+**A ideia não é um botão, é um gatilho de voz.** A mulher fala uma frase secreta
+escolhida por ela; o celular reconhece **dentro do próprio aparelho, sem internet**, e
+envia alerta com localização para uma central, que despacha ajuda. Junto com a central,
+a rede de pessoas de confiança que ela aprovou é avisada por link de WhatsApp.
 
-**Modelo:** B2G, para Secretaria Estadual de Segurança, que instala em mulheres já
-identificadas como em risco.
+**Modelo:** B2G, para Secretaria Estadual de Segurança. A landing também publica
+**preço em tabela** (R$ 98,90 / 198,90 / 248,90 por mês, para 20 / 50 / 100 mulheres,
+com plano anual de 2 meses grátis) — que é a porta de entrada sem licitação, para
+prefeitura pequena, delegacia ou ONG.
 
 **Porta de entrada em Lages:** Delegacia da Mulher. Consenso do time.
+
+**Frase da marca**, definida em 16/08:
+> O medo que silencia mulheres revela uma sociedade que ainda não aprendeu a protegê-las.
 
 ---
 
@@ -26,40 +31,38 @@ identificadas como em risco.
 | Onde | O quê |
 |---|---|
 | `docs/pesquisa-dominio.md` | O problema em números, com fontes |
-| `docs/benchmark/` | Varredura de Brasil, EUA, Europa e Ásia — o que existe, o que morreu e por quê |
-| `docs/identidade-visual.md` | Paleta creme + azul-petróleo, e a regra das duas identidades |
-| `docs/cabine-de-decisao.html` | Cédula do time, com a pesquisa embutida |
-| `docs/pauta-de-mentoria.html` | 19 perguntas para mentores, com o porquê de cada uma |
-| `docs/pesquisa-de-campo.html` | Roteiros para órgãos e para mulheres, uso interno |
-| `docs/questionario-institucional.html` | Para enviar à Delegacia responder |
-| `docs/questionario-mulheres.html` | Anônimo, para responder no celular do time |
-| `servidor/` | Node + MariaDB: formulário, banco e painel em `/admin` |
-| `servidor/alerts.js` | API do aparelho, da central e do Anjo, montada com 2 linhas de diff |
-| `servidor/publico/dispatch.html` | Central ao vivo: fila, trajeto, Anjos, linha do tempo |
-| `servidor/publico/guardian.html` | A página que o Anjo abre no celular dele |
-| `servidor/publico/enroll.html` | Cadastro da usuária e dos Anjos, com o código de vínculo |
-| `servidor/publico/simulator.html` | Finge ser o app — o seguro da demonstração |
-| `app-android/` | APK Kotlin: calculadora de fachada, Vosk offline, alerta com localização |
+| `docs/benchmark/` | Brasil, EUA, Europa e Ásia — o que existe, o que morreu e por quê |
+| `docs/identidade-visual.md` | **Duas paletas**: institucional roxa e produto azul-petróleo |
+| `docs/arquitetura.md` | Como o servidor está organizado e onde acrescentar coisa nova |
 | `docs/como-rodar-a-demo.md` | Do laptop desligado até a palavra chegando na central |
+| `docs/roteiro-video.md` | Vídeo de 2min30 para o NotebookLM, falas prontas |
+| `docs/roteiro-pitch.md` | Pitch de 4 minutos, 14 slides, com preparação para o júri |
+| `servidor/` | Três produtos num processo: site, pesquisa e o sistema |
+| `app-android/` | APK Kotlin: calculadora, Vosk offline, alerta com localização |
 
-O servidor foi testado com banco real e está no GitHub, pronto para subir na VPS.
-O passo a passo está em `servidor/README.md`.
+**O fluxo inteiro funciona.** Em 15/08 o gatilho de voz foi acionado num Android real:
+a palavra foi falada, o alerta chegou à central, a ocorrência foi resolvida no painel e
+o aparelho voltou a acionar com a mesma palavra.
 
-**O fluxo inteiro foi verificado ponta a ponta no navegador**, com a central recebendo o
-alerta em menos de um segundo, o trajeto se movendo, o Anjo abrindo o link e o "estou a
-caminho" voltando: 7 segundos entre o acionamento e o Anjo confirmar.
+---
 
-**Funcionou num celular Android de verdade em 15/08.** A palavra foi falada em voz alta, o
-alerta chegou à central, a ocorrência foi resolvida no painel e o aparelho voltou a acionar
-com a mesma palavra. O ciclo inteiro fecha.
+## ⚠️ A limitação que precisa ser resolvida antes de prometer qualquer coisa
 
-Dois bugs só apareceram nesse uso real, e valem lembrar porque nenhum teste automatizado os
-pegaria: os arquivos do modelo de voz chegavam truncados em 4 MiB (asset comprimido), e o
-celular ficava travado depois que a central resolvia, porque **quem encerra a ocorrência é a
-central e não existe push para o aparelho — ele precisa perguntar**.
+**O reconhecimento funciona offline. O envio do alerta, não.**
 
-Ainda não foi testado: tela apagada, celular na bolsa, e serviço rodando por muito tempo em
-aparelho de fabricante que mata processo em segundo plano.
+Descoberto em 16/08, lendo o código: se ela falar a palavra **sem sinal**, o `POST` de
+abertura da ocorrência falha e **o alerta se perde**. A fila em disco (`q.jsonl`) que
+existe no app carrega apenas **posições**, não a abertura da ocorrência. E ela não tem
+como perceber, porque a tela não muda — por projeto.
+
+Isso contradiz o RNF-3 (caminho degradado que funcione offline) e é a pergunta mais
+provável de um jurado técnico. O texto da landing foi corrigido para não prometer o que
+não existe.
+
+**O conserto** (~2 horas): persistir o alerta pendente igual às posições, tentar de novo
+com backoff, e disparar quando a conectividade voltar (`ConnectivityManager.NetworkCallback`).
+Depois disso a promessa vira verdadeira — e vira diferencial, porque mulher em risco no
+interior costuma estar justamente onde o sinal é ruim.
 
 ---
 
@@ -72,39 +75,58 @@ pela vítima** em vez de esperar que ela grite.
 
 **2. O bloco jurídico está inteiro em aberto.** Transmitir áudio ambiente ao vivo para
 um órgão público, sem o agressor saber, esbarra em interceptação? O áudio serve como
-prova ou o advogado dele derruba? As respostas do time foram *"consulte a legislação"*.
-Um promotor ou delegada responde isso de improviso — está no roteiro dos órgãos.
+prova? As respostas do time foram *"consulte a legislação"*. **Por isso áudio ficou fora
+do MVP** — hoje o produto envia alerta e localização, não som.
 
 **3. A solução gera mais alerta para uma central que já não vaza.** São Paulo tem 1.250
 tornozeleiras e 189 em uso. A França recebe 5 a 7 mil alertas por dia com dez
-funcionários. O gargalo que a pesquisa encontrou em seis jurisdições não é o alarme — é
-a resposta. Nossa ideia aumenta o volume de alarme.
+funcionários. O gargalo não é o alarme — é a resposta. A rede de confiança é a nossa
+aposta contra isso, e é aposta, não prova.
 
 ---
 
 ## O quarto risco, que só apareceu ao construir
 
-**O ponto verde do microfone.** No Android 12+, qualquer captura contínua de áudio acende o
-indicador de privacidade na barra de status e registra o uso no Painel de Privacidade. Isso
-vale para o Vosk, para o reconhecedor do Google e para qualquer outra abordagem — não existe
-contorno legítimo para um aplicativo comum.
+**O ponto verde do microfone.** No Android 12+, qualquer captura contínua acende o
+indicador de privacidade na barra de status. Vale para o Vosk, para o reconhecedor do
+Google e para qualquer abordagem — não existe contorno legítimo.
 
 Um app disfarçado de calculadora com o ponto verde permanente é um disfarce com um furo
-permanente. Há duas saídas, e é preciso escolher uma antes do júri perguntar: assumir ("o
-disfarce protege do olhar casual, não da perícia") ou passar a escutar em janelas
-intermitentes, o que degrada exatamente a função central.
+permanente. Ou o time assume ("protege do olhar casual, não da perícia"), ou vai para
+escuta intermitente, que degrada a função central. **Decidir antes que perguntem.**
+
+---
+
+## A colisão de nome, descoberta em 16/08
+
+A referência de vídeo escolhida pelo time é o *Manual do Aplicativo* da **Todas Por
+Uma** — concorrente que o próprio benchmark registra como **ativa há 7 anos, com mais de
+20 mil usuárias**. A descrição do vídeo delas diz: *"pessoas de confiança, pré-cadastradas
+como **Anjos**"*.
+
+**"Anjos" é o termo delas, para a mesma função.** Não é impeditivo, mas soa derivado para
+quem conhece. Os roteiros usam **"rede de confiança"**; o código ainda usa `guardian` /
+`Anjo`. Alternativas que cabem: *rede de confiança*, *quem chega primeiro*, *próximos*.
+
+O diferencial de vocês continua intacto: elas resolvem por botão e dispositivo, vocês
+por voz.
+
+---
 
 ## Próximos passos
 
-1. **Levar as três perguntas acima à Delegacia da Mulher.** É a fonte que ninguém mais
-   tem, e um "sim, topamos testar" vale mais que qualquer slide.
-3. **Subir o servidor na VPS** e trocar o link do questionário pelo endereço próprio.
-   O `schema_alerts.sql` roda depois do `schema.sql`, e o nginx precisa de
-   `proxy_buffering off` para o alerta não chegar atrasado na tela.
-4. **Aplicar a pesquisa com mulheres** — o painel destaca sozinho o percentual que não
-   falaria a palavra em voz alta. Acima de 40%, o gatilho de voz precisa ser repensado.
-5. **Decidir o nome de fachada** do app. Por ora está "Calculadora", que é o que a doc já
-   apontava; falta o logotipo e a decisão formal do time.
+1. **Implementar a fila do alerta offline.** É a lacuna que transforma uma promessa
+   quebrada em diferencial.
+2. **Decidir o nome da rede de confiança** — antes de gravar o vídeo e de imprimir slide.
+3. **Decidir o que dizer sobre o ponto verde do microfone.**
+4. **Levar as três perguntas à Delegacia da Mulher.** É a fonte que ninguém mais tem, e
+   um "sim, topamos testar" vale mais que qualquer slide.
+5. **Subir na VPS**: `modules/survey/schema.sql`, `modules/alert/schema.sql`, `.env` com
+   os dois papéis, e `proxy_buffering off` no nginx.
+6. **Testar no celular**: tela apagada, aparelho na bolsa, e o serviço aguentando 30
+   minutos no fabricante de vocês.
+7. **Atualizar os números de Lages**, que são de 2021. Se não der tempo, dizer o ano em
+   voz alta no pitch.
 
 ---
 

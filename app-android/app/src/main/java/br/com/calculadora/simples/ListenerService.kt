@@ -134,7 +134,11 @@ class ListenerService : Service() {
         if (alert != null) return
         worker.execute {
             val handle = api.openAlert(tracker.lastKnown(), batteryPercent()) ?: run {
-                Log.w(TAG, "alerta não subiu; a fila tentará de novo")
+                // LIMITAÇÃO CONHECIDA: sem rede no instante do gatilho, o alerta
+                // se perde aqui. A fila em disco só carrega posições, não a
+                // abertura da ocorrência — e ela não tem como saber, porque a
+                // tela não muda por projeto. Ver docs/estado-do-projeto.md.
+                Log.w(TAG, "alerta não subiu e NÃO será reenviado")
                 return@execute
             }
             alert = handle

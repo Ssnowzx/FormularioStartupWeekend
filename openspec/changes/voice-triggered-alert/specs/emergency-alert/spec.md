@@ -37,9 +37,15 @@ avião. O modelo está embarcado no aplicativo.
 **Dado pessoal persistido:** bateria no acionamento — a central precisa saber se vai perder
 o rastro em minutos. Opcional; o alerta abre sem ele.
 
-**Caminho degradado:** sem rede, o evento entra numa fila em disco e é reenviado com
-backoff exponencial. Cada ponto carrega o instante em que foi capturado, então a entrega
-tardia reconstrói o trajeto real em vez de amontoá-lo no momento da entrega.
+**Caminho degradado — parcialmente implementado.** As **posições** entram numa fila em
+disco e são reenviadas com backoff; cada ponto carrega o instante em que foi capturado,
+então a entrega tardia reconstrói o trajeto real em vez de amontoá-lo na hora da entrega.
+
+**A abertura da ocorrência ainda não tem fila.** Sem rede no instante do gatilho, o
+alerta se perde, e a usuária não tem como perceber porque a tela não muda por projeto.
+Isso descumpre o RNF-3 e está registrado como a tarefa crítica número 1 em `tasks.md`.
+Enquanto não for resolvido, nenhum material pode prometer **acionamento** offline — só
+**reconhecimento** offline, que esse funciona.
 
 ## ADDED: Janela de cancelamento
 

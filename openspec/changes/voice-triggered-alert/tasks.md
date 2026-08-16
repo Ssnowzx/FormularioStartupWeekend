@@ -1,6 +1,6 @@
 # Tarefas
 
-Estado em 15/08/2026, fim da sessão de implementação.
+Estado em 16/08/2026.
 
 ## Feitas — críticas para a demo
 
@@ -53,6 +53,13 @@ Estado em 15/08/2026, fim da sessão de implementação.
 Os dois bugs que só apareceram aqui: modelo truncado em 4 MiB, e o aparelho travado depois
 do "resolvido" porque ninguém avisava o celular. Ambos corrigidos e verificados.
 
+## ⚠️ Crítica — a lacuna offline
+
+- [ ] **Fila do alerta quando não há rede.** Hoje `Api.openAlert` falha e a ocorrência
+      se perde: a fila em disco só carrega posições. Persistir o alerta pendente,
+      tentar de novo com backoff e disparar no `ConnectivityManager.NetworkCallback`.
+      Sem isso o RNF-3 não está cumprido e a landing não pode prometer offline. (~2h)
+
 ## Pendentes — críticas, dependem de tempo com o aparelho
 
 - [ ] Tela apagada e celular dentro da bolsa, a 1 metro
@@ -60,8 +67,17 @@ do "resolvido" porque ninguém avisava o celular. Ambos corrigidos e verificados
 - [ ] Isenção de otimização de bateria e autostart no aparelho da demo
 - [ ] Ensaio cronometrado do roteiro, duas vezes, uma com a wifi desligada
 - [ ] Vídeo de 60s do fluxo completo, salvo no disco — plano B de última instância
-- [ ] Subir na VPS: `schema_alerts.sql`, `.env`, `proxy_buffering off` no nginx
-- [ ] Testar com a tela apagada e com o celular dentro da bolsa, a 1 metro
+- [ ] Subir na VPS: `modules/survey/schema.sql`, `modules/alert/schema.sql`, `.env`
+      com os dois papéis, e `proxy_buffering off` no nginx
+
+## Feitas depois da demo — 16/08
+
+- [x] Servidor reorganizado em três módulos independentes (site, survey, alert)
+- [x] Papéis separados: pesquisadora e operadora não se alcançam
+- [x] Landing page comercial, com DNA extraído da referência do próprio time
+- [x] Planos de venda com alternador mensal/anual
+- [x] Roteiro do vídeo (2min30) e do pitch (4 min)
+
 ## Roadmap declarado — não prometer como pronto
 
 - [ ] Áudio como prova (buffer circular + assinatura). Bloqueado pelo bloco jurídico
