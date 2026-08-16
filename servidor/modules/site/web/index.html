@@ -411,7 +411,7 @@
   </section>
 
   <!-- ============ 07 · planos ============ -->
-  <section class="secao" id="planos">
+  <section class="secao faixa-tenue" id="planos">
     <div class="faixa">
       <div class="cabeca entra">
         <span class="marcador">07 — Planos</span>
@@ -452,7 +452,7 @@
           <a class="btn btn-vazio" href="#contato">Começar por aqui</a>
         </div>
 
-        <div class="plano destacado">
+        <div class="plano destacado escuro">
           <span class="plano-selo">Mais escolhido</span>
           <h3>Município</h3>
           <p class="preco">
@@ -471,7 +471,7 @@
             <li>Vários operadores na mesma central</li>
             <li>Suporte por WhatsApp, sete dias por semana</li>
           </ul>
-          <a class="btn btn-primario" href="#contato">Falar sobre este plano</a>
+          <a class="btn btn-claro" href="#contato">Falar sobre este plano</a>
         </div>
 
         <div class="plano">
@@ -505,43 +505,11 @@
     </div>
   </section>
 
-  <!-- ============ 08 · o que não fazemos ============ -->
-  <section class="secao faixa-escura" id="limites">
-    <div class="faixa">
-      <div class="cabeca entra">
-        <span class="marcador">08 — Honestidade</span>
-        <h2>O que não fazemos.</h2>
-        <p class="apoio">
-          A pesquisa que fizemos é, em boa parte, um catálogo de projetos que prometeram
-          demais. Estas linhas existem para não repetirmos isso.
-        </p>
-      </div>
-      <div class="limites entra">
-        <div class="limite">
-          <h3>Não prometemos reduzir a violência</h3>
-          <p>Nenhum aplicativo tem essa evidência. Uma revisão de 621 apps não encontrou um único estudo de efetividade.</p>
-        </div>
-        <div class="limite">
-          <h3>Não classificamos risco por algoritmo</h3>
-          <p>Na Espanha, 247 mulheres foram assassinadas depois de avaliadas por um sistema de pontuação. É recusa, não falta de tempo.</p>
-        </div>
-        <div class="limite">
-          <h3>Não guardamos o que não precisamos</h3>
-          <p>A palavra nunca sai do aparelho. Localização só existe atrelada a uma ocorrência — não há rastreamento contínuo.</p>
-        </div>
-        <div class="limite">
-          <h3>Não prometemos resposta policial</h3>
-          <p>Despacho depende de parceria formal assinada com quem atende. Enquanto não houver, dizemos exatamente isso.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 09 · chamada ============ -->
+  <!-- ============ 08 · chamada ============ -->
   <section class="secao faixa-escura" id="contato">
     <div class="faixa chamada">
       <div class="cabeca centro entra">
-        <span class="marcador">09 — Piloto</span>
+        <span class="marcador">08 — Piloto</span>
         <h2>Para quem atende quem está em risco.</h2>
         <p class="apoio">
           Procuramos uma delegacia, uma patrulha ou uma secretaria disposta a testar isto
@@ -588,22 +556,37 @@
   }, { passive: true });
 
   // Alternador de periodicidade. Os dois preços já estão no HTML como
-  // data-mes e data-ano, então trocar é só reescrever o texto — nada é
-  // calculado aqui, e o que o leitor vê é o que está escrito na página.
+  // data-mes e data-ano — nada é calculado aqui, e o que o leitor vê é o
+  // que está escrito na página.
+  const alternador = document.querySelector(".alternador");
   const btnMensal = document.getElementById("btn-mensal");
   const btnAnual = document.getElementById("btn-anual");
+
+  // O indicador que desliza precisa saber a largura real de cada botão,
+  // que muda com a fonte e com o idioma.
+  function medirIndicador() {
+    const ativo = alternador.querySelector('[aria-pressed="true"]');
+    alternador.style.setProperty("--largura-ind", ativo.offsetWidth + "px");
+    alternador.style.setProperty("--desloca-ind", (ativo.offsetLeft - 4) + "px");
+  }
 
   function periodicidade(qual) {
     btnMensal.setAttribute("aria-pressed", String(qual === "mes"));
     btnAnual.setAttribute("aria-pressed", String(qual === "ano"));
+    medirIndicador();
     for (const el of document.querySelectorAll("[data-mes]")) {
       const valor = el.dataset[qual];
       if (el.classList.contains("preco-nota")) el.innerHTML = valor;
       else el.textContent = valor;
+      el.classList.remove("mudou");
+      void el.offsetWidth;              // reinicia a animação
+      el.classList.add("mudou");
     }
   }
   btnMensal.addEventListener("click", () => periodicidade("mes"));
   btnAnual.addEventListener("click", () => periodicidade("ano"));
+  medirIndicador();
+  addEventListener("resize", medirIndicador, { passive: true });
 
   // A simulação do lado dela. Três estados em laço, para a seção ser lida
   // como o sistema funcionando e não como uma captura parada.
