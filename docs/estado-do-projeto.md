@@ -40,6 +40,7 @@ identificadas como em risco.
 | `servidor/publico/enroll.html` | Cadastro da usuária e dos Anjos, com o código de vínculo |
 | `servidor/publico/simulator.html` | Finge ser o app — o seguro da demonstração |
 | `app-android/` | APK Kotlin: calculadora de fachada, Vosk offline, alerta com localização |
+| `docs/como-rodar-a-demo.md` | Do laptop desligado até a palavra chegando na central |
 
 O servidor foi testado com banco real e está no GitHub, pronto para subir na VPS.
 O passo a passo está em `servidor/README.md`.
@@ -48,14 +49,17 @@ O passo a passo está em `servidor/README.md`.
 alerta em menos de um segundo, o trajeto se movendo, o Anjo abrindo o link e o "estou a
 caminho" voltando: 7 segundos entre o acionamento e o Anjo confirmar.
 
-**O APK foi instalado e exercitado num emulador Android 16**: abre como "Calculadora",
-vincula pelo código de convite contra o servidor de verdade, carrega o modelo de voz por
-inteiro e aplica a gramática de duas palavras. A captura de tela sai preta, que é a prova de
-que o `FLAG_SECURE` funciona.
+**Funcionou num celular Android de verdade em 15/08.** A palavra foi falada em voz alta, o
+alerta chegou à central, a ocorrência foi resolvida no painel e o aparelho voltou a acionar
+com a mesma palavra. O ciclo inteiro fecha.
 
-**Falta falar a frase para um microfone de verdade** — o emulador não injeta áudio. É o
-único elo não exercitado, e é também onde aparecem o fabricante que mata serviço em segundo
-plano e o Play Protect. Instalar no celular na noite anterior, nunca no palco.
+Dois bugs só apareceram nesse uso real, e valem lembrar porque nenhum teste automatizado os
+pegaria: os arquivos do modelo de voz chegavam truncados em 4 MiB (asset comprimido), e o
+celular ficava travado depois que a central resolvia, porque **quem encerra a ocorrência é a
+central e não existe push para o aparelho — ele precisa perguntar**.
+
+Ainda não foi testado: tela apagada, celular na bolsa, e serviço rodando por muito tempo em
+aparelho de fabricante que mata processo em segundo plano.
 
 ---
 
@@ -92,9 +96,7 @@ intermitentes, o que degrada exatamente a função central.
 
 ## Próximos passos
 
-1. **Instalar o APK num celular Android de verdade e rodar o fluxo inteiro.** É a lacuna
-   que sobrou, e nenhuma outra validação a substitui.
-2. **Levar as três perguntas acima à Delegacia da Mulher.** É a fonte que ninguém mais
+1. **Levar as três perguntas acima à Delegacia da Mulher.** É a fonte que ninguém mais
    tem, e um "sim, topamos testar" vale mais que qualquer slide.
 3. **Subir o servidor na VPS** e trocar o link do questionário pelo endereço próprio.
    O `schema_alerts.sql` roda depois do `schema.sql`, e o nginx precisa de

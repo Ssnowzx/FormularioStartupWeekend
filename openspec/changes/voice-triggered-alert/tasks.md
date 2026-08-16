@@ -43,20 +43,25 @@ Estado em 15/08/2026, fim da sessão de implementação.
 - [x] O microfone abre e a tela mostra "Fale agora"
 - [x] Modelo fica em `filesDir`; `/sdcard/Android/data/<pacote>/` **nem existe**
 
-## Pendentes — críticas, mas dependem de aparelho e de gente
+## Verificado em celular Android real — 15/08/2026
 
-- [ ] **Falar a frase para um microfone de verdade.** É o único elo que o emulador não
-      exercita, porque não há como injetar áudio real nele. Tudo em volta está verificado.
-- [ ] **Instalar o APK num celular Android real e rodar o fluxo inteiro.** É onde aparecem
-      o fabricante que mata serviço em background e o Play Protect.
-      **Fazer na noite anterior, nunca no palco.**
-- [ ] Testar com a tela apagada e com o celular dentro da bolsa, a 1 metro
-- [ ] Deixar o serviço 30 minutos rodando e conferir que não morreu
-- [ ] Isenção de otimização de bateria e autostart do fabricante, no aparelho da demo
-- [ ] Ensaio cronometrado do roteiro, duas vezes, uma delas com a wifi desligada
-- [ ] Vídeo de 60s do fluxo completo, salvo no disco — o plano B de última instância
+- [x] APK instala pelo navegador e abre como "Calculadora"
+- [x] Vínculo por código de convite digitado no aparelho
+- [x] **Palavra falada em voz alta dispara o alerta**, que chega à central
+- [x] Central resolve a ocorrência e o aparelho **volta a acionar com a mesma palavra**
+
+Os dois bugs que só apareceram aqui: modelo truncado em 4 MiB, e o aparelho travado depois
+do "resolvido" porque ninguém avisava o celular. Ambos corrigidos e verificados.
+
+## Pendentes — críticas, dependem de tempo com o aparelho
+
+- [ ] Tela apagada e celular dentro da bolsa, a 1 metro
+- [ ] Serviço rodando 30 minutos sem morrer (é onde o fabricante aparece)
+- [ ] Isenção de otimização de bateria e autostart no aparelho da demo
+- [ ] Ensaio cronometrado do roteiro, duas vezes, uma com a wifi desligada
+- [ ] Vídeo de 60s do fluxo completo, salvo no disco — plano B de última instância
 - [ ] Subir na VPS: `schema_alerts.sql`, `.env`, `proxy_buffering off` no nginx
-
+- [ ] Testar com a tela apagada e com o celular dentro da bolsa, a 1 metro
 ## Roadmap declarado — não prometer como pronto
 
 - [ ] Áudio como prova (buffer circular + assinatura). Bloqueado pelo bloco jurídico
