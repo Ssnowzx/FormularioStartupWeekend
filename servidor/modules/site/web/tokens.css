@@ -52,7 +52,11 @@
   --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-label:   "Space Grotesk", ui-monospace, monospace;
 
+  /* Título curto (até ~50 caracteres) usa --text-display. Uma tese longa
+     precisa descer um degrau, senão vira quatro linhas de 4.5rem e o leitor
+     perde a frase no meio. */
   --text-display:   clamp(2.75rem, 6.2vw, 4.5rem);
+  --text-display-s: clamp(2.1rem, 4.4vw, 3.35rem);
   --text-h2:        clamp(2rem, 4.2vw, 3rem);
   --text-h3:        1.125rem;
   --text-lead:      clamp(1.05rem, 1.6vw, 1.2rem);
