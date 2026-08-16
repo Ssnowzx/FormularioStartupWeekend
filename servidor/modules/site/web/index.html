@@ -26,6 +26,7 @@
       <a href="#problema">O problema</a>
       <a href="#ideia">A ideia</a>
       <a href="#fluxo">Como funciona</a>
+      <a href="#produto">O produto</a>
       <a href="#limites">O que não fazemos</a>
     </div>
     <a class="btn btn-escuro" href="#contato">Falar conosco</a>
@@ -263,11 +264,73 @@
     </div>
   </section>
 
+  <!-- ============ 05 · o produto ============ -->
+  <section class="secao faixa-tenue" id="produto">
+    <div class="faixa">
+      <div class="cabeca entra">
+        <span class="marcador">05 — O produto</span>
+        <h2>Dois lados. Uma resposta.</h2>
+        <p class="apoio">
+          Do lado dela, o sistema trabalha em silêncio. A interface completa vive
+          na central que a atende.
+        </p>
+      </div>
+
+      <div class="dois-lados">
+        <div class="lado entra">
+          <span class="rotulo">Lado dela</span>
+          <h3>Uma calculadora.</h3>
+
+          <div class="tela" id="tela">
+            <div class="tela-topo"><span>14:38</span><span id="tela-estado"></span></div>
+            <div class="visor" id="visor">0</div>
+            <div class="onda-mini" id="onda"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="teclado" aria-hidden="true">
+              <span class="tecla fn">C</span><span class="tecla fn">±</span>
+              <span class="tecla fn">%</span><span class="tecla op">÷</span>
+              <span class="tecla">7</span><span class="tecla">8</span>
+              <span class="tecla">9</span><span class="tecla op">×</span>
+              <span class="tecla">4</span><span class="tecla">5</span>
+              <span class="tecla">6</span><span class="tecla op">−</span>
+              <span class="tecla">1</span><span class="tecla">2</span>
+              <span class="tecla">3</span><span class="tecla op">+</span>
+              <span class="tecla">0</span><span class="tecla">,</span>
+              <span class="tecla"></span><span class="tecla op">=</span>
+            </div>
+          </div>
+
+          <p class="narra"><span class="pulsante"></span><span class="txt" id="narra">Escutando.</span></p>
+
+          <p class="nota">
+            Ela fala a frase e o alerta sai. A tela não muda — a única marca é a vírgula
+            no zero, combinada com ela. Não há nada mais para ver, e é esse o ponto.
+          </p>
+        </div>
+
+        <div class="lado entra">
+          <span class="rotulo">Lado da central</span>
+          <h3>A interface completa.</h3>
+
+          <figure class="captura">
+            <img src="/site/central-real.png" width="1720" height="1560" loading="lazy"
+                 alt="A central mostrando a ocorrência de Maria Aparecida: telefone, cidade,
+                      bateria, referência de endereço e o trajeto dela no mapa">
+            <figcaption>
+              Captura da central em funcionamento, não uma maquete. Nome, telefone,
+              referência de endereço e o trajeto se atualizando enquanto ela se move
+              chegam em menos de um segundo para quem responde.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ 06 · a ponte ============ -->
   <section class="secao faixa-escura">
     <div class="faixa">
       <div class="cabeca entra">
-        <span class="marcador">05 — Por quê</span>
+        <span class="marcador">06 — Por quê</span>
         <h2>O gargalo não é o alarme. É a resposta.</h2>
         <p class="apoio">Levantamos o que existe em quatro continentes. O padrão se repete em todos.</p>
       </div>
@@ -300,7 +363,7 @@
   <section class="secao" id="limites">
     <div class="faixa">
       <div class="cabeca entra">
-        <span class="marcador">06 — Honestidade</span>
+        <span class="marcador">07 — Honestidade</span>
         <h2>O que não fazemos.</h2>
         <p class="apoio">
           A pesquisa que fizemos é, em boa parte, um catálogo de projetos que prometeram
@@ -332,7 +395,7 @@
   <section class="secao faixa-escura" id="contato">
     <div class="faixa chamada">
       <div class="cabeca centro entra">
-        <span class="marcador">07 — Piloto</span>
+        <span class="marcador">08 — Piloto</span>
         <h2>Para quem atende quem está em risco.</h2>
         <p class="apoio">
           Procuramos uma delegacia, uma patrulha ou uma secretaria disposta a testar isto
@@ -377,6 +440,32 @@
   addEventListener("scroll", () => {
     pilula.classList.toggle("rolada", scrollY > 12);
   }, { passive: true });
+
+  // A simulação do lado dela. Três estados em laço, para a seção ser lida
+  // como o sistema funcionando e não como uma captura parada.
+  const parado = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const visor = document.getElementById("visor");
+  const onda = document.getElementById("onda");
+  const narra = document.getElementById("narra");
+
+  const ATOS = [
+    { ms: 3800, visor: "0",  viva: false, txt: "Escutando. O reconhecimento roda dentro do aparelho." },
+    { ms: 1500, visor: "0",  viva: true,  txt: "<b>Palavra reconhecida.</b>" },
+    { ms: 4200, visor: "0,", viva: false, txt: "<b>Alerta enviado.</b> A tela não mudou." }
+  ];
+
+  let ato = 0;
+  function tocar() {
+    const a = ATOS[ato];
+    visor.textContent = a.visor;
+    onda.classList.toggle("viva", a.viva);
+    narra.innerHTML = a.txt;
+    ato = (ato + 1) % ATOS.length;
+    setTimeout(tocar, a.ms);
+  }
+  // Sem movimento: mostra o estado final, que é o que interessa entender.
+  if (parado) { const a = ATOS[2]; visor.textContent = a.visor; narra.innerHTML = a.txt; }
+  else tocar();
 </script>
 </body>
 </html>

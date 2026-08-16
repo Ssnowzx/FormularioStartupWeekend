@@ -102,7 +102,8 @@ body {
    Seções — a alternância clara/escura é o ritmo da página
    ================================================================== */
 
-.secao { padding-block: var(--space-24); position: relative; }
+/* a pílula do topo é fixa: sem isto, clicar no menu esconde o título dela embaixo */
+.secao { padding-block: var(--space-24); position: relative; scroll-margin-top: 5.5rem; }
 @media (max-width: 48rem) { .secao { padding-block: var(--space-16); } }
 
 .faixa-escura {
@@ -253,6 +254,81 @@ h1 .destaque { color: var(--color-accent); }
 .limites { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr)); gap: var(--space-8); }
 .limite { border-top: 2px solid var(--color-accent); padding-top: var(--space-4); }
 .limite p { margin: var(--space-2) 0 0; font-size: 0.94rem; color: var(--color-ink-soft); }
+
+/* ==================================================================
+   O produto — dois lados
+   ================================================================== */
+
+/* Faixa tênue: quebra a monotonia entre duas seções claras seguidas sem
+   precisar inverter o ritmo de todas as outras. */
+.faixa-tenue { background: var(--color-paper-2); }
+
+.dois-lados { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+              gap: var(--space-12); align-items: start; }
+@media (max-width: 62rem) { .dois-lados { grid-template-columns: minmax(0, 1fr); gap: var(--space-12); } }
+
+.lado > h3 { margin-bottom: var(--space-2); }
+.lado > .rotulo { font-family: var(--font-label); font-size: var(--text-label);
+                  text-transform: uppercase; letter-spacing: 0.16em;
+                  color: var(--color-ink-soft); display: block; margin-bottom: var(--space-3); }
+.lado .nota { font-size: 0.9rem; color: var(--color-ink-soft); margin: var(--space-4) 0 0; }
+
+/* A tela dela. Sem moldura de celular desenhada: o que importa é a interface,
+   e hardware falso é justamente o tipo de enfeite que denuncia uma página
+   feita por IA. */
+.tela {
+  border-radius: var(--radius); border: var(--rule); background: var(--color-paper);
+  box-shadow: 0 18px 44px oklch(16.4% 0.01 265 / 0.10);
+  overflow: hidden; aspect-ratio: 9 / 17; display: flex; flex-direction: column;
+  max-width: 20rem;
+}
+.tela-topo { display: flex; justify-content: space-between; align-items: center;
+             padding: var(--space-3) var(--space-4); font-family: var(--font-label);
+             font-size: 0.68rem; color: var(--color-ink-soft); letter-spacing: 0.06em; }
+.visor { flex: 1; display: flex; align-items: flex-end; justify-content: flex-end;
+         padding: var(--space-4) var(--space-4) var(--space-2);
+         font-family: var(--font-display); font-weight: 600; font-size: 3.25rem;
+         letter-spacing: -0.03em; line-height: 1; color: var(--color-ink);
+         font-variant-numeric: tabular-nums; }
+.teclado { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem;
+           padding: var(--space-3) var(--space-4) var(--space-4); }
+.tecla { aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
+         background: var(--color-paper-2); font-size: 0.82rem; color: var(--color-ink); }
+.tecla.op { background: oklch(58.5% 0.143 315 / 0.12); color: var(--color-accent); }
+.tecla.fn { background: var(--color-border); color: var(--color-ink-soft); }
+
+/* A narração embaixo da tela — é ela que faz a simulação ser lida como
+   simulação, e não como uma captura parada. */
+.narra { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4);
+         min-height: 2.75rem; }
+.narra .pulsante { width: 0.5rem; height: 0.5rem; border-radius: 50%;
+                   background: var(--color-accent); flex: none; }
+.narra .txt { font-size: 0.9rem; color: var(--color-ink-soft); }
+.narra .txt b { color: var(--color-ink); font-weight: 600; }
+@keyframes pulsar { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+.narra .pulsante { animation: pulsar 1.6s ease-in-out infinite; }
+
+/* onda dentro da tela */
+.onda-mini { display: flex; align-items: center; justify-content: center; gap: 3px;
+             height: 1.5rem; padding-bottom: var(--space-2); }
+.onda-mini i { display: block; width: 3px; border-radius: 2px; background: var(--color-accent);
+               height: 100%; transform-box: fill-box; transform-origin: center;
+               animation: onda 1.1s ease-in-out infinite; opacity: .35;
+               transition: opacity var(--dur-mid) var(--ease-out); }
+.onda-mini.viva i { opacity: 1; }
+.onda-mini i:nth-child(1) { height: 30%; animation-delay: .05s }
+.onda-mini i:nth-child(2) { height: 58%; animation-delay: .18s }
+.onda-mini i:nth-child(3) { height: 92%; animation-delay: .02s }
+.onda-mini i:nth-child(4) { height: 70%; animation-delay: .26s }
+.onda-mini i:nth-child(5) { height: 44%; animation-delay: .12s }
+.onda-mini i:nth-child(6) { height: 78%; animation-delay: .31s }
+.onda-mini i:nth-child(7) { height: 36%; animation-delay: .08s }
+
+/* A central: captura do produto de verdade, não maquete desenhada. */
+.captura { margin: 0; }
+.captura img { width: 100%; height: auto; display: block; border-radius: var(--radius);
+               border: var(--rule); box-shadow: 0 18px 44px oklch(16.4% 0.01 265 / 0.10); }
+.captura figcaption { font-size: 0.85rem; color: var(--color-ink-soft); margin-top: var(--space-4); }
 
 /* ==================================================================
    Chamada e rodapé
