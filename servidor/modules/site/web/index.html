@@ -269,17 +269,17 @@
     <div class="faixa">
       <div class="cabeca entra">
         <span class="marcador">05 — O produto</span>
-        <h2>Dois lados. Uma resposta.</h2>
+        <h2>Ela vê uma calculadora. Quem responde vê tudo.</h2>
         <p class="apoio">
-          Do lado dela, o sistema trabalha em silêncio. A interface completa vive
-          na central que a atende.
+          A assimetria é o produto. Toda a informação vai para quem pode agir, e
+          nenhuma fica na tela que o agressor pode pegar.
         </p>
       </div>
 
       <div class="dois-lados">
         <div class="lado entra">
-          <span class="rotulo">Lado dela</span>
-          <h3>Uma calculadora.</h3>
+          <span class="rotulo">O que ela vê</span>
+          <h3>Uma calculadora que calcula.</h3>
 
           <div class="tela" id="tela">
             <div class="tela-topo"><span>14:38</span><span id="tela-estado"></span></div>
@@ -308,19 +308,68 @@
         </div>
 
         <div class="lado entra">
-          <span class="rotulo">Lado da central</span>
-          <h3>A interface completa.</h3>
+          <span class="rotulo">O que a central recebe</span>
+          <h3>Tudo, no mesmo segundo.</h3>
 
-          <figure class="captura">
-            <img src="/site/central-real.png" width="1720" height="1560" loading="lazy"
-                 alt="A central mostrando a ocorrência de Maria Aparecida: telefone, cidade,
-                      bateria, referência de endereço e o trajeto dela no mapa">
-            <figcaption>
-              Captura da central em funcionamento, não uma maquete. Nome, telefone,
-              referência de endereço e o trajeto se atualizando enquanto ela se move
-              chegam em menos de um segundo para quem responde.
-            </figcaption>
-          </figure>
+          <div class="central" id="central">
+            <div class="central-topo">
+              <span class="aovivo"><i></i> ao vivo</span>
+              <span id="protocolo">sem ocorrência</span>
+            </div>
+
+            <p class="central-vazia">Nenhuma ocorrência aberta agora.</p>
+
+            <div class="central-corpo">
+              <p class="ocorrencia-nome">Maria Aparecida</p>
+              <p class="ocorrencia-sub">
+                <span class="selo-status">Recebida</span>
+                acionada há <b id="cronometro">00:00</b>
+              </p>
+
+              <div class="campos">
+                <div class="campo-c"><span>Telefone</span><b>(49) 99912-3456</b></div>
+                <div class="campo-c"><span>Cidade</span><b>Lages</b></div>
+                <div class="campo-c"><span>Bateria</span><b>41%</b></div>
+              </div>
+
+              <p class="referencia-c">
+                <span>Referência de endereço</span>
+                Bairro Coral, casa amarela perto da escola
+              </p>
+
+              <div class="mapa-c">
+                <svg viewBox="0 0 420 120" role="img" aria-label="Trajeto dela desde o acionamento">
+                  <polyline points="34,96 78,86 118,90 162,72 206,64 248,46 292,42 334,26"
+                            fill="none" stroke="var(--color-accent-soft)" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="334" cy="26" r="16" fill="var(--color-accent)" opacity=".16"/>
+                  <circle cx="334" cy="26" r="5.5" fill="var(--color-accent)"/>
+                  <g fill="var(--color-accent-soft)">
+                    <circle cx="34" cy="96" r="3"/><circle cx="78" cy="86" r="3"/>
+                    <circle cx="118" cy="90" r="3"/><circle cx="162" cy="72" r="3"/>
+                    <circle cx="206" cy="64" r="3"/><circle cx="248" cy="46" r="3"/>
+                    <circle cx="292" cy="42" r="3"/>
+                  </g>
+                  <line x1="34" y1="110" x2="94" y2="110" stroke="var(--color-ink-soft)" stroke-width="1"/>
+                  <text x="34" y="106" font-size="9" fill="var(--color-ink-soft)"
+                        font-family="var(--font-label)">100 m</text>
+                </svg>
+              </div>
+              <p class="coords">−27.813798, −50.324176 · ±20 m · atualizando</p>
+
+              <div class="linha-tempo">
+                <p class="evento forte"><i></i> Alerta recebido <span>· por voz</span></p>
+                <p class="evento"><i></i> Rita avisada pelo WhatsApp <span>· irmã</span></p>
+                <p class="evento forte"><i></i> Rita está a caminho</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="nota">
+            Nome, telefone, referência de endereço, bateria e o trajeto se atualizando
+            enquanto ela anda. Os Anjos que ela aprovou recebem no mesmo instante que
+            a central — não depois.
+          </p>
         </div>
       </div>
     </div>
@@ -448,24 +497,55 @@
   const onda = document.getElementById("onda");
   const narra = document.getElementById("narra");
 
+  const central = document.getElementById("central");
+  const crono = document.getElementById("cronometro");
+  const protocolo = document.getElementById("protocolo");
+
   const ATOS = [
-    { ms: 3800, visor: "0",  viva: false, txt: "Escutando. O reconhecimento roda dentro do aparelho." },
-    { ms: 1500, visor: "0",  viva: true,  txt: "<b>Palavra reconhecida.</b>" },
-    { ms: 4200, visor: "0,", viva: false, txt: "<b>Alerta enviado.</b> A tela não mudou." }
+    { ms: 3800, visor: "0",  viva: false, viva_central: false,
+      txt: "Escutando. O reconhecimento roda dentro do aparelho." },
+    { ms: 1500, visor: "0",  viva: true,  viva_central: false,
+      txt: "<b>Palavra reconhecida.</b>" },
+    { ms: 5600, visor: "0,", viva: false, viva_central: true,
+      txt: "<b>Alerta enviado.</b> A tela não mudou." }
   ];
 
-  let ato = 0;
+  let ato = 0, segundos = 0, contando = null;
+
   function tocar() {
     const a = ATOS[ato];
     visor.textContent = a.visor;
     onda.classList.toggle("viva", a.viva);
     narra.innerHTML = a.txt;
+
+    // Os dois lados são o mesmo evento: quando o alerta sai do celular, a
+    // central acende. É essa simultaneidade que a seção precisa mostrar.
+    central.classList.toggle("ativa", a.viva_central);
+    protocolo.textContent = a.viva_central ? "ocorrência #1284" : "sem ocorrência";
+    clearInterval(contando);
+    if (a.viva_central) {
+      segundos = 0;
+      crono.textContent = "00:00";
+      contando = setInterval(() => {
+        segundos++;
+        crono.textContent = String(Math.floor(segundos / 60)).padStart(2, "0") + ":" +
+                            String(segundos % 60).padStart(2, "0");
+      }, 1000);
+    }
+
     ato = (ato + 1) % ATOS.length;
     setTimeout(tocar, a.ms);
   }
-  // Sem movimento: mostra o estado final, que é o que interessa entender.
-  if (parado) { const a = ATOS[2]; visor.textContent = a.visor; narra.innerHTML = a.txt; }
-  else tocar();
+
+  // Sem movimento: mostra o estado final dos dois lados, que é o que interessa.
+  if (parado) {
+    const a = ATOS[2];
+    visor.textContent = a.visor;
+    narra.innerHTML = a.txt;
+    central.classList.add("ativa");
+    protocolo.textContent = "ocorrência #1284";
+    crono.textContent = "00:12";
+  } else tocar();
 </script>
 </body>
 </html>
