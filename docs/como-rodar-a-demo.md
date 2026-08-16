@@ -13,15 +13,15 @@ Na VPS ele já está de pé. Localmente, um container resolve:
 
 ```bash
 docker start mer-db 2>/dev/null || docker run -d --name mer-db \
-  -p 127.0.0.1:3311:3306 -e MARIADB_ROOT_PASSWORD=raiz_local_hackathon mariadb:11
+  -p 127.0.0.1:3311:3306 -e MARIADB_ROOT_PASSWORD=SENHA_LOCAL_DA_RAIZ mariadb:11
 ```
 
 Só na primeira vez, aplique os dois esquemas e crie os usuários:
 
 ```bash
 cd servidor
-docker exec -i mer-db mariadb -uroot -praiz_local_hackathon < schema.sql
-docker exec -i mer-db mariadb -uroot -praiz_local_hackathon < schema_alerts.sql
+docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < schema.sql
+docker exec -i mer-db mariadb -uroot -pSENHA_LOCAL_DA_RAIZ < schema_alerts.sql
 ```
 
 O `schema.sql` cria usuários `@'localhost'`, que é o certo na VPS, onde o Node e o banco
@@ -115,10 +115,10 @@ Para reabrir as configurações no celular: digite **`271828`** e aperte **`=`**
 Só necessário quando o banco está num container e o Node fora dele:
 
 ```sql
-CREATE USER IF NOT EXISTS 'mer_app'@'%' IDENTIFIED BY 'senha_pesquisa_local';
+CREATE USER IF NOT EXISTS 'mer_app'@'%' IDENTIFIED BY 'SENHA_LOCAL_DA_PESQUISA';
 GRANT SELECT, INSERT ON mulheres_em_risco.respostas TO 'mer_app'@'%';
 
-CREATE USER IF NOT EXISTS 'mer_alerts'@'%' IDENTIFIED BY 'senha_alertas_local';
+CREATE USER IF NOT EXISTS 'mer_alerts'@'%' IDENTIFIED BY 'SENHA_LOCAL_DOS_ALERTAS';
 GRANT SELECT, INSERT ON mulheres_em_risco.protected_user TO 'mer_alerts'@'%';
 GRANT UPDATE (display_name, phone_e164, city, reference_note, status, redacted_at)
   ON mulheres_em_risco.protected_user TO 'mer_alerts'@'%';
