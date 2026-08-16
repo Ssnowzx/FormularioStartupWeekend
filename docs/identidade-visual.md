@@ -29,38 +29,54 @@ institucional é o que vai para o telão.
 
 ## Paleta
 
-Extraída da referência, ajustada para contraste acessível. Nomes em inglês (regra de idioma do
-código); os valores são o contrato.
+> **Atualizado em 16/08/2026.** A paleta institucional foi trocada a partir da referência
+> própria do time (`orange-echo-shield-safe.base44.app`), extraída com `hallmark study`.
+> A anterior — azul `#2E2FB8` sobre creme — não chegou a ser implementada em lugar nenhum.
+
+A regra das duas identidades agora tem valores concretos dos dois lados. **Não são a mesma
+paleta, e isso é o ponto.**
+
+### Institucional — landing page, deck, imprensa
+
+Âncora em roxo, com faixas profundas alternando com papel quase branco. Valores em OKLCH
+(o hex fica ao lado para quem precisar em ferramenta de design):
 
 ```css
-:root {
-  /* Base — creme quente, nunca branco puro */
-  --bg-cream:        #FDF3ED;
-  --bg-cream-deep:   #F7E9E0;
-  --surface:         #FFFFFF;
-
-  /* Azuis — cor principal da marca */
-  --blue-soft:       #7B9CE3;  /* vestido: superfícies amplas, ilustração */
-  --blue-deep:       #2E2FB8;  /* top: títulos, botões primários */
-  --blue-ink:        #1A1A3E;  /* texto sobre creme */
-
-  /* Acentos */
-  --coral:           #E8453C;  /* haste da placa: CTA, alertas — usar com parcimônia */
-  --teal:            #4FC3B0;  /* colar: destaques secundários, sucesso */
-  --sand:            #E8C4A0;  /* transições suaves */
-
-  /* Texto */
-  --text-primary:    #1A1A2E;
-  --text-secondary:  #55556B;
-}
+--color-paper:       oklch(99.2% 0.001 264.5);  /* #FCFCFD */
+--color-ink:         oklch(16.4% 0.010 265.6);  /* #0C0E13 */
+--color-ink-soft:    oklch(48.4% 0.015 261.5);  /* #5A5F68 */
+--color-accent:      oklch(58.5% 0.143 315.0);  /* #9B5EB5 — a âncora */
+--color-accent-soft: oklch(77.7% 0.084 313.6);  /* #CAA7DD */
+--color-deep:        oklch(34.2% 0.110 311.1);  /* #4B2361 — as faixas escuras */
+--color-emergency:   oklch(67.8% 0.210 24.7);   /* #FF5252 */
 ```
 
-**Regra do coral:** é a única cor quente forte da paleta. Reservar para **uma** ação por tela.
-Coral em tudo vira alarme visual — o oposto de "não agressivo".
+**Sobre o roxo e a regra anti-slop.** A lista de "slop de IA" abaixo proíbe *gradiente
+roxo-para-azul em tudo*, e continua valendo. O que existe aqui é diferente: uma âncora
+sólida, sem gradiente, usada com disciplina — e o roxo profundo carrega o ritmo da página
+através da alternância de faixas. Se aparecer gradiente roxo→azul em qualquer superfície,
+é erro.
 
-**Contraste:** `--blue-deep` sobre `--bg-cream` dá contraste alto e seguro. `--blue-soft` sobre creme
-**não passa** em WCAG AA para texto pequeno — usar só em superfícies e ilustração, nunca em corpo de
-texto.
+**Regra do vermelho:** `--color-emergency` aparece **uma vez** na landing inteira, no aviso
+de perigo imediato do rodapé. Em qualquer outro lugar ele compete com o roxo e a página vira
+alarme — o oposto de "não agressivo".
+
+### Produto — central, cadastro, página do Anjo
+
+Continua no creme + azul-petróleo que está em `servidor/shared/web/theme.css` e já foi
+validado em tela. É a superfície operacional: quem a usa está atendendo uma emergência, não
+sendo convencido de nada.
+
+```css
+--cream: #FAF1E1;  --surface: #FFFBF3;  --petrol-deep: #155E63;
+--coral: #AE432B;  --good: #387043;     --ink: #1F2A2B;
+```
+
+O app no celular dela não tem marca nenhuma: aparece como calculadora.
+
+**Contraste:** `--color-accent` sobre papel dá 4.6:1 — passa em AA para corpo de texto.
+`--color-accent-soft` **não passa** sobre papel; usar só sobre as faixas escuras ou em
+superfície e ilustração.
 
 ---
 
@@ -89,11 +105,12 @@ As skills `hallmark-anti-slop` e `kill-ai-slop` existem exatamente para varrer i
 
 ## Tipografia
 
-Sem-serifa geométrica e amigável, com peso alto para títulos — a placa da referência usa caixa alta
-bold. Sugestões (todas com bom suporte a português):
+Definida em 16/08/2026 e **auto-hospedada** em `servidor/shared/web/fonts/` — sem CDN, sem
+Google Fonts em runtime. Três arquivos variáveis, 128 KB somados.
 
-- **Títulos:** Poppins, Outfit ou Nunito — peso 700/800
-- **Corpo:** Inter ou Source Sans — peso 400/500
+- **Títulos:** **Sora** 700–800, tracking fechado (−0.03em). Geométrica, peso alto
+- **Corpo:** **Inter** 400–500
+- **Rótulos e marcadores:** **Space Grotesk**, caixa alta, tracking aberto (0.18em)
 
 Corpo de texto **nunca em caixa alta**. Caixa alta só em selos e chamadas curtas.
 

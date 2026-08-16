@@ -1,0 +1,286 @@
+/* Landing institucional. Tokens em tokens.css — nada de cor ou fonte
+   literal neste arquivo. */
+
+@font-face {
+  font-family: "Sora"; src: url("/shared/fonts/Sora.woff2") format("woff2-variations");
+  font-weight: 400 800; font-display: swap; font-style: normal;
+}
+@font-face {
+  font-family: "Inter"; src: url("/shared/fonts/Inter.woff2") format("woff2-variations");
+  font-weight: 300 700; font-display: swap; font-style: normal;
+}
+@font-face {
+  font-family: "Space Grotesk"; src: url("/shared/fonts/SpaceGrotesk.woff2") format("woff2-variations");
+  font-weight: 400 600; font-display: swap; font-style: normal;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* clip, nunca hidden: hidden quebra position:sticky em cadeia */
+html, body { overflow-x: clip; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.faixa { width: min(72rem, 100% - 2.5rem); margin-inline: auto; }
+@media (max-width: 30rem) { .faixa { width: min(72rem, 100% - 1.75rem); } }
+
+/* ==================================================================
+   Nav — N5 pílula flutuante
+   ================================================================== */
+
+.topo {
+  position: fixed; inset-inline: 0; top: 0; z-index: 50;
+  display: flex; justify-content: center; padding: var(--space-4);
+  pointer-events: none;
+}
+.pilula {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: var(--space-6);
+  height: 3.5rem; padding-inline: var(--space-4) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: oklch(100% 0 0 / 0.72);
+  border: var(--rule);
+  backdrop-filter: blur(14px);
+  transition: box-shadow var(--dur-mid) var(--ease-out),
+              background var(--dur-mid) var(--ease-out);
+  max-width: 100%;
+}
+.pilula.rolada { box-shadow: 0 8px 30px oklch(16.4% 0.01 265 / 0.10); background: oklch(100% 0 0 / 0.9); }
+
+.marca { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-display);
+         font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--color-ink);
+         white-space: nowrap; }
+.marca svg { display: block; }
+
+.links { display: flex; gap: var(--space-6); }
+.links a {
+  font-size: 0.9rem; color: var(--color-ink-soft); text-decoration: none;
+  white-space: nowrap;                      /* nunca quebrar link em duas linhas */
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.links a:hover { color: var(--color-ink); }
+@media (max-width: 56rem) { .links { display: none; } }
+
+/* ==================================================================
+   Botões
+   ================================================================== */
+
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: 0.8rem 1.4rem; border-radius: var(--radius-pill);
+  font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;
+  text-decoration: none; border: 0; cursor: pointer; white-space: nowrap;
+  transition: transform var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+.btn-primario { background: var(--color-accent); color: var(--color-paper);
+                box-shadow: 0 4px 16px oklch(58.5% 0.143 315 / 0.28); }
+.btn-primario:hover { background: oklch(53% 0.15 315); box-shadow: 0 6px 22px oklch(58.5% 0.143 315 / 0.36); }
+.btn-escuro { background: var(--color-ink); color: var(--color-paper); padding: 0.65rem 1.15rem; font-size: 0.88rem; }
+.btn-escuro:hover { background: oklch(26% 0.02 265); }
+.btn-vazio { background: transparent; color: var(--color-ink); border: var(--rule); }
+.btn-vazio:hover { background: var(--color-paper-2); }
+.btn:active { transform: translateY(1px); }
+.btn .seta { transition: transform var(--dur-fast) var(--ease-out); }
+.btn:hover .seta { transform: translateX(3px); }
+
+:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; border-radius: 4px; }
+.faixa-escura :focus-visible { outline-color: var(--color-accent-soft); }
+
+/* ==================================================================
+   Seções — a alternância clara/escura é o ritmo da página
+   ================================================================== */
+
+.secao { padding-block: var(--space-24); position: relative; }
+@media (max-width: 48rem) { .secao { padding-block: var(--space-16); } }
+
+.faixa-escura {
+  background: var(--color-deep);
+  color: oklch(97% 0.005 310);
+  overflow: hidden;
+}
+.faixa-escura .apoio { color: oklch(85% 0.03 310); }
+
+/* Grade tênue ao fundo das faixas escuras — dá textura sem virar ruído. */
+.faixa-escura::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(oklch(100% 0 0 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(100% 0 0 / 0.045) 1px, transparent 1px);
+  background-size: 5rem 5rem;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+.faixa-escura > .faixa { position: relative; }
+
+/* Cabeça de seção — marcador ordinal EMPILHADO sobre o título, nunca ao lado */
+.cabeca { max-width: 34rem; margin-bottom: var(--space-12); }
+.cabeca.centro { margin-inline: auto; text-align: center; }
+.marcador {
+  font-family: var(--font-label); font-size: var(--text-label);
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--color-ink-soft); display: block; margin-bottom: var(--space-4);
+}
+.faixa-escura .marcador { color: var(--color-accent-soft); }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; font-style: normal;
+             letter-spacing: -0.03em; line-height: 1.06; margin: 0;
+             overflow-wrap: anywhere; min-width: 0; }
+h2 { font-size: var(--text-h2); }
+h3 { font-size: var(--text-h3); letter-spacing: -0.01em; line-height: 1.3; }
+.apoio { color: var(--color-ink-soft); font-size: var(--text-lead); margin: var(--space-4) 0 0; }
+
+/* ==================================================================
+   Herói — H2 split
+   ================================================================== */
+
+.heroi { padding-block: calc(var(--space-32) + 2rem) var(--space-24); }
+.heroi-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+               gap: var(--space-16); align-items: center; }
+@media (max-width: 62rem) { .heroi-grade { grid-template-columns: minmax(0, 1fr); gap: var(--space-12); } }
+
+.selo {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: 0.4rem 0.9rem; border-radius: var(--radius-pill);
+  border: var(--rule); background: var(--color-paper);
+  font-family: var(--font-label); font-size: var(--text-label);
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-ink-soft);
+  margin-bottom: var(--space-6);
+}
+.selo .ponto { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--color-accent); }
+
+h1 { font-size: var(--text-display); }
+h1 .destaque { color: var(--color-accent); }
+.heroi .apoio { max-width: 34rem; }
+.heroi .acoes { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-8); }
+
+/* ==================================================================
+   A onda — a ideia do produto, desenhada
+   ================================================================== */
+
+/* proporção casada com o viewBox da ilustração — senão a onda embaixo é cortada */
+.palco { position: relative; display: grid; place-items: center; aspect-ratio: 1; }
+.palco > svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+@keyframes anel {
+  0%   { transform: scale(0.35); opacity: 0; }
+  12%  { opacity: 0.55; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes respirar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes onda     { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+@keyframes surgir   { from { opacity: 0; transform: translateY(1.25rem); } to { opacity: 1; transform: none; } }
+
+/* transform-box: sem isto, transform-origin em SVG resolve contra o viewport
+   inteiro e não contra o próprio elemento — as barras saem do lugar. */
+.anel, .figura, .barra { transform-box: fill-box; transform-origin: center; }
+.anel { animation: anel 4.5s var(--ease-out) infinite; }
+.anel:nth-of-type(2) { animation-delay: 1.5s; }
+.anel:nth-of-type(3) { animation-delay: 3s; }
+.figura { animation: respirar 5s ease-in-out infinite; }
+.barra  { animation: onda 1.15s ease-in-out infinite; }
+.barra:nth-child(2) { animation-delay: .12s } .barra:nth-child(3) { animation-delay: .26s }
+.barra:nth-child(4) { animation-delay: .09s } .barra:nth-child(5) { animation-delay: .31s }
+.barra:nth-child(6) { animation-delay: .18s } .barra:nth-child(7) { animation-delay: .04s }
+
+/* Fichas sobrepostas — sólidas, não de vidro. O documento de identidade
+   proíbe glassmorphism, e a referência usava. */
+.ficha {
+  position: absolute; display: flex; align-items: center; gap: var(--space-3);
+  padding: 0.7rem 1rem; border-radius: var(--radius-sm);
+  background: var(--color-paper); border: var(--rule);
+  box-shadow: 0 10px 30px oklch(16.4% 0.01 265 / 0.10);
+  font-family: var(--font-label); font-size: var(--text-label);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+.ficha b { display: block; font-family: var(--font-display); font-size: 0.95rem;
+           letter-spacing: -0.01em; text-transform: none; color: var(--color-ink); }
+.ficha-alta { top: 8%; right: 4%; }
+.ficha-baixa { bottom: 1%; left: 0; }
+@media (max-width: 30rem) { .ficha { display: none; } }
+
+/* A palavra em grande, na faixa escura */
+.palavra-palco { position: relative; display: grid; place-items: center;
+                 padding-block: var(--space-16); }
+.palavra {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(3.5rem, 13vw, 9rem); letter-spacing: -0.05em; line-height: 1;
+  color: var(--color-accent-soft); opacity: 0.92;
+}
+
+/* ==================================================================
+   Números, passos, limites
+   ================================================================== */
+
+.dados { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); gap: var(--space-8); }
+.dado b { display: block; font-family: var(--font-display); font-weight: 700;
+          font-size: clamp(2.25rem, 4.5vw, 3rem); line-height: 1; letter-spacing: -0.04em;
+          color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.faixa-escura .dado b { color: var(--color-accent-soft); }
+.dado p { margin: var(--space-3) 0 var(--space-2); font-size: 0.95rem; }
+.dado cite { font-style: normal; font-family: var(--font-label); font-size: 0.7rem;
+             text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-ink-soft); }
+.faixa-escura .dado cite { color: oklch(72% 0.03 310); }
+
+.passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: var(--space-6); }
+.passo { padding: var(--space-6); border-radius: var(--radius); border: var(--rule-dark);
+         background: oklch(100% 0 0 / 0.03); }
+.passo .n { font-family: var(--font-label); font-size: var(--text-label); letter-spacing: 0.14em;
+            color: var(--color-accent-soft); display: block; margin-bottom: var(--space-4); }
+.passo p { margin: var(--space-2) 0 0; font-size: 0.92rem; }
+
+.funil { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+         gap: var(--space-3); margin-bottom: var(--space-8); }
+.etapa { padding: var(--space-4) var(--space-4); border-radius: var(--radius-sm);
+         border: var(--rule); background: var(--color-paper); }
+.etapa.corte { border-color: var(--color-accent); background: oklch(58.5% 0.143 315 / 0.07); }
+.etapa .r { display: block; font-family: var(--font-label); font-size: 0.68rem;
+            text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-ink-soft);
+            margin-bottom: var(--space-2); }
+.etapa.corte .r { color: var(--color-accent); }
+
+.limites { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr)); gap: var(--space-8); }
+.limite { border-top: 2px solid var(--color-accent); padding-top: var(--space-4); }
+.limite p { margin: var(--space-2) 0 0; font-size: 0.94rem; color: var(--color-ink-soft); }
+
+/* ==================================================================
+   Chamada e rodapé
+   ================================================================== */
+
+.chamada { text-align: center; }
+.chamada h2 { max-width: 20ch; margin-inline: auto; }
+.chamada .apoio { max-width: 48ch; margin-inline: auto; }
+
+.rodape { padding-block: var(--space-16); border-top: var(--rule); font-size: 0.9rem;
+          color: var(--color-ink-soft); }
+/* nowrap para o link inteiro descer junto em vez de partir no meio:
+   texto clicável em duas linhas é alvo de toque ambíguo no celular */
+.rodape a { color: var(--color-ink); white-space: nowrap; }
+.socorro { border-left: 3px solid var(--color-emergency); padding-left: var(--space-4);
+           margin-bottom: var(--space-8); color: var(--color-ink); }
+.socorro b { color: var(--color-emergency); }
+.ressalva { max-width: 60ch; }
+
+/* ==================================================================
+   Entrada ao rolar — uma primitiva só, aplicada com parcimônia
+   ================================================================== */
+
+.entra { animation: surgir var(--dur-slow) var(--ease-out) both; animation-timeline: view();
+         animation-range: entry 0% entry 45%; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
+  .entra { opacity: 1; transform: none; }
+}

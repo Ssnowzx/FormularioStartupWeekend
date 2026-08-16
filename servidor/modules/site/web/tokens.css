@@ -1,0 +1,87 @@
+/* Hallmark · macrostructure: Long Document (faixas alternadas)
+ * H2 hero knobs: ratio=45/55, right=ilustração autoral, divider=negative-space
+ * N5 nav knobs: floating pill, centred, dark CTA · Ft5 footer knobs: statement + socorro
+ * theme: studied-DNA (source: url) · source-url: https://orange-echo-shield-safe.base44.app
+ * paper oklch(99.2% 0.001 264.5) · accent oklch(58.5% 0.143 315) magenta-indigo
+ * display: Sora 700 · body: Inter 400 · label: Space Grotesk
+ * studied: yes · DNA-source: url (usuário atestou autoria)
+ * pre-emit critique: P5 H5 E4 S5 R4 V4
+ */
+
+/*
+ * Identidade INSTITUCIONAL. Só a landing usa estes tokens.
+ *
+ * A superfície do produto — central, cadastro, página do Anjo — continua no
+ * creme + azul-petróleo de shared/web/theme.css. Isso não é inconsistência:
+ * é a regra das duas identidades de docs/identidade-visual.md. A página que
+ * convence um comprador público e a tela que ela aciona com medo não podem
+ * se parecer.
+ */
+
+:root {
+  /* ---- superfície ---- */
+  --color-paper:        oklch(99.2% 0.001 264.5);   /* #FCFCFD */
+  --color-paper-2:      oklch(96.5% 0.004 300);
+  --color-ink:          oklch(16.4% 0.010 265.6);   /* #0C0E13 */
+  --color-ink-soft:     oklch(48.4% 0.015 261.5);   /* #5A5F68 */
+  --color-border:       oklch(93.6% 0.006 264.5);   /* #E8EAED */
+
+  /* ---- âncora ---- */
+  --color-accent:       oklch(58.5% 0.143 315.0);   /* #9B5EB5 */
+  --color-accent-soft:  oklch(77.7% 0.084 313.6);   /* #CAA7DD */
+  --color-deep:         oklch(34.2% 0.110 311.1);   /* #4B2361 — as faixas escuras */
+  --color-deep-2:       oklch(28.0% 0.095 311.0);
+
+  /* Vermelho de emergência. Aparece UMA vez na página, no rodapé, no aviso
+     de perigo imediato. Em qualquer outro lugar ele compete com o roxo e a
+     página inteira vira alarme. */
+  --color-emergency:    oklch(67.8% 0.210 24.7);    /* #FF5252 */
+
+  /* ---- ilustração ----
+     A pesquisa diz que 64% das vítimas de feminicídio no Brasil são mulheres
+     negras. Uma ilustração só com mulheres brancas contradiz o próprio
+     produto — por isso o tom de pele é token, e não um acidente do desenho. */
+  --ilo-skin:       oklch(58% 0.070 55);
+  --ilo-skin-dark:  oklch(48% 0.065 52);
+  --ilo-hair:       oklch(26% 0.030 40);
+  --ilo-cloth:      oklch(72% 0.100 315);
+  --ilo-cloth-dark: oklch(62% 0.105 313);
+
+  /* ---- tipografia ---- */
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label:   "Space Grotesk", ui-monospace, monospace;
+
+  --text-display:   clamp(2.75rem, 6.2vw, 4.5rem);
+  --text-h2:        clamp(2rem, 4.2vw, 3rem);
+  --text-h3:        1.125rem;
+  --text-lead:      clamp(1.05rem, 1.6vw, 1.2rem);
+  --text-body:      1rem;
+  --text-label:     0.75rem;
+
+  /* ---- espaço, escala de 4pt ---- */
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  --radius:     1.5rem;   /* 24px — o raio da referência */
+  --radius-sm:  0.75rem;
+  --radius-pill: 999px;
+
+  --rule: 1px solid var(--color-border);
+  --rule-dark: 1px solid oklch(100% 0 0 / 0.12);
+
+  /* ---- movimento ---- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:   180ms;
+  --dur-mid:    420ms;
+  --dur-slow:   900ms;
+}
