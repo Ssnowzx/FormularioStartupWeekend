@@ -70,11 +70,23 @@ class Settings(context: Context) {
  * only matches words that exist in its vocabulary, so an invented word would
  * silently never fire. And two-word phrases are what keep the television from
  * triggering an alert — "socorro" is spoken on every soap opera in Brazil.
+ *
+ * EVERY WORD HERE WAS CHECKED AGAINST THE MODEL'S LEXICON (16/08/2026).
+ * The detector feeds Vosk a grammar built from PhraseMatcher.normalize(), so a
+ * word outside the ~80k lexicon of vosk-model-small-pt-0.3 is not "harder to
+ * hear" — it is impossible to hear, silently. "chuva de verão" used to be on
+ * this list and could never fire: the model has "cafe" but not "verao".
+ *
+ * To check a new phrase before adding it, dump the symbol table out of
+ * assets/model-pt/Gr.fst and HCLr.fst (int32 length, bytes, int64 key) and
+ * look for every normalized token.
  */
 val SUGGESTED_PHRASES = listOf(
+    // Primeira da lista porque é a pré-selecionada, e é a frase da demonstração.
+    "orion park",
     "abacaxi azul",
     "girassol amarelo",
-    "chuva de verão",
+    "chuva de janeiro",
     "caderno verde",
     "janela aberta",
     "café frio",
