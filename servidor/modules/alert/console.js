@@ -7,9 +7,8 @@
  * aberto a uma rota que anda com credencial do navegador.
  */
 
-import crypto from "node:crypto";
 import {
-  VALIDADE_CONVITE_MS, VALIDADE_LINK_ANJO_MS, STATUS_VALIDOS,
+  VALIDADE_CONVITE_MS, STATUS_VALIDOS, DESPACHOS, DESFECHOS,
   sha256, texto, numero, paraE164, gerarConvite
 } from "./internals.js";
 import { resumoDoAlerta, detalheDoAlerta, anotar } from "./serialize.js";
@@ -22,7 +21,7 @@ const HEARTBEAT_MS = 15 * 1000;
  * ================================================================== */
 
 export function registrarRotasDoPainel(ctx) {
-  const { app, estado, fluxo, exigirLogin, exigirBanco, BASE_PUBLICA } = ctx;
+  const { app, estado, fluxo, exigirLogin, exigirBanco } = ctx;
 
   app.get("/api/console/stream", exigirLogin, (req, res) => {
     const cliente = fluxo.conectar(res);
@@ -49,27 +48,59 @@ export function registrarRotasDoPainel(ctx) {
     if (!a) return res.status(404).json({ ok: false, erro: "Ocorrência não encontrada." });
     const status = req.body?.status;
     if (!STATUS_VALIDOS.includes(status)) return res.status(400).json({ ok: false, erro: "Status inválido." });
-    mudarStatus(estado, fluxo, a, status, "operator", { note: texto(req.body?.note, 255) });
+
+    // Encerrar sem dizer como é o que transforma relatório em papel em branco.
+    const desfecho = req.body?.outcome;
+    if (status === "resolved" && desfecho && !DESFECHOS[desfecho]) {
+      return res.status(400).json({ ok: false, erro: "Desfecho inválido." });
+    }
+    if (status === "resolved" && desfecho) a.outcome = DESFECHOS[desfecho];
+
+    mudarStatus(estado, fluxo, a, status, "operator", {
+      note: (status === "resolved" && desfecho ? DESFECHOS[desfecho] : null) || texto(req.body?.note, 255)
+    });
     res.json({ ok: true, alert: detalheDoAlerta(a) });
   });
 
-  app.post("/api/console/alerts/:publicId/guardian-links", exigirLogin, exigirBanco, async (req, res) => {
+  /* ---------------- despacho ----------------
+   * Sem a rede de Anjos, é aqui que a central diz o que fez. Cada clique vira
+   * um evento com hora, e é dele que sai o tempo de resposta do relatório. */
+
+  app.post("/api/console/alerts/:publicId/dispatch", exigirLogin, (req, res) => {
     const a = estado.achar(req.params.publicId);
     if (!a) return res.status(404).json({ ok: false, erro: "Ocorrência não encontrada." });
-    const pedidos = Array.isArray(req.body?.guardian_ids) ? req.body.guardian_ids : [];
-    const alvos = a.guardians.filter((g) => pedidos.includes(g.id));
-    if (!alvos.length) return res.status(400).json({ ok: false, erro: "Nenhum Anjo selecionado." });
+    const tipo = req.body?.kind;
+    if (!DESPACHOS[tipo]) return res.status(400).json({ ok: false, erro: "Tipo de despacho inválido." });
+    if (a.status === "resolved" || a.status === "cancelled") {
+      return res.status(409).json({ ok: false, erro: "Esta ocorrência já foi encerrada." });
+    }
 
-    const base = BASE_PUBLICA || `${req.protocol}://${req.get("host")}`;
-    const links = await Promise.all(alvos.map((g) => criarLinkDeAnjo(estado, fluxo, a, g, base)));
-    res.json({ ok: true, links });
+    const registro = { kind: tipo, label: DESPACHOS[tipo], at: new Date().toISOString() };
+    a.dispatches.push(registro);
+    anotar(estado, fluxo, a, "dispatched", "operator", { actorRef: tipo, note: DESPACHOS[tipo] });
+    // Despachar é assumir. Ninguém manda viatura e deixa a ocorrência "nova".
+    if (a.status === "open") mudarStatus(estado, fluxo, a, "in_progress", "operator");
+    else fluxo.emitir("alert.status", resumoDoAlerta(a));
+
+    res.status(201).json({ ok: true, dispatch: registro, alert: detalheDoAlerta(a) });
   });
+
+  app.post("/api/console/alerts/:publicId/note", exigirLogin, (req, res) => {
+    const a = estado.achar(req.params.publicId);
+    if (!a) return res.status(404).json({ ok: false, erro: "Ocorrência não encontrada." });
+    const nota = texto(req.body?.note, 255);
+    if (!nota) return res.status(400).json({ ok: false, erro: "Escreva alguma coisa." });
+    anotar(estado, fluxo, a, "note", "operator", { note: nota });
+    fluxo.emitir("alert.status", resumoDoAlerta(a));
+    res.status(201).json({ ok: true, alert: detalheDoAlerta(a) });
+  });
+
 
   app.get("/api/console/users", exigirLogin, exigirBanco, async (_req, res) => {
     const linhas = await estado.consultar(
       `SELECT u.id, u.display_name, u.city, u.status,
               (SELECT COUNT(*) FROM device d WHERE d.protected_user_id = u.id AND d.revoked_at IS NULL) devices,
-              (SELECT COUNT(*) FROM guardian_link l WHERE l.protected_user_id = u.id AND l.revoked_at IS NULL) guardians
+              (SELECT COUNT(*) FROM alert al WHERE al.protected_user_id = u.id) alerts
          FROM protected_user u ORDER BY u.id DESC LIMIT 200`);
     res.json({ ok: true, users: linhas || [] });
   });
@@ -83,7 +114,6 @@ export function registrarRotasDoPainel(ctx) {
       [nome, paraE164(req.body?.phone_e164), texto(req.body?.city, 80), texto(req.body?.reference_note, 200)]);
     if (!criada) return res.status(503).json({ ok: false, erro: "Não foi possível cadastrar agora." });
 
-    await cadastrarAnjos(estado, criada.insertId, req.body?.guardians);
     const convite = await emitirConvite(estado, criada.insertId);
     res.status(201).json({ ok: true, user_id: criada.insertId, ...convite });
   });
@@ -97,22 +127,6 @@ export function registrarRotasDoPainel(ctx) {
   });
 }
 
-async function cadastrarAnjos(estado, usuariaId, lista) {
-  const anjos = Array.isArray(lista) ? lista.slice(0, 10) : [];
-  let prioridade = 1;
-  for (const anjo of anjos) {
-    const nome = texto(anjo?.name, 80);
-    const fone = paraE164(anjo?.phone_e164);
-    if (!nome || !fone) continue;
-    const criado = await estado.consultar(
-      "INSERT INTO guardian (name, phone_e164, relationship) VALUES (?,?,?)",
-      [nome, fone, texto(anjo?.relationship, 40)]);
-    if (!criado) continue;
-    await estado.consultar(
-      "INSERT INTO guardian_link (protected_user_id, guardian_id, priority) VALUES (?,?,?)",
-      [usuariaId, criado.insertId, prioridade++]);
-  }
-}
 
 async function emitirConvite(estado, usuariaId) {
   const codigo = gerarConvite();
@@ -125,27 +139,3 @@ async function emitirConvite(estado, usuariaId) {
   return { invite_code: `${codigo.slice(0, 4)}-${codigo.slice(4)}`, expires_at: expira.toISOString() };
 }
 
-async function criarLinkDeAnjo(estado, fluxo, a, g, base) {
-  const token = crypto.randomBytes(24).toString("base64url");
-  const expira = new Date(Date.now() + VALIDADE_LINK_ANJO_MS);
-  if (a.dbId) {
-    await estado.consultar(
-      "INSERT INTO guardian_access (alert_id, guardian_id, token_hash, expires_at) VALUES (?,?,?,?)",
-      [a.dbId, g.id, sha256(token), expira]);
-  }
-  estado.tokensDeAnjo.set(sha256(token), { publicId: a.publicId, guardianId: g.id, expira });
-  g.notifiedAt = new Date().toISOString();
-  anotar(estado, fluxo, a, "guardian_notified", "operator", { actorRef: String(g.id), note: g.name });
-  fluxo.emitir("alert.guardian", resumoDoAlerta(a));
-
-  const url = `${base}/anjo/${token}`;
-  const nome = (a.usuaria.displayName || "").split(" ")[0] || "Ela";
-  const mensagem =
-    `${nome} acionou um alerta de emergência agora. ` +
-    `Abra para ver onde ela está e avisar que você está a caminho: ${url}`;
-  return {
-    guardian_id: g.id, name: g.name, url,
-    wa_url: g.phone ? `https://wa.me/${g.phone}?text=${encodeURIComponent(mensagem)}` : null,
-    message: mensagem
-  };
-}

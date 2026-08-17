@@ -107,11 +107,11 @@ async function abrirAlerta(estado, fluxo, req) {
     cancelUntil: new Date(agora.getTime() + JANELA_CANCELAMENTO_MS),
     batteryPct: numero(req.body?.battery_pct, 0, 100),
     usuaria: req.aparelho.usuaria,
-    locations: [], events: [], guardians: []
+    acknowledgedAt: null, outcome: null,
+    locations: [], events: [], dispatches: []
   };
   estado.alertas.set(alerta.publicId, alerta);
   anotar(estado, fluxo, alerta, "created", "device");
-  await carregarAnjos(estado, alerta);
   fluxo.emitir("alert.created", resumoDoAlerta(alerta));
 
   const inserido = await estado.consultar(
@@ -130,17 +130,6 @@ async function abrirAlerta(estado, fluxo, req) {
   return alerta;
 }
 
-async function carregarAnjos(estado, alerta) {
-  const linhas = await estado.consultar(
-    `SELECT g.id, g.name, g.phone_e164, g.relationship, l.priority
-       FROM guardian_link l JOIN guardian g ON g.id = l.guardian_id
-      WHERE l.protected_user_id = ? AND l.revoked_at IS NULL
-      ORDER BY l.priority ASC, g.id ASC`, [alerta.usuariaId]);
-  alerta.guardians = (linhas || []).map((g) => ({
-    id: g.id, name: g.name, phone: g.phone_e164, relationship: g.relationship,
-    priority: g.priority, notifiedAt: null, openedAt: null, onTheWayAt: null
-  }));
-}
 
 export function registrarPosicao(estado, fluxo, a, p) {
   const lat = numero(p?.lat, -90, 90);
@@ -167,6 +156,7 @@ export function registrarPosicao(estado, fluxo, a, p) {
 
 export function mudarStatus(estado, fluxo, a, status, actor, { actorRef = null, note = null } = {}) {
   a.status = status;
+  if (status === "in_progress" && !a.acknowledgedAt) a.acknowledgedAt = new Date().toISOString();
   const campo = status === "cancelled" ? "cancelled_at"
     : status === "in_progress" ? "acknowledged_at"
     : status === "resolved" ? "closed_at" : null;

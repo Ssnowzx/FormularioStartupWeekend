@@ -15,7 +15,6 @@ import { redact } from "../../core/log.js";
 
 export function criarEstado(bda) {
   const alertas = new Map();      // publicId -> alerta vivo
-  const tokensDeAnjo = new Map(); // sha256(token) -> { publicId, guardianId }
   let bancoVivo = Boolean(bda);
 
   async function consultar(sql, params = []) {
@@ -42,7 +41,7 @@ export function criarEstado(bda) {
   }
 
   return {
-    alertas, tokensDeAnjo, consultar, gravar, bancoOk,
+    alertas, consultar, gravar, bancoOk,
     get bancoVivo() { return bancoVivo; },
 
     abertos: () => [...alertas.values()].filter((a) => a.status === "open" || a.status === "in_progress"),
@@ -67,9 +66,8 @@ export function criarEstado(bda) {
     /**
      * Recarrega os alertas recentes depois de um restart.
      *
-     * Não é só para o painel não nascer vazio: os tokens dos Anjos vivem em
-     * memória, e sem isto um link já enviado pelo WhatsApp passaria a responder
-     * 404 no meio da ocorrência — justamente quando alguém está a caminho.
+     * O painel não pode nascer vazio depois de um restart: uma ocorrência
+     * ainda aberta precisa reaparecer na fila, com trajeto e linha do tempo.
      */
     async hidratar() {
       const linhas = await consultar(
@@ -88,7 +86,9 @@ export function criarEstado(bda) {
           openedAt: new Date(l.opened_at), cancelUntil: new Date(l.cancel_window_ends_at),
           batteryPct: l.battery_pct,
           usuaria: { displayName: l.display_name, phone: l.phone_e164, city: l.city, referenceNote: l.reference_note },
-          locations: [], events: [], guardians: []
+          acknowledgedAt: l.acknowledged_at?.toISOString() ?? null,
+          outcome: l.outcome_note || null,
+          locations: [], events: [], dispatches: []
         };
         alertas.set(l.public_id, alerta);
         porId.set(l.id, alerta);
@@ -96,46 +96,12 @@ export function criarEstado(bda) {
       const ids = [...porId.keys()];
       const marcadores = ids.map(() => "?").join(",");
       await Promise.all([
-        preencherAnjos(porId, ids, marcadores),
         preencherPosicoes(porId, ids, marcadores),
         preencherEventos(porId, ids, marcadores)
       ]);
     }
   };
 
-  async function preencherAnjos(porId, ids, marcadores) {
-    // Os vínculos vêm da usuária; os acessos, da ocorrência. Um Anjo cadastrado
-    // e nunca acionado aparece na lista sem token, que é o correto.
-    const vinculos = await consultar(
-      `SELECT a.id alert_id, g.id, g.name, g.phone_e164, g.relationship, l.priority
-         FROM alert a
-         JOIN guardian_link l ON l.protected_user_id = a.protected_user_id AND l.revoked_at IS NULL
-         JOIN guardian g ON g.id = l.guardian_id
-        WHERE a.id IN (${marcadores}) ORDER BY l.priority ASC, g.id ASC`, ids);
-    for (const v of vinculos || []) {
-      porId.get(v.alert_id)?.guardians.push({
-        id: v.id, name: v.name, phone: v.phone_e164, relationship: v.relationship,
-        priority: v.priority, notifiedAt: null, openedAt: null, onTheWayAt: null
-      });
-    }
-
-    const acessos = await consultar(
-      `SELECT alert_id, guardian_id, token_hash, expires_at, created_at, opened_at, on_the_way_at
-         FROM guardian_access
-        WHERE alert_id IN (${marcadores}) AND revoked_at IS NULL AND expires_at > NOW()`, ids);
-    for (const ac of acessos || []) {
-      const alerta = porId.get(ac.alert_id);
-      if (!alerta) continue;
-      tokensDeAnjo.set(ac.token_hash, {
-        publicId: alerta.publicId, guardianId: ac.guardian_id, expira: new Date(ac.expires_at)
-      });
-      const anjo = alerta.guardians.find((g) => g.id === ac.guardian_id);
-      if (!anjo) continue;
-      anjo.notifiedAt = ac.created_at?.toISOString() ?? null;
-      anjo.openedAt = ac.opened_at?.toISOString() ?? null;
-      anjo.onTheWayAt = ac.on_the_way_at?.toISOString() ?? null;
-    }
-  }
 
   async function preencherPosicoes(porId, ids, marcadores) {
     const pontos = await consultar(
@@ -159,10 +125,18 @@ export function criarEstado(bda) {
          FROM alert_event
         WHERE alert_id IN (${marcadores}) ORDER BY created_at ASC`, ids);
     for (const e of eventos || []) {
-      porId.get(e.alert_id)?.events.push({
+      const alerta = porId.get(e.alert_id);
+      if (!alerta) continue;
+      const evento = {
         kind: e.kind, actor: e.actor, actor_ref: e.actor_ref, note: e.note,
         created_at: e.created_at.toISOString()
-      });
+      };
+      alerta.events.push(evento);
+      // O despacho vive no log de eventos; a lista em memória é só um índice
+      // dele, para a tela não ter que filtrar a linha do tempo a cada pintura.
+      if (e.kind === "dispatched") {
+        alerta.dispatches.push({ kind: e.actor_ref, label: e.note, at: evento.created_at });
+      }
     }
   }
 }

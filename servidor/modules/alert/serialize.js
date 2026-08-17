@@ -22,11 +22,12 @@ export function resumoDoAlerta(a) {
     battery_pct: a.batteryPct ?? null,
     user: { display_name: a.usuaria.displayName, city: a.usuaria.city },
     last_location: ultimaPosicao(a),
-    guardians_on_the_way: a.guardians.filter((g) => g.onTheWayAt).length,
-    guardians_notified: a.guardians.filter((g) => g.notifiedAt).length,
-    // O número do pitch: quanto tempo levou entre a palavra dita e alguém
-    // que se importa dizer "estou indo".
-    first_on_the_way_at: a.guardians.map((g) => g.onTheWayAt).filter(Boolean).sort()[0] || null
+    // Os dois números do pitch: quanto tempo entre a palavra dita e a central
+    // assumir, e entre assumir e alguém sair para o endereço.
+    acknowledged_at: a.acknowledgedAt || null,
+    first_dispatch_at: a.dispatches.length ? a.dispatches[0].at : null,
+    dispatches: a.dispatches.length,
+    outcome: a.outcome || null
   };
 }
 
@@ -41,10 +42,7 @@ export function detalheDoAlerta(a) {
     },
     locations: a.locations,
     events: a.events,
-    guardians: a.guardians.map((g) => ({
-      guardian_id: g.id, name: g.name, phone_e164: g.phone, relationship: g.relationship,
-      priority: g.priority, notified_at: g.notifiedAt, opened_at: g.openedAt, on_the_way_at: g.onTheWayAt
-    }))
+    dispatch_log: a.dispatches
   };
 }
 

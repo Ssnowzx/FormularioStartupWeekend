@@ -216,8 +216,11 @@ CREATE TABLE IF NOT EXISTS alert_event (
   id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   alert_id   INT UNSIGNED NOT NULL,
 
+  -- Os tres 'guardian_*' ficam pelas linhas antigas: a rede de Anjos saiu em
+  -- 16/08/2026, mas ocorrencia ja gravada nao se reescreve.
   kind       ENUM('created','location','status_changed','cancelled',
-                  'guardian_notified','guardian_opened','guardian_on_the_way','note') NOT NULL,
+                  'guardian_notified','guardian_opened','guardian_on_the_way',
+                  'dispatched','note') NOT NULL,
   actor      ENUM('device','operator','guardian','system') NOT NULL,
 
   -- Operacional: usuario da central ou id do Anjo. Existe para auditoria de quem

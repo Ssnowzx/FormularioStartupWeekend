@@ -4,6 +4,8 @@
  * Cada arquivo é servido por rota nomeada, não por express.static sobre uma
  * pasta comum. É o que impede o console de despacho de acabar acessível por
  * adivinhação de nome de arquivo a partir de outro produto.
+ *
+ * `/anjo/:token` saiu em 16/08/2026 junto com a rede de Anjos.
  */
 
 import path from "node:path";
@@ -17,13 +19,6 @@ export function registrarPaginas({ app, roleOf, MODO_DEMO }) {
 
   app.get("/central", pagina("console.html"));
   app.get("/cadastro", pagina("enroll.html"));
-
-  // O token fica na URL porque não há como evitar num link de WhatsApp.
-  // Mitigação: Referrer-Policy no-referrer já é global, a página não carrega
-  // nada de terceiros, e o link expira em 12h.
-  app.get("/anjo/:token", (_req, res) =>
-    res.set("Cache-Control", "no-store").set("X-Robots-Tag", "noindex, nofollow")
-       .sendFile(path.join(HERE, "web", "guardian.html")));
 
   // Entrega o APK para o celular baixar e instalar, sem precisar de adb.
   // Só existe em modo demo, e o caminho vem do .env — o APK nunca fica no repo.

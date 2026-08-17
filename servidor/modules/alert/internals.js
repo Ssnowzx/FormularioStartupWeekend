@@ -9,7 +9,6 @@ import crypto from "node:crypto";
 
 export const JANELA_CANCELAMENTO_MS = 15 * 1000;
 export const VALIDADE_CONVITE_MS = 24 * 60 * 60 * 1000;
-export const VALIDADE_LINK_ANJO_MS = 12 * 60 * 60 * 1000;
 export const MAX_OUVINTES = 20;
 export const HEARTBEAT_MS = 15 * 1000;
 
@@ -17,6 +16,25 @@ export const HEARTBEAT_MS = 15 * 1000;
 export const ALFABETO_CONVITE = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 export const STATUS_VALIDOS = ["open", "in_progress", "resolved", "cancelled"];
+
+/* Quem a central manda. O rótulo aparece na linha do tempo e no relatório —
+   é o que responde "o que vocês fizeram" numa prestação de contas. */
+export const DESPACHOS = {
+  patrol:   "Viatura de pronta resposta",
+  police:   "Polícia Militar pelo 190",
+  call:     "Ligação para ela",
+  presence: "Equipe a caminho"
+};
+
+/* Como a ocorrência terminou. Sem isto, "resolvido" não diz nada a quem lê o
+   relatório seis meses depois. */
+export const DESFECHOS = {
+  attended:    "Atendida no local",
+  safe:        "Contato feito, ela está segura",
+  no_contact:  "Sem contato com ela",
+  false_alarm: "Falso alarme",
+  duplicate:   "Ocorrência repetida"
+};
 
 /* ---------------- utilidades ---------------- */
 

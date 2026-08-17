@@ -6,7 +6,7 @@
  *
  *   site     landing page comercial, pública, sem banco e sem sessão
  *   survey   formulários de campo e o dashboard da pesquisa
- *   alert    o sistema do produto: aparelho, central e Anjos
+ *   alert    o sistema do produto: aparelho e central
  *
  * Os módulos não se conhecem. Cada um recebe o núcleo, é dono do próprio
  * prefixo de URL, do próprio schema e do próprio usuário de banco. Para
@@ -14,7 +14,7 @@
  * no ar.
  *
  * A ordem importa: o site fica por último a reclamar a raiz, e os módulos com
- * rota curinga (`/anjo/:token`) precisam vir antes de qualquer estático.
+ * rota curinga precisam vir antes de qualquer estático.
  */
 
 import { createApp } from "./core/app.js";

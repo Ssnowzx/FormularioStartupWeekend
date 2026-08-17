@@ -9,13 +9,15 @@
  */
 
 /*
- * Identidade INSTITUCIONAL. Só a landing usa estes tokens.
+ * Identidade INSTITUCIONAL. A landing usa estes tokens; a central usa os
+ * mesmos valores por outro caminho, em shared/web/central.css — decidido em
+ * 16/08/2026, para que landing e central não leiam como dois produtos quando
+ * aparecem em sequência no telão.
  *
- * A superfície do produto — central, cadastro, página do Anjo — continua no
- * creme + azul-petróleo de shared/web/theme.css. Isso não é inconsistência:
- * é a regra das duas identidades de docs/identidade-visual.md. A página que
- * convence um comprador público e a tela que ela aciona com medo não podem
- * se parecer.
+ * A regra das duas identidades de docs/identidade-visual.md continua valendo
+ * onde ela nasceu: no **app do celular dela**, que é neutro, sem marca e sem
+ * roxo nenhum. A página que convence um comprador e a tela que ela aciona com
+ * medo não podem se parecer.
  */
 
 :root {

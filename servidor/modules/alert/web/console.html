@@ -6,60 +6,232 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Central · Mulheres em Risco</title>
 <link rel="stylesheet" href="/shared/theme.css">
+<link rel="stylesheet" href="/shared/central.css">
 <style>
-/* Precisa vir antes das classes de tela: sem isto, .login-tela { display:grid }
-     vence o display:none que o atributo hidden aplica. */
   [hidden] { display:none !important; }
 
+  /* ---------- topo ---------- */
+  .tira { max-width:76rem; margin:0 auto; padding:0 1.1rem .85rem; display:flex; gap:2rem; flex-wrap:wrap; }
+  .tira span { color:var(--petrol-soft); font-size:.82rem; }
+  .tira b { font-family:var(--f-display); font-size:1.5rem; font-weight:750; color:#fff;
+            font-variant-numeric:tabular-nums; margin-right:.35rem; }
+  .tira b.alerta { color:var(--emergencia); }
+
   /* ---------- duas colunas ---------- */
-  .duas { display:grid; grid-template-columns:22rem 1fr; gap:1rem; align-items:start; }
-  @media (max-width:60rem) { .duas { grid-template-columns:1fr; } }
+  .duas { display:grid; grid-template-columns:21rem 1fr; gap:1.1rem; align-items:start; }
+  @media (max-width:64rem) { .duas { grid-template-columns:1fr; } }
 
   /* ---------- fila ---------- */
-  .fila { display:flex; flex-direction:column; gap:.7rem; }
-  .ocorrencia { background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--petrol-mid);
-                border-radius:.9rem; padding:.85rem .95rem; cursor:pointer; text-align:left; width:100%;
+  .filtro { display:flex; gap:.25rem; background:var(--cream-deep); border-radius:.6rem; padding:.2rem;
+            margin-bottom:.8rem; }
+  .filtro button { flex:1; font-family:inherit; font-size:.8rem; font-weight:600; padding:.4rem .2rem;
+                   border:0; border-radius:.45rem; background:transparent; color:var(--ink-soft); cursor:pointer; }
+  .filtro button[aria-pressed="true"] { background:var(--surface); color:var(--petrol-deep);
+                                        box-shadow:0 1px 3px var(--shadow); }
+
+  /* A fila acompanha a rolagem: numa ocorrência comprida ela saía da tela, e
+     a operadora perdia de vista o que mais estava aberto. */
+  .fila-caixa { position:sticky; top:1rem; }
+  .fila { display:flex; flex-direction:column; gap:.55rem; max-height:calc(100vh - 12rem); overflow:auto;
+          padding-right:.2rem; }
+  @media (max-width:64rem) { .fila-caixa { position:static; } }
+  .ocorrencia { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--petrol-soft);
+                border-radius:.7rem; padding:.7rem .8rem; cursor:pointer; text-align:left; width:100%;
                 font-family:inherit; font-size:1rem; color:inherit; }
-  .ocorrencia.aberta { border-left-color:var(--coral); }
-  .ocorrencia.escolhida { box-shadow:0 0 0 3px var(--petrol-wash); border-color:var(--petrol-deep); }
-  .ocorrencia.fria { opacity:.55; border-left-color:var(--line); }
-  .ocorrencia .nome { font-family:var(--f-display); font-weight:700; font-size:1.05rem; letter-spacing:-.01em; }
-  .ocorrencia .linha2 { display:flex; justify-content:space-between; gap:.6rem; font-size:.84rem;
-                        color:var(--ink-soft); margin-top:.1rem; }
+  .ocorrencia.aberta { border-left-color:var(--emergencia); animation:brasa 2s ease-in-out infinite; }
+  @keyframes brasa {
+    0%, 100% { box-shadow:0 0 0 0 rgba(255,82,82,0); }
+    50%      { box-shadow:0 0 0 4px rgba(255,82,82,.16); }
+  }
+  .ocorrencia.escolhida { border-color:var(--petrol-mid); box-shadow:0 0 0 2px var(--petrol-wash); }
+  .ocorrencia.fria { opacity:.6; border-left-color:var(--line); animation:none; }
+  .ocorrencia .nome { font-family:var(--f-display); font-weight:700; font-size:1rem; }
+  .ocorrencia .linha2 { display:flex; justify-content:space-between; gap:.6rem; font-size:.8rem;
+                        color:var(--ink-soft); margin-top:.1rem; align-items:center; }
   .crono { font-variant-numeric:tabular-nums; font-weight:650; }
   .crono.tarde { color:var(--coral); }
-  .pilula { display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase;
-            letter-spacing:.04em; padding:.15rem .5rem; border-radius:99px; background:var(--petrol-wash);
-            color:var(--petrol-deep); }
+
+  .pilula { display:inline-block; font-family:var(--f-label); font-size:.66rem; font-weight:600;
+            text-transform:uppercase; letter-spacing:.1em; padding:.18rem .5rem; border-radius:99px;
+            background:var(--petrol-wash); color:var(--petrol-deep); }
   .pilula.open { background:var(--peach); color:var(--coral); }
   .pilula.in_progress { background:var(--petrol-wash); color:var(--petrol-deep); }
   .pilula.resolved { background:var(--mint); color:var(--good); }
   .pilula.cancelled { background:var(--cream-deep); color:var(--ink-soft); }
 
-  .janela { height:.3rem; background:var(--cream-deep); border-radius:99px; overflow:hidden; margin-top:.5rem; }
-  .janela i { display:block; height:100%; background:var(--coral); border-radius:99px; }
+  .janela { height:.25rem; background:var(--cream-deep); border-radius:99px; overflow:hidden; margin-top:.45rem; }
+  .janela i { display:block; height:100%; background:var(--emergencia); border-radius:99px; }
 
-  /* ---------- detalhe ---------- */
-  .id-grande { font-family:var(--f-display); font-size:1.8rem; font-weight:750; letter-spacing:-.02em;
-               margin:0 0 .1rem; color:var(--petrol-deep); }
-  .campos { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.8rem; margin-bottom:.9rem; }
-  .campo-ro span { display:block; font-size:.76rem; color:var(--ink-soft); text-transform:uppercase;
-                   letter-spacing:.05em; }
-  .campo-ro b { font-weight:650; font-size:1rem; }
-  .referencia { background:var(--peach); border-radius:.65rem; padding:.7rem .85rem; font-size:.95rem; }
-  .coords { font-variant-numeric:tabular-nums; font-size:.9rem; color:var(--ink-soft); }
-  .mapa { width:100%; height:16rem; background:var(--cream-deep); border-radius:.8rem; display:block; }
+  /* ---------- ocorrência: cabeça ---------- */
+  .oc-cabeca { display:flex; gap:1.2rem; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; }
+  .oc-nome { font-family:var(--f-display); font-size:2.1rem; font-weight:800; line-height:1.05;
+             margin:.15rem 0 .3rem; color:var(--ink); }
+  .oc-estado { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; font-size:.9rem;
+               color:var(--ink-soft); margin:0; }
+  .oc-acoes { display:flex; gap:.5rem; flex-wrap:wrap; }
+  .oc-acoes .btn { width:auto; }
 
-  .anjo { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; padding:.6rem 0;
-          border-bottom:1px solid var(--line-soft); }
-  .anjo:last-child { border-bottom:0; }
-  .anjo .quem { flex:1; min-width:9rem; }
-  .anjo .quem b { display:block; font-weight:650; }
-  .anjo .quem span { font-size:.82rem; color:var(--ink-soft); }
-  .a-caminho { color:var(--good); font-weight:700; font-size:.88rem; }
+  /* Os tempos são o produto para quem compra: quanto se levou para agir. */
+  .tempos { display:flex; gap:1.6rem; flex-wrap:wrap; margin:1rem 0 0; padding-top:.9rem;
+            border-top:1px solid var(--line-soft); }
+  .tempos div b { display:block; font-family:var(--f-display); font-size:1.35rem; font-weight:750;
+                  color:var(--petrol-deep); font-variant-numeric:tabular-nums; line-height:1.1; }
+  .tempos div b.vazio-t { color:var(--petrol-soft); }
+
+  .ficha { display:flex; gap:1.6rem; flex-wrap:wrap; margin-top:.9rem; }
+  .ficha div b { display:block; font-size:1.02rem; font-weight:650; }
+  .referencia { background:var(--peach); border-radius:.6rem; padding:.65rem .8rem; margin:.9rem 0 0;
+                font-size:.95rem; }
+  .referencia span { color:var(--coral); font-weight:700; margin-right:.45rem; }
+  .referencia span::after { content:"·"; margin-left:.45rem; font-weight:400; opacity:.5; }
+
+  /* ---------- onde ela está ---------- */
+  .mapa { position:relative; width:100%; height:19rem; background:var(--cream-deep);
+          border-radius:.75rem; overflow:hidden; display:block; }
+  .mapa img { position:absolute; width:256px; height:256px; }
+  .mapa svg { position:absolute; inset:0; }
+  .mapa .credito { position:absolute; right:.3rem; bottom:.25rem; font-size:.62rem; color:var(--ink-soft);
+                   background:rgba(255,255,255,.85); padding:0 .3rem; border-radius:.25rem; }
+  .mapa .sem-gps { position:absolute; inset:0; display:grid; place-items:center; margin:0; padding:1rem;
+                   text-align:center; }
+  @keyframes farol { 0% { transform:scale(.7); opacity:.6 } 100% { transform:scale(3); opacity:0 } }
+  .mapa .farol { animation:farol 2s ease-out infinite; }
+
+  .endereco { font-family:var(--f-display); font-size:1.15rem; font-weight:700; margin:.8rem 0 .15rem;
+              color:var(--petrol-deep); }
+  .endereco.procurando { font-family:var(--f-body); font-weight:400; font-size:.9rem; color:var(--ink-soft);
+                         font-style:italic; }
+  .coords { font-variant-numeric:tabular-nums; font-size:.82rem; color:var(--ink-soft); margin:0 0 .8rem; }
+
+  /* ---------- despacho ---------- */
+  .despacho { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.55rem; }
+  .desp-btn { font-family:inherit; font-size:.92rem; font-weight:650; text-align:left; cursor:pointer;
+              padding:.75rem .85rem; border-radius:.7rem; border:1.5px solid var(--line);
+              background:var(--surface); color:var(--petrol-deep); display:flex; align-items:center; gap:.55rem; }
+  .desp-btn:hover { border-color:var(--petrol-mid); background:var(--petrol-wash); }
+  .desp-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .desp-btn.feito { border-color:var(--good); background:var(--mint); color:var(--good); }
+  .desp-btn svg { flex:none; }
+
+  .nota-linha { display:flex; gap:.5rem; margin:1rem 0 .2rem; }
+  .nota-linha input { flex:1; }
+  .nota-linha .btn { width:auto; white-space:nowrap; }
+
+  /* ---------- linha do tempo ---------- */
+  .tempo-lista { margin-top:1rem; border-left:2px solid var(--line); padding-left:.9rem; }
+  .ev { position:relative; padding:.3rem 0; font-size:.9rem; }
+  .ev::before { content:""; position:absolute; left:-1.32rem; top:.72rem; width:.5rem; height:.5rem;
+                border-radius:50%; background:var(--petrol-soft); }
+  .ev.forte::before { background:var(--emergencia); }
+  .ev.bom::before { background:var(--good); }
+  .ev time { font-variant-numeric:tabular-nums; color:var(--ink-soft); font-size:.8rem; margin-left:.4rem; }
 
   .faixa { background:var(--peach); color:var(--coral); font-weight:650; font-size:.88rem;
            padding:.5rem 1.1rem; text-align:center; }
+
+  /* ================================================================= *
+   *  O alerta que toma a tela
+   *
+   *  A regra da identidade — "nada de animação no fluxo de emergência" —
+   *  vale para o celular dela, que ela aciona com medo. Aqui é o contrário:
+   *  a central fica num telão, e quase sempre ninguém está olhando para ela
+   *  no segundo em que a palavra é dita. Alarme que some sozinho é alarme
+   *  que ninguém atendeu — por isso ele exige um ato.
+   * ================================================================= */
+
+  .pop { position:fixed; inset:0; z-index:60; display:grid; place-items:center; padding:1.5rem; }
+  .pop::before { content:""; position:absolute; inset:0; background:rgba(28,12,38,.94); }
+  .pop-luz { position:absolute; inset:0; pointer-events:none;
+             background:radial-gradient(58rem 40rem at 50% 50%, rgba(255,82,82,.34), transparent 70%);
+             animation:respirar 2.2s ease-in-out infinite; }
+  @keyframes respirar { 0%, 100% { opacity:.3 } 50% { opacity:1 } }
+
+  .pop-cartao { position:relative; width:min(60rem,100%); max-height:calc(100vh - 3rem); overflow:auto;
+                background:var(--surface); border-radius:1.4rem;
+                box-shadow:0 32px 90px rgba(0,0,0,.5); animation:chegar .28s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes chegar { from { opacity:0; transform:translateY(16px) scale(.94) } to { opacity:1; transform:none } }
+
+  .pop-trilho { height:.55rem; background:var(--emergencia); animation:pulsar 1.2s ease-in-out infinite; }
+  @keyframes pulsar { 0%, 100% { opacity:1 } 50% { opacity:.35 } }
+
+  .pop.frio .pop-trilho { background:var(--ink-soft); animation:none; }
+  .pop.frio .pop-luz { display:none; }
+  .pop.frio .pop-ponto { animation:none; opacity:.45; }
+  .pop.frio .btn.perigo { display:none; }
+  .pop.frio .pop-ref { background:var(--cream-deep); }
+  .pop.frio .pop-ref span { color:var(--ink-soft); }
+  .pop.frio .pop-anel .arco { stroke:var(--ink-soft); opacity:.3; }
+  .pop.frio .pop-anel .conta { display:none; }
+  .pop.frio .pop-anel .miolo { fill:transparent; }
+  .pop.frio .pop-anel p { color:var(--ink-soft); font-weight:400; }
+
+  .pop-corpo { display:grid; grid-template-columns:1fr auto; gap:2.2rem; padding:1.8rem 2.1rem 2rem; }
+  @media (max-width:52rem) { .pop-corpo { grid-template-columns:1fr; gap:1.4rem; } }
+
+  .pop-selo { display:flex; align-items:center; gap:.55rem; margin:0 0 .5rem;
+              font-family:var(--f-label); font-size:.8rem; font-weight:600;
+              text-transform:uppercase; letter-spacing:.18em; color:var(--coral); }
+  .pop.frio .pop-selo { color:var(--ink-soft); }
+  .pop-ponto { width:.62rem; height:.62rem; border-radius:50%; background:var(--emergencia);
+               animation:batida 1.5s ease-out infinite; flex:none; }
+  @keyframes batida {
+    0%   { box-shadow:0 0 0 0 rgba(255,82,82,.6) }
+    70%  { box-shadow:0 0 0 .85rem rgba(255,82,82,0) }
+    100% { box-shadow:0 0 0 0 rgba(255,82,82,0) }
+  }
+
+  .pop-nome { font-family:var(--f-display); font-size:clamp(2.4rem,5.4vw,4.1rem);
+              font-weight:800; letter-spacing:-.035em; line-height:.94; margin:0 0 .45rem; color:var(--ink); }
+  .pop-onde { font-size:1.05rem; color:var(--ink-soft); margin:0 0 1.05rem; }
+  .pop-onde b { color:var(--ink); font-weight:650; }
+
+  .pop-ref { background:var(--peach); border-radius:.7rem; padding:.7rem .85rem; margin:0 0 1.05rem;
+             font-size:1rem; line-height:1.45; }
+  .pop-ref span { display:block; font-family:var(--f-label); font-size:.66rem;
+                  font-weight:600; text-transform:uppercase; letter-spacing:.16em; color:var(--coral);
+                  margin-bottom:.15rem; }
+
+  .pop-dados { display:flex; flex-wrap:wrap; gap:1.5rem; margin:0 0 1.4rem; }
+  .pop-dados div span { display:block; font-family:var(--f-label); font-size:.66rem;
+                        font-weight:600; text-transform:uppercase; letter-spacing:.16em;
+                        color:var(--ink-soft); margin-bottom:.1rem; }
+  .pop-dados div b { font-size:1.18rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .pop-dados a { color:var(--petrol-deep); }
+
+  .pop-acoes { display:flex; gap:.7rem; flex-wrap:wrap; }
+  .pop-acoes .btn { width:auto; font-size:1.02rem; padding:.9rem 1.5rem; border-radius:.8rem; }
+
+  .pop-anel { display:grid; place-items:center; text-align:center; align-content:start; gap:.7rem; }
+  .pop-anel svg.anel { width:12.5rem; height:12.5rem; display:block; }
+  .pop-anel .trilha { fill:none; stroke:var(--cream-deep); stroke-width:9; }
+  .pop-anel .arco { fill:none; stroke:var(--emergencia); stroke-width:9; stroke-linecap:round;
+                    transform:rotate(-90deg); transform-origin:50% 50%; transition:stroke-dashoffset .12s linear; }
+  /* Tamanho em px porque dentro do SVG a unidade é a do viewBox, não a da página. */
+  .pop-anel .conta { font-family:var(--f-display); font-size:34px; font-weight:800;
+                     fill:var(--petrol-deep); font-variant-numeric:tabular-nums; letter-spacing:-.03em; }
+  .pop-anel .conta.selado { font-size:46px; fill:var(--coral); }
+  .pop-anel .miolo { fill:transparent; }
+  .pop-anel.selado .miolo { fill:var(--peach); }
+  .pop-anel p { margin:0; max-width:12.5rem; font-size:.84rem; color:var(--ink-soft); line-height:1.35; }
+  .pop-anel.selado p { color:var(--coral); font-weight:650; }
+  .mapa-pop { width:12.5rem; height:8.5rem; border-radius:.6rem; border:1px solid var(--line);
+              animation:chegar .3s cubic-bezier(.16,1,.3,1) both; }
+
+  @keyframes aterrissar {
+    0%   { background:var(--peach); box-shadow:0 0 0 .35rem var(--peach); }
+    100% { background:transparent; box-shadow:0 0 0 .35rem transparent; }
+  }
+  .pop-dados b.chegou { animation:aterrissar 1.4s ease-out both; border-radius:.25rem; }
+
+  .pop-x { position:absolute; top:1rem; right:1rem; width:2.3rem; height:2.3rem; border-radius:50%;
+           border:0; background:var(--cream-deep); color:var(--ink-soft); font-size:1.25rem;
+           line-height:1; cursor:pointer; font-family:inherit; }
+  .pop-x:hover { background:var(--line); }
+
+  .pop-rodape { grid-column:1/-1; border-top:1px solid var(--line-soft); padding-top:.8rem;
+                font-size:.79rem; color:var(--ink-soft); }
+  .pop-rodape kbd { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.74rem;
+                    background:var(--cream-deep); border-radius:.3rem; padding:.1rem .35rem; }
 </style>
 </head>
 <body>
@@ -78,32 +250,79 @@
 </div>
 
 <div id="tela-central" hidden>
-  <div class="topo">
+  <div class="topo escuro">
     <div class="topo-int larga">
       <h1>Central de atendimento</h1>
       <span class="vivo"><span class="pulso" id="pulso"></span><span id="estado">conectando…</span></span>
       <a class="btn ghost pequeno" href="/cadastro">Cadastro</a>
       <button class="btn ghost pequeno" id="btn-sair">Sair</button>
     </div>
+    <div class="tira">
+      <span><b id="n-abertos" class="alerta">0</b>abertos agora</span>
+      <span><b id="n-atendimento">0</b>em atendimento</span>
+      <span><b id="n-resolvidos">0</b>encerrados hoje</span>
+      <span><b id="n-tempo">—</b>até o despacho, hoje</span>
+    </div>
   </div>
   <p class="faixa" id="faixa-banco" hidden>Sem banco de dados. As ocorrências estão só na memória do servidor.</p>
 
   <div class="wrap larga">
-    <div class="numeros">
-      <div class="num"><b id="n-abertos" class="alerta">0</b><span>alertas abertos</span></div>
-      <div class="num"><b id="n-atendimento">0</b><span>em atendimento</span></div>
-      <div class="num"><b id="n-resolvidos">0</b><span>resolvidos hoje</span></div>
-      <div class="num"><b id="n-tempo">—</b><span>até o primeiro Anjo a caminho</span></div>
-    </div>
-
     <div class="duas">
-      <div>
-        <div class="card" style="padding:.9rem">
-          <h2 style="margin-bottom:.7rem">Fila</h2>
-          <div class="fila" id="fila"><p class="vazio">Nenhum alerta agora.</p></div>
+      <div class="card fila-caixa" style="padding:.85rem">
+        <div class="filtro" role="group" aria-label="Filtro da fila">
+          <button type="button" data-filtro="abertas" aria-pressed="true">Abertas</button>
+          <button type="button" data-filtro="hoje" aria-pressed="false">Hoje</button>
+          <button type="button" data-filtro="tudo" aria-pressed="false">Tudo</button>
         </div>
+        <div class="fila" id="fila"><p class="vazio">Nenhum alerta agora.</p></div>
       </div>
       <div id="detalhe"><div class="card"><p class="vazio">Escolha uma ocorrência à esquerda.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- O alerta em tela cheia. Nasce vazio; quem preenche é o evento que chega do
+     aparelho. Fica fora de #tela-central para não herdar o hidden do login. -->
+<div id="pop" class="pop" role="alertdialog" aria-modal="true" aria-labelledby="pop-nome" hidden>
+  <div class="pop-luz" aria-hidden="true"></div>
+  <div class="pop-cartao">
+    <div class="pop-trilho" aria-hidden="true"></div>
+    <button class="pop-x" id="pop-x" aria-label="Dispensar">&times;</button>
+    <div class="pop-corpo">
+      <div>
+        <p class="pop-selo"><span class="pop-ponto" aria-hidden="true"></span><span id="pop-selo">Gatilho de voz acionado</span></p>
+        <h2 class="pop-nome" id="pop-nome">—</h2>
+        <p class="pop-onde" id="pop-onde">—</p>
+        <p class="pop-ref" id="pop-ref" hidden><span>Referência de endereço</span><b id="pop-ref-texto"></b></p>
+        <div class="pop-dados">
+          <div><span>Desde o acionamento</span><b class="crono" id="pop-crono">0s</b></div>
+          <div><span>Telefone</span><b id="pop-fone">—</b></div>
+          <div><span>Bateria</span><b id="pop-bateria">—</b></div>
+          <div><span>Posição</span><b id="pop-pos">—</b></div>
+        </div>
+        <div class="pop-acoes">
+          <button class="btn perigo" id="pop-assumir">Assumir agora</button>
+          <button class="btn ghost" id="pop-ver">Ver a ocorrência</button>
+        </div>
+      </div>
+
+      <div class="pop-anel" id="pop-anel">
+        <svg class="anel" viewBox="0 0 120 120" role="img" aria-labelledby="pop-anel-txt">
+          <circle class="miolo" cx="60" cy="60" r="47"></circle>
+          <circle class="trilha" cx="60" cy="60" r="52"></circle>
+          <circle class="arco" id="pop-arco" cx="60" cy="60" r="52"
+                  stroke-dasharray="326.73" stroke-dashoffset="0"></circle>
+          <text class="conta" id="pop-conta" x="60" y="60" text-anchor="middle" dominant-baseline="central">15</text>
+        </svg>
+        <p id="pop-anel-txt">segundos em que ela ainda pode desdizer, do próprio aparelho</p>
+        <!-- Nasce escondido: o alerta sobe antes do GPS, e o mapa entra quando
+             a primeira posição chega. É o segundo em que a tela vira endereço. -->
+        <div class="mapa mapa-pop" id="pop-mapa" hidden></div>
+      </div>
+
+      <p class="pop-rodape">
+        <kbd>Esc</kbd> dispensa e volta para a fila · <kbd>A</kbd> traz o último alerta de volta
+      </p>
     </div>
   </div>
 </div>
@@ -120,8 +339,24 @@ let fonte = null;
 let relogio = null;
 let poll = null;
 let audio = null;
+let filtro = "abertas";
 
-/* ---------- som de alerta novo: gerado, sem arquivo e sem rede ---------- */
+const DESPACHOS = [
+  { kind:"patrol",   rotulo:"Viatura de pronta resposta" },
+  { kind:"police",   rotulo:"Polícia Militar pelo 190" },
+  { kind:"call",     rotulo:"Ligação para ela" },
+  { kind:"presence", rotulo:"Equipe a caminho" }
+];
+
+const DESFECHOS = [
+  { chave:"attended",    rotulo:"Atendida no local" },
+  { chave:"safe",        rotulo:"Contato feito, ela está segura" },
+  { chave:"no_contact",  rotulo:"Sem contato com ela" },
+  { chave:"false_alarm", rotulo:"Falso alarme" },
+  { chave:"duplicate",   rotulo:"Ocorrência repetida" }
+];
+
+/* ---------- som ---------- */
 function bipe() {
   try {
     audio = audio || new (window.AudioContext || window.webkitAudioContext)();
@@ -140,6 +375,29 @@ function bipe() {
   } catch (e) { /* sem áudio, a tela ainda avisa */ }
 }
 
+/* A sirene é outra coisa: seis toques alternando duas alturas, porque um tom
+   só vira ruído de fundo em três segundos e a alternância o ouvido não ignora.
+   Toca uma vez — alarme que repete sem parar é alarme que alguém desliga. */
+function sirene() {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === "suspended") audio.resume();
+    const t0 = audio.currentTime;
+    for (let i = 0; i < 6; i++) {
+      const em = t0 + i * 0.26;
+      const osc = audio.createOscillator(), vol = audio.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = i % 2 ? 1046 : 784;
+      vol.gain.setValueAtTime(0.0001, em);
+      vol.gain.exponentialRampToValueAtTime(0.3, em + 0.02);
+      vol.gain.exponentialRampToValueAtTime(0.0001, em + 0.22);
+      osc.connect(vol).connect(audio.destination);
+      osc.start(em);
+      osc.stop(em + 0.24);
+    }
+  } catch (e) { /* sem áudio, a tela ainda grita */ }
+}
+
 /* ---------- tempo ---------- */
 function decorrido(desde) {
   const s = Math.max(0, Math.floor((Date.now() - new Date(desde).getTime()) / 1000));
@@ -147,11 +405,39 @@ function decorrido(desde) {
   return m ? `${m}min ${String(s % 60).padStart(2, "0")}s` : `${s}s`;
 }
 
+const entre = (de, ate) => de && ate
+  ? `${Math.max(0, Math.round((new Date(ate) - new Date(de)) / 1000))}s` : null;
+
+// O operador lê este número em voz alta, no rádio ou no telefone.
+// "(49) 99912-3456" se lê; "5549999123456" se erra.
+function fone(e164) {
+  if (!e164) return null;
+  const n = String(e164).replace(/\D/g, "").replace(/^55/, "");
+  if (n.length === 11) return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;
+  if (n.length === 10) return `(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`;
+  return e164;
+}
+
+const rotulo = (s) => ({ open:"Novo", in_progress:"Em atendimento", resolved:"Encerrado", cancelled:"Falso alarme" }[s] || s);
+const ehHoje = (d) => new Date(d).toDateString() === new Date().toDateString();
+
 /* ---------- fila ---------- */
+function daFila() {
+  if (filtro === "tudo") return alertas;
+  if (filtro === "hoje") return alertas.filter((a) => ehHoje(a.opened_at));
+  return alertas.filter((a) => a.status === "open" || a.status === "in_progress");
+}
+
 function pintarFila() {
   const alvo = $("fila");
-  if (!alertas.length) { alvo.innerHTML = '<p class="vazio">Nenhum alerta agora.</p>'; return; }
-  alvo.innerHTML = alertas.map((a) => {
+  const lista = daFila();
+  if (!lista.length) {
+    alvo.innerHTML = `<p class="vazio">${filtro === "abertas"
+      ? "Nenhuma ocorrência aberta. A central está tranquila."
+      : "Nada neste filtro."}</p>`;
+    return;
+  }
+  alvo.innerHTML = lista.map((a) => {
     const fria = a.status === "resolved" || a.status === "cancelled";
     const seg = (Date.now() - new Date(a.opened_at).getTime()) / 1000;
     const restante = (new Date(a.cancel_until).getTime() - Date.now()) / 1000;
@@ -165,7 +451,7 @@ function pintarFila() {
           <span class="crono ${seg > 120 && !fria ? "tarde" : ""}" data-desde="${a.opened_at}">${decorrido(a.opened_at)}</span>
         </span>
         <span class="linha2"><span class="pilula ${a.status}">${rotulo(a.status)}</span>
-          ${a.guardians_on_the_way ? `<span class="a-caminho">${a.guardians_on_the_way} a caminho</span>` : ""}</span>
+          ${a.dispatches ? `<span>${a.dispatches} despacho${a.dispatches > 1 ? "s" : ""}</span>` : ""}</span>
         ${barra}
       </button>`;
   }).join("");
@@ -173,69 +459,155 @@ function pintarFila() {
     b.addEventListener("click", () => abrir(b.dataset.id)));
 }
 
-const rotulo = (s) => ({ open:"Novo", in_progress:"Em atendimento", resolved:"Resolvido", cancelled:"Falso alarme" }[s] || s);
-
-// O operador lê este número em voz alta, no rádio ou no telefone.
-// "(49) 99912-3456" se lê; "5549999123456" se erra.
-function fone(e164) {
-  if (!e164) return null;
-  const n = String(e164).replace(/\D/g, "").replace(/^55/, "");
-  if (n.length === 11) return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;
-  if (n.length === 10) return `(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`;
-  return e164;
-}
-
 function pintarNumeros() {
   $("n-abertos").textContent = alertas.filter((a) => a.status === "open").length;
   $("n-atendimento").textContent = alertas.filter((a) => a.status === "in_progress").length;
-  const hoje = new Date().toDateString();
   $("n-resolvidos").textContent = alertas.filter((a) =>
-    a.status === "resolved" && new Date(a.opened_at).toDateString() === hoje).length;
+    (a.status === "resolved" || a.status === "cancelled") && ehHoje(a.opened_at)).length;
 
-  const tempos = alertas.filter((a) => a.first_on_the_way_at)
-    .map((a) => (new Date(a.first_on_the_way_at) - new Date(a.opened_at)) / 1000);
+  // Só as de hoje. Uma ocorrência de teste que ficou aberta a noite inteira
+  // envenena a média e põe "7445s" no telão, ao lado de "encerrados hoje".
+  const tempos = alertas
+    .filter((a) => a.first_dispatch_at && ehHoje(a.opened_at))
+    .map((a) => (new Date(a.first_dispatch_at) - new Date(a.opened_at)) / 1000);
   $("n-tempo").textContent = tempos.length
     ? Math.round(tempos.reduce((s, t) => s + t, 0) / tempos.length) + "s"
     : "—";
 }
 
-/* ---------- mapa desenhado localmente, sem CDN ---------- *
- * Projeção equirretangular. Em escala de quarteirão o erro é irrelevante,
- * e a página continua inteira mesmo sem internet nenhuma.               */
-function mapa(pontos) {
-  if (!pontos.length) return '<p class="vazio">Sem posição ainda. O alerta abre mesmo sem GPS.</p>';
-  const o = pontos[0];
-  const cos = Math.cos(o.lat * Math.PI / 180);
-  const xy = pontos.map((p) => ({
-    x: (p.lng - o.lng) * 111320 * cos,
-    y: (o.lat - p.lat) * 110540,
-    r: p.accuracy_m || 25
-  }));
-  const raio = Math.max(...xy.map((p) => p.r), 30);
-  const minX = Math.min(...xy.map((p) => p.x - p.r)) - 10, maxX = Math.max(...xy.map((p) => p.x + p.r)) + 10;
-  const minY = Math.min(...xy.map((p) => p.y - p.r)) - 10, maxY = Math.max(...xy.map((p) => p.y + p.r)) + 10;
-  const larg = Math.max(maxX - minX, 60), alt = Math.max(maxY - minY, 60);
-  const lado = Math.max(larg, alt);
-  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-  const vb = `${cx - lado / 2} ${cy - lado / 2} ${lado} ${lado}`;
-  const atual = xy[xy.length - 1];
-  const escala = lado / 4;
-  const passo = [10, 25, 50, 100, 250, 500].find((p) => p >= escala) || 1000;
+/* ================================================================== *
+ *  Mapa — ladrilhos do OpenStreetMap, sem biblioteca e sem chave
+ *
+ *  Antes daqui havia um SVG desenhado à mão: correto na geometria e
+ *  ilegível na tela, porque um ponto sobre fundo liso não diz onde ela
+ *  está. Agora tem rua com nome.
+ *
+ *  Por que OSM e não Google: a API do Google exige chave e conta de
+ *  cobrança, e chave que falta vira retângulo cinza de erro no meio do
+ *  pitch. Aqui o navegador só busca imagem — nada para configurar.
+ *
+ *  Por que sem Leaflet: a página não carrega script de terceiro. São
+ *  vinte linhas de projeção Web Mercator, e escrevê-las custa menos que
+ *  depender de um CDN numa emergência.
+ * ================================================================== */
 
-  return `<svg class="mapa" viewBox="${vb}" preserveAspectRatio="xMidYMid meet" role="img"
-            aria-label="Posição aproximada, com margem de erro do GPS">
-    <circle cx="${atual.x}" cy="${atual.y}" r="${atual.r}" fill="#AE432B" opacity=".14"/>
-    ${xy.length > 1 ? `<polyline points="${xy.map((p) => `${p.x},${p.y}`).join(" ")}"
-        fill="none" stroke="#3E8A8F" stroke-width="${lado / 140}" stroke-linejoin="round"/>` : ""}
-    ${xy.slice(0, -1).map((p) => `<circle cx="${p.x}" cy="${p.y}" r="${lado / 110}" fill="#9CC5C7"/>`).join("")}
-    <circle cx="${atual.x}" cy="${atual.y}" r="${lado / 55}" fill="#AE432B"/>
-    <g stroke="#55605F" stroke-width="${lado / 260}" fill="none">
-      <line x1="${cx - lado / 2 + lado * .06}" y1="${cy + lado / 2 - lado * .07}"
-            x2="${cx - lado / 2 + lado * .06 + passo}" y2="${cy + lado / 2 - lado * .07}"/>
-    </g>
-    <text x="${cx - lado / 2 + lado * .06}" y="${cy + lado / 2 - lado * .1}" font-size="${lado / 28}"
-          fill="#55605F" font-family="system-ui">${passo} m</text>
-  </svg>`;
+const LADRILHO = 256;
+const xDeLng = (lng, z) => (lng + 180) / 360 * Math.pow(2, z);
+const yDeLat = (lat, z) => {
+  const r = lat * Math.PI / 180;
+  return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+};
+const metrosPorPixel = (lat, z) => 156543.03392 * Math.cos(lat * Math.PI / 180) / Math.pow(2, z);
+
+/** Maior zoom em que todos os pontos e a margem de erro ainda cabem na moldura. */
+function zoomQueCabe(pontos, atual, larg, alt) {
+  for (let z = 18; z > 12; z--) {
+    const folga = (atual.accuracy_m || 25) / metrosPorPixel(atual.lat, z) + 26;
+    const cx = xDeLng(atual.lng, z) * LADRILHO, cy = yDeLat(atual.lat, z) * LADRILHO;
+    const dx = Math.max(...pontos.map((p) => Math.abs(xDeLng(p.lng, z) * LADRILHO - cx)));
+    const dy = Math.max(...pontos.map((p) => Math.abs(yDeLat(p.lat, z) * LADRILHO - cy)));
+    if ((dx + folga) * 2 <= larg && (dy + folga) * 2 <= alt) return z;
+  }
+  return 13;
+}
+
+function desenharMapa(alvo, pontos) {
+  if (!alvo) return;
+  if (!pontos.length) {
+    alvo.innerHTML = '<p class="vazio sem-gps">Sem posição ainda. O alerta abre mesmo sem GPS.</p>';
+    return;
+  }
+  const larg = Math.max(alvo.clientWidth || 320, 160);
+  const alt = alvo.clientHeight || 256;
+  const atual = pontos[pontos.length - 1];
+  const z = zoomQueCabe(pontos, atual, larg, alt);
+
+  // Canto superior esquerdo da moldura, em pixels do mundo naquele zoom.
+  const esq = xDeLng(atual.lng, z) * LADRILHO - larg / 2;
+  const topo = yDeLat(atual.lat, z) * LADRILHO - alt / 2;
+  const naTela = (p) => ({
+    x: xDeLng(p.lng, z) * LADRILHO - esq,
+    y: yDeLat(p.lat, z) * LADRILHO - topo
+  });
+
+  const mundo = Math.pow(2, z);
+  let imagens = "";
+  for (let tx = Math.floor(esq / LADRILHO); tx <= Math.floor((esq + larg) / LADRILHO); tx++) {
+    for (let ty = Math.floor(topo / LADRILHO); ty <= Math.floor((topo + alt) / LADRILHO); ty++) {
+      if (ty < 0 || ty >= mundo) continue;
+      const wx = ((tx % mundo) + mundo) % mundo;   // o mundo dá a volta em x, não em y
+      imagens += `<img src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png" alt=""
+                    style="left:${tx * LADRILHO - esq}px;top:${ty * LADRILHO - topo}px">`;
+    }
+  }
+
+  const xy = pontos.map(naTela);
+  const aqui = xy[xy.length - 1];
+  const raio = Math.max((atual.accuracy_m || 25) / metrosPorPixel(atual.lat, z), 8);
+
+  alvo.innerHTML = `${imagens}
+    <svg viewBox="0 0 ${larg} ${alt}" width="${larg}" height="${alt}" role="img"
+         aria-label="Onde ela está, com a margem de erro do GPS">
+      <circle cx="${aqui.x}" cy="${aqui.y}" r="${raio}" fill="#FF5252" fill-opacity=".16"
+              stroke="#FF5252" stroke-opacity=".5" stroke-width="1.5"/>
+      ${xy.length > 1 ? `<polyline points="${xy.map((p) => `${p.x},${p.y}`).join(" ")}" fill="none"
+          stroke="#4B2361" stroke-width="4" stroke-opacity=".85"
+          stroke-linejoin="round" stroke-linecap="round"/>` : ""}
+      ${xy.slice(0, -1).map((p) =>
+        `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#4B2361" fill-opacity=".7"/>`).join("")}
+      <circle class="farol" cx="${aqui.x}" cy="${aqui.y}" r="10" fill="#FF5252"
+              style="transform-origin:${aqui.x}px ${aqui.y}px"/>
+      <circle cx="${aqui.x}" cy="${aqui.y}" r="7" fill="#C42B2B" stroke="#fff" stroke-width="3"/>
+    </svg>
+    <span class="credito">© OpenStreetMap</span>`;
+
+  // Sem internet a imagem quebrada mostraria ícone de erro; melhor sumir e
+  // deixar a trilha sobre o fundo, que ainda diz o trajeto. Caindo todas, o
+  // crédito sai junto — não se credita mapa que não apareceu.
+  alvo.querySelectorAll("img").forEach((i) => i.addEventListener("error", () => {
+    i.remove();
+    if (!alvo.querySelector("img")) alvo.querySelector(".credito")?.remove();
+  }));
+}
+
+/* ---------- endereço ----------
+ * Coordenada não se lê no rádio. O Nominatim é do mesmo OpenStreetMap dos
+ * ladrilhos, é aberto e não pede chave. O cache por coordenada arredondada
+ * (~11 m) é o que impede uma consulta por segundo enquanto ela caminha —
+ * a política de uso deles pede exatamente isso.                            */
+const enderecos = new Map();
+
+async function enderecoDe(lat, lng) {
+  const chave = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+  if (enderecos.has(chave)) return enderecos.get(chave);
+  enderecos.set(chave, null);
+  try {
+    const r = await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18" +
+      `&lat=${lat}&lng=${lng}&lon=${lng}&accept-language=pt-BR`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    const e = d.address || {};
+    const rua = [e.road, e.house_number].filter(Boolean).join(", ");
+    const bairro = e.suburb || e.neighbourhood || e.village || null;
+    const cidade = e.city || e.town || e.municipality || null;
+    const texto = [rua || null, bairro, cidade].filter(Boolean).join(" · ");
+    enderecos.set(chave, texto || null);
+    return texto || null;
+  } catch (e) { return null; }
+}
+
+async function pintarEndereco(pos) {
+  const alvo = $("endereco");
+  if (!alvo || !pos) return;
+  const texto = await enderecoDe(pos.lat, pos.lng);
+  const ainda = $("endereco");
+  if (!ainda) return;
+  if (texto) {
+    ainda.textContent = texto;
+    ainda.classList.remove("procurando");
+  } else {
+    ainda.textContent = "Endereço não encontrado para esta coordenada.";
+  }
 }
 
 /* ---------- detalhe ---------- */
@@ -256,62 +628,113 @@ function pintarDetalhe() {
   const u = a.user;
   const pos = a.last_location;
   const fim = a.status === "resolved" || a.status === "cancelled";
+  const feitos = new Set((a.dispatch_log || []).map((d) => d.kind));
+
+  const tempoAssumir = entre(a.opened_at, a.acknowledged_at);
+  const tempoDespacho = entre(a.opened_at, a.first_dispatch_at);
 
   $("detalhe").innerHTML = `
     <div class="card">
-      <p class="id-grande">${esc(u.display_name || "Sem nome")}</p>
-      <p style="margin:0 0 .9rem"><span class="pilula ${a.status}">${rotulo(a.status)}</span>
-        <span class="crono" data-desde="${a.opened_at}">${decorrido(a.opened_at)}</span> desde o acionamento</p>
-      <div class="campos">
-        <div class="campo-ro"><span>Telefone</span>
-          <b>${u.phone_e164 ? `<a href="tel:+${esc(u.phone_e164)}">${esc(fone(u.phone_e164))}</a>` : "—"}</b></div>
-        <div class="campo-ro"><span>Cidade</span><b>${esc(u.city || "—")}</b></div>
-        <div class="campo-ro"><span>Bateria</span><b>${a.battery_pct != null ? a.battery_pct + "%" : "—"}</b></div>
+      <div class="oc-cabeca">
+        <div>
+          <p class="rotulo">Ocorrência ${esc(a.alert_id.slice(0, 8))} ·
+            ${a.trigger === "voice" ? "gatilho de voz" : esc(a.trigger)}</p>
+          <h2 class="oc-nome">${esc(u.display_name || "Sem nome")}</h2>
+          <p class="oc-estado"><span class="pilula ${a.status}">${rotulo(a.status)}</span>
+            <span><b class="crono" data-desde="${a.opened_at}">${decorrido(a.opened_at)}</b>
+              desde o acionamento</span>
+            ${a.outcome ? `<span>· ${esc(a.outcome)}</span>` : ""}</p>
+        </div>
+        <div class="oc-acoes">
+          ${fim ? "" : `<button class="btn ${a.status === "in_progress" ? "ghost" : "perigo"}"
+              data-status="in_progress" ${a.status === "in_progress" ? "disabled" : ""}>
+              ${a.status === "in_progress" ? "Assumida" : "Assumir"}</button>
+            <button class="btn ghost" id="btn-encerrar">Encerrar</button>`}
+        </div>
       </div>
-      ${u.reference_note ? `<p class="referencia"><b>Referência:</b> ${esc(u.reference_note)}</p>` : ""}
+
+      <div class="ficha">
+        <div><span class="rotulo">Telefone</span>
+          <b>${u.phone_e164 ? `<a href="tel:+${esc(u.phone_e164)}">${esc(fone(u.phone_e164))}</a>` : "—"}</b></div>
+        <div><span class="rotulo">Cidade</span><b>${esc(u.city || "—")}</b></div>
+        <div><span class="rotulo">Bateria do aparelho</span>
+          <b>${a.battery_pct != null ? a.battery_pct + "%" : "—"}</b></div>
+      </div>
+      ${u.reference_note ? `<p class="referencia"><span>Referência</span>${esc(u.reference_note)}</p>` : ""}
+
+      <div class="tempos">
+        <div><b class="${tempoAssumir ? "" : "vazio-t"}">${tempoAssumir || "—"}</b>
+          <span class="rotulo">até assumir</span></div>
+        <div><b class="${tempoDespacho ? "" : "vazio-t"}">${tempoDespacho || "—"}</b>
+          <span class="rotulo">até o despacho</span></div>
+        <div><b>${a.locations.length}</b><span class="rotulo">posições recebidas</span></div>
+      </div>
+
+      <div id="caixa-encerrar" hidden style="margin-top:1rem">
+        <p class="rotulo" style="margin-bottom:.5rem">Como terminou?</p>
+        <div class="despacho">
+          ${DESFECHOS.map((d) => `<button class="desp-btn" data-desfecho="${d.chave}">${d.rotulo}</button>`).join("")}
+        </div>
+      </div>
     </div>
 
     <div class="card">
       <h2>Onde ela está</h2>
-      ${mapa(a.locations)}
-      ${pos ? `<p class="coords">${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}
-          · ±${pos.accuracy_m ?? "?"} m · ${a.locations.length} posições</p>
+      <div class="mapa" id="mapa-detalhe"></div>
+      ${pos ? `<p class="endereco procurando" id="endereco">procurando o endereço…</p>
+        <p class="coords">${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)} · margem de ±${pos.accuracy_m ?? "?"} m</p>
         <div class="acoes">
           <button class="btn ghost pequeno" id="btn-copiar">Copiar coordenadas</button>
           <a class="btn ghost pequeno" target="_blank" rel="noopener"
-             href="https://www.google.com/maps?q=${pos.lat},${pos.lng}">Abrir no mapa</a>
+             href="https://www.google.com/maps?q=${pos.lat},${pos.lng}">Abrir no Google Maps</a>
         </div>` : ""}
     </div>
 
     <div class="card">
-      <h2>Anjos de ${esc((u.display_name || "").split(" ")[0] || "confiança")}</h2>
-      ${a.guardians.length ? a.guardians.map((g) => `
-        <div class="anjo">
-          <span class="quem"><b>${esc(g.name)}</b><span>${esc(g.relationship || "contato de confiança")}${
-            g.phone_e164 ? " · " + esc(fone(g.phone_e164)) : ""}</span></span>
-          ${g.on_the_way_at ? '<span class="a-caminho">Está a caminho</span>'
-            : g.opened_at ? '<span class="vazio">abriu o link</span>'
-            : g.notified_at ? '<span class="vazio">avisado</span>' : ""}
-          ${fim ? "" : `<button class="btn pequeno ${g.notified_at ? "ghost" : ""}"
-                data-anjo="${g.guardian_id}">${g.notified_at ? "Avisar de novo" : "Avisar pelo WhatsApp"}</button>`}
-        </div>`).join("") : '<p class="vazio">Nenhum Anjo cadastrado para ela.</p>'}
-    </div>
-
-    <div class="card">
-      <h2>Atendimento</h2>
-      <div class="acoes" style="margin-bottom:1rem">
-        <button class="btn pequeno ${a.status === "in_progress" ? "" : "ghost"}" data-status="in_progress"
-          ${fim ? "disabled" : ""}>Assumir</button>
-        <button class="btn pequeno ghost" data-status="resolved" ${fim ? "disabled" : ""}>Resolver</button>
+      <h2>Despacho</h2>
+      <div class="despacho">
+        ${DESPACHOS.map((d) => `<button class="desp-btn ${feitos.has(d.kind) ? "feito" : ""}"
+            data-despacho="${d.kind}" ${fim ? "disabled" : ""}>
+            ${feitos.has(d.kind) ? "✓ " : ""}${d.rotulo}</button>`).join("")}
       </div>
-      ${[...a.events].reverse().map((e) => `<p class="quote">${esc(textoEvento(e))}
-        <cite>${new Date(e.created_at).toLocaleTimeString("pt-BR")}</cite></p>`).join("")}
+
+      ${fim ? "" : `<div class="nota-linha">
+        <input type="text" id="campo-nota" maxlength="255"
+               placeholder="Anotar o que ela disse, o que foi feito…">
+        <button class="btn pequeno ghost" id="btn-nota">Anotar</button>
+      </div>`}
+
+      <div class="tempo-lista">
+        ${[...a.events].reverse().map((e) => `<p class="ev ${classeEvento(e)}">${esc(textoEvento(e))}
+          <time>${new Date(e.created_at).toLocaleTimeString("pt-BR")}</time></p>`).join("")}
+      </div>
     </div>`;
+
+  // Depois do innerHTML: o mapa precisa medir a largura real da coluna.
+  desenharMapa($("mapa-detalhe"), a.locations);
+  if (pos) pintarEndereco(pos);
 
   $("detalhe").querySelectorAll("[data-status]").forEach((b) =>
     b.addEventListener("click", () => mudarStatus(a.alert_id, b.dataset.status)));
-  $("detalhe").querySelectorAll("[data-anjo]").forEach((b) =>
-    b.addEventListener("click", () => avisarAnjo(a.alert_id, Number(b.dataset.anjo), b)));
+  $("detalhe").querySelectorAll("[data-despacho]").forEach((b) =>
+    b.addEventListener("click", () => despachar(a.alert_id, b.dataset.despacho, b)));
+  $("detalhe").querySelectorAll("[data-desfecho]").forEach((b) =>
+    b.addEventListener("click", () => mudarStatus(a.alert_id, "resolved", b.dataset.desfecho)));
+
+  const encerrar = $("btn-encerrar");
+  if (encerrar) encerrar.addEventListener("click", () => {
+    const caixa = $("caixa-encerrar");
+    caixa.hidden = !caixa.hidden;
+    if (!caixa.hidden) caixa.scrollIntoView({ block: "nearest" });
+  });
+
+  const nota = $("btn-nota");
+  if (nota) nota.addEventListener("click", () => anotarNaOcorrencia(a.alert_id));
+  const campo = $("campo-nota");
+  if (campo) campo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") anotarNaOcorrencia(a.alert_id);
+  });
+
   const copiar = $("btn-copiar");
   if (copiar && pos) copiar.addEventListener("click", () => {
     navigator.clipboard.writeText(`${pos.lat}, ${pos.lng}`);
@@ -323,35 +746,217 @@ function textoEvento(e) {
   const quem = { device:"Aparelho", operator:"Central", guardian:"Anjo", system:"Sistema" }[e.actor] || e.actor;
   const oque = {
     created:"alerta acionado por voz", location:"nova posição", status_changed:"status alterado",
-    cancelled:"cancelado pela usuária — falso alarme", guardian_notified:"Anjo avisado pelo WhatsApp",
-    guardian_opened:"Anjo abriu o link", guardian_on_the_way:"Anjo confirmou que está a caminho", note:"anotação"
+    cancelled:"cancelado pela usuária — falso alarme", dispatched:"despachou",
+    note:"anotação",
+    // Ocorrências antigas ainda carregam eventos da rede de Anjos, que saiu
+    // em 16/08. O texto fica para elas não virarem linha ilegível.
+    guardian_notified:"Anjo avisado", guardian_opened:"Anjo abriu o link",
+    guardian_on_the_way:"Anjo confirmou que está a caminho"
   }[e.kind] || e.kind;
   return `${quem}: ${oque}${e.note ? ` — ${e.note}` : ""}`;
 }
 
-async function mudarStatus(id, status) {
+const classeEvento = (e) =>
+  e.kind === "created" ? "forte"
+  : e.kind === "dispatched" ? "bom"
+  : e.kind === "status_changed" && e.note ? "bom" : "";
+
+async function mudarStatus(id, status, desfecho) {
   await fetch(`/api/console/alerts/${encodeURIComponent(id)}/status`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status })
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(desfecho ? { status, outcome: desfecho } : { status })
   });
   abrir(id);
 }
 
-async function avisarAnjo(id, guardianId, botao) {
+async function despachar(id, kind, botao) {
   botao.disabled = true;
   try {
-    const r = await fetch(`/api/console/alerts/${encodeURIComponent(id)}/guardian-links`, {
+    const r = await fetch(`/api/console/alerts/${encodeURIComponent(id)}/dispatch`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ guardian_ids: [guardianId] })
+      body: JSON.stringify({ kind })
     });
-    const { links } = await r.json();
-    const link = links && links[0];
-    if (!link) throw new Error("sem link");
-    // Abrir antes de recarregar: o navegador só deixa abrir aba a partir do clique.
-    if (link.wa_url) window.open(link.wa_url, "_blank", "noopener");
-    else { await navigator.clipboard.writeText(link.message); botao.textContent = "Mensagem copiada"; }
+    if (!r.ok) throw new Error("falhou");
     abrir(id);
   } catch (e) { botao.disabled = false; }
 }
+
+async function anotarNaOcorrencia(id) {
+  const campo = $("campo-nota");
+  const nota = campo.value.trim();
+  if (!nota) return;
+  campo.disabled = true;
+  try {
+    await fetch(`/api/console/alerts/${encodeURIComponent(id)}/note`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ note: nota })
+    });
+    abrir(id);
+  } catch (e) { campo.disabled = false; }
+}
+
+/* ================================================================== *
+ *  O alerta em tela cheia
+ * ================================================================== */
+
+const TITULO_ABA = document.title;
+const VOLTA = 326.73;                 // 2π × 52, o raio do anel no viewBox
+const JANELA_S = 15;
+const LEGENDA_ANEL = "segundos em que ela ainda pode desdizer, do próprio aparelho";
+
+let popAlerta = null;   // o resumo que está na tela
+let popAnel = null;     // redesenha o anel dez vezes por segundo
+let popAba = null;      // pisca o título, para quem está em outra aba
+let popSaida = null;    // fechamento depois de um desfecho
+
+function abrirPop(resumo) {
+  clearTimeout(popSaida); popSaida = null;
+  clearInterval(popAnel);
+  popAlerta = resumo;
+
+  $("pop").classList.remove("frio");
+  $("pop-selo").textContent = resumo.trigger === "voice" ? "Gatilho de voz acionado" : "Alerta acionado";
+  $("pop-nome").textContent = resumo.user.display_name || "Sem nome";
+  $("pop-onde").innerHTML = `<b>${esc(resumo.user.city || "cidade não informada")}</b>` +
+    ` · ocorrência ${esc(resumo.alert_id.slice(0, 8))}`;
+  $("pop-crono").dataset.desde = resumo.opened_at;
+  $("pop-crono").textContent = decorrido(resumo.opened_at);
+  $("pop-bateria").textContent = resumo.battery_pct != null ? resumo.battery_pct + "%" : "—";
+  $("pop-pos").textContent = posicaoTexto(resumo.last_location);
+  $("pop-pos").classList.remove("chegou");
+  mapaDoPop(resumo.last_location);
+  $("pop-fone").textContent = "—";
+  $("pop-ref").hidden = true;
+  $("pop-anel").classList.remove("selado");
+  $("pop-conta").classList.remove("selado");
+  $("pop-anel-txt").textContent = LEGENDA_ANEL;
+
+  $("pop").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("pop-assumir").focus();
+
+  tiquePop();
+  popAnel = setInterval(tiquePop, 100);
+  clearInterval(popAba);
+  popAba = setInterval(() => {
+    document.title = document.title === TITULO_ABA
+      ? `● ALERTA — ${resumo.user.display_name || "sem nome"}` : TITULO_ABA;
+  }, 900);
+
+  enriquecerPop(resumo.alert_id);
+
+  // Só chega aqui com status diferente de "open" pelo atalho de ensaio.
+  if (resumo.status !== "open") esfriarPop(resumo);
+}
+
+// Telefone e referência de endereço só existem no detalhe. O cartão abre sem
+// eles, no mesmo instante do evento, e eles caem dentro meio segundo depois.
+async function enriquecerPop(id) {
+  try {
+    const r = await fetch(`/api/console/alerts/${encodeURIComponent(id)}`);
+    if (!r.ok) return;
+    const d = (await r.json()).alert;
+    if (!popAlerta || popAlerta.alert_id !== id) return;
+    $("pop-fone").innerHTML = d.user.phone_e164
+      ? `<a href="tel:+${esc(d.user.phone_e164)}">${esc(fone(d.user.phone_e164))}</a>` : "—";
+    if (d.user.reference_note) {
+      $("pop-ref-texto").textContent = d.user.reference_note;
+      $("pop-ref").hidden = false;
+    }
+  } catch (e) { /* o essencial já está na tela */ }
+}
+
+function tiquePop() {
+  if (!popAlerta) return;
+  const resta = (new Date(popAlerta.cancel_until).getTime() - Date.now()) / 1000;
+  const arco = $("pop-arco"), conta = $("pop-conta");
+  if (resta > 0) {
+    arco.style.strokeDashoffset = VOLTA * (1 - resta / JANELA_S);
+    conta.textContent = Math.ceil(resta);
+  } else {
+    arco.style.strokeDashoffset = 0;
+    conta.classList.add("selado");
+    conta.textContent = "✓";
+    $("pop-anel").classList.add("selado");
+    $("pop-anel-txt").textContent = "confirmado — a janela fechou e agora quem encerra é a central";
+    clearInterval(popAnel); popAnel = null;
+  }
+}
+
+const posicaoTexto = (p) => p
+  ? `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)} · ±${p.accuracy_m ?? "?"} m`
+  : "sem GPS ainda";
+
+// O mapa só existe depois de sair do hidden: escondido, ele mede zero de largura.
+function mapaDoPop(ponto) {
+  const alvo = $("pop-mapa");
+  alvo.hidden = !ponto;
+  if (ponto) desenharMapa(alvo, [ponto]);
+}
+
+function esfriarPop(resumo) {
+  $("pop-selo").textContent = {
+    in_progress: "Assumido pela central",
+    resolved: "Ocorrência encerrada",
+    cancelled: "Falso alarme — ela cancelou do próprio aparelho"
+  }[resumo.status] || resumo.status;
+  $("pop-anel-txt").textContent = {
+    in_progress: "a central assumiu a ocorrência",
+    resolved: "a ocorrência foi encerrada pela central",
+    cancelled: "ela desdisse dentro da janela, do próprio aparelho"
+  }[resumo.status] || "";
+  $("pop").classList.add("frio");
+  clearInterval(popAnel); popAnel = null;
+}
+
+function atualizarPop(resumo) {
+  popAlerta = resumo;
+  if (resumo.status === "open") return;
+  esfriarPop(resumo);
+  // Ao vivo dá para ser exato: o evento chega no instante em que acontece, e o
+  // relógio do navegador basta para dizer em quanto tempo ela desdisse.
+  if (resumo.status === "cancelled") {
+    $("pop-anel-txt").textContent =
+      `ela desdisse ${decorrido(resumo.opened_at)} depois de acionar, do próprio aparelho`;
+  }
+  clearTimeout(popSaida);
+  popSaida = setTimeout(fecharPop, 4000);
+}
+
+function fecharPop() {
+  clearInterval(popAnel); popAnel = null;
+  clearInterval(popAba); popAba = null;
+  clearTimeout(popSaida); popSaida = null;
+  document.title = TITULO_ABA;
+  $("pop").hidden = true;
+  $("pop").classList.remove("frio");
+  document.body.style.overflow = "";
+  popAlerta = null;
+}
+
+$("pop-x").addEventListener("click", fecharPop);
+
+$("pop-ver").addEventListener("click", () => {
+  const id = popAlerta && popAlerta.alert_id;
+  fecharPop();
+  if (id) abrir(id);
+});
+
+$("pop-assumir").addEventListener("click", () => {
+  const id = popAlerta && popAlerta.alert_id;
+  fecharPop();
+  if (id) mudarStatus(id, "in_progress");
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key === "Escape" && !$("pop").hidden) { fecharPop(); return; }
+  // Ensaio: traz o alerta de volta sem precisar acionar o celular de novo.
+  // O aberto tem preferência sobre o mais recente — é o que se quer mostrar.
+  if ((e.key === "a" || e.key === "A") && $("pop").hidden && alertas.length) {
+    abrirPop(alertas.find((a) => a.status === "open") || alertas[0]);
+  }
+});
 
 /* ---------- carga e tempo real ---------- */
 async function carregar() {
@@ -372,23 +977,45 @@ function vivo(ok) {
 
 function entrou(resumo) {
   const i = alertas.findIndex((a) => a.alert_id === resumo.alert_id);
-  if (i >= 0) alertas[i] = resumo; else { alertas.unshift(resumo); bipe(); }
+  const novo = i < 0;
+  if (novo) alertas.unshift(resumo); else alertas[i] = resumo;
   pintarFila(); pintarNumeros();
+
+  if (novo && resumo.status === "open") { sirene(); abrirPop(resumo); }
+  else if (popAlerta && popAlerta.alert_id === resumo.alert_id) atualizarPop(resumo);
+
   if (detalhe && detalhe.alert_id === resumo.alert_id) abrir(resumo.alert_id);
 }
 
 function ligarStream() {
   fonte = new EventSource("/api/console/stream");
-  ["alert.created", "alert.status", "alert.cancelled", "alert.guardian"].forEach((ev) =>
+  ["alert.created", "alert.status", "alert.cancelled"].forEach((ev) =>
     fonte.addEventListener(ev, (e) => entrou(JSON.parse(e.data))));
   fonte.addEventListener("alert.location", (e) => {
     const d = JSON.parse(e.data);
     if (detalhe && detalhe.alert_id === d.alert_id) { detalhe.locations.push(d.location); pintarDetalhe(); }
+    // A primeira posição costuma chegar depois do cartão já estar na tela.
+    if (popAlerta && popAlerta.alert_id === d.alert_id) {
+      popAlerta.last_location = d.location;
+      $("pop-pos").textContent = posicaoTexto(d.location);
+      $("pop-pos").classList.remove("chegou");
+      void $("pop-pos").offsetWidth;          // reinicia a animação
+      $("pop-pos").classList.add("chegou");
+      mapaDoPop(d.location);
+    }
   });
   fonte.onopen = () => vivo(true);
   // O EventSource reconecta sozinho; recriar aqui só multiplicaria conexões.
   fonte.onerror = () => vivo(false);
 }
+
+document.querySelectorAll("[data-filtro]").forEach((b) =>
+  b.addEventListener("click", () => {
+    filtro = b.dataset.filtro;
+    document.querySelectorAll("[data-filtro]").forEach((o) =>
+      o.setAttribute("aria-pressed", String(o === b)));
+    pintarFila();
+  }));
 
 function mostrarCentral() {
   $("tela-login").hidden = true;
@@ -435,6 +1062,7 @@ $("btn-sair").addEventListener("click", async () => {
 window.addEventListener("pagehide", () => {
   if (fonte) fonte.close();
   clearInterval(poll); clearInterval(relogio);
+  clearInterval(popAnel); clearInterval(popAba); clearTimeout(popSaida);
 });
 
 (async () => {

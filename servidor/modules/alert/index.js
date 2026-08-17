@@ -1,8 +1,13 @@
 /**
  * O MVP — o sistema do produto.
  *
- * Palavra falada no celular → alerta → central → Anjos → atendimento.
- * Este módulo é dono do aparelho, da central e da página do Anjo.
+ * Palavra falada no celular → alerta → central → despacho.
+ * Este módulo é dono do aparelho e da central.
+ *
+ * A rede de Anjos foi removida em 16/08/2026: quem atende é a central, e só
+ * ela. Aviso a terceiro por link de WhatsApp criava uma promessa que ninguém
+ * garantia — e o benchmark já mostrava que o gargalo é a resposta, não o
+ * número de avisados.
  *
  * A PALAVRA-CHAVE NUNCA CHEGA AQUI. Não há rota que a receba nem coluna onde
  * guardá-la. O aparelho envia "fui acionado" e mais nada.
@@ -21,7 +26,6 @@ import { criarEstado } from "./state.js";
 import { criarFluxo } from "./stream.js";
 import { registrarRotasDoAparelho } from "./device.js";
 import { registrarRotasDoPainel } from "./console.js";
-import { registrarRotasDoAnjo } from "./guardian.js";
 import { registrarPaginas } from "./pages.js";
 
 const log = createLog("alerta");
@@ -95,7 +99,6 @@ export function mount(app, { requireRole, roleOf, production }) {
 
   registrarRotasDoAparelho({ app, estado, fluxo, exigirBanco, exigirAparelho, excedeu, marca, registros, disparos });
   registrarRotasDoPainel({ app, estado, fluxo, exigirLogin: operadora, exigirBanco, BASE_PUBLICA });
-  registrarRotasDoAnjo({ app, estado, fluxo, exigirBanco });
   registrarPaginas({ app, roleOf, MODO_DEMO });
 
   app.get("/api/v1/health", async (_req, res) => {

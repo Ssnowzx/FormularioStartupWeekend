@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Cadastro · Mulheres em Risco</title>
 <link rel="stylesheet" href="/shared/theme.css">
+<link rel="stylesheet" href="/shared/central.css">
 <style>
 .card .dica { font-size:.86rem; color:var(--ink-soft); margin:0 0 1rem; }
   input, select { width:100%; font-family:inherit; font-size:1rem; padding:.7rem .85rem; border-radius:.65rem;
@@ -13,12 +14,6 @@
   .linha { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
   @media (max-width:34rem) { .linha { grid-template-columns:1fr; } }
 
-  .anjo-bloco { border:1px solid var(--line-soft); border-radius:.8rem; padding:.9rem; margin-bottom:.8rem;
-                background:var(--cream); }
-  .anjo-topo { display:flex; justify-content:space-between; align-items:center; gap:.6rem; margin-bottom:.6rem; }
-  .anjo-topo b { font-size:.86rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; }
-  .tirar { background:none; border:0; color:var(--coral); font:inherit; font-size:.86rem; cursor:pointer;
-           padding:0; text-decoration:underline; }
   .cuidado { background:var(--peach); border-radius:.65rem; padding:.85rem .95rem; font-size:.9rem;
              margin:0 0 1rem; }
   .cuidado b { color:var(--coral); }
@@ -31,7 +26,7 @@
 </head>
 <body>
 
-<div class="topo">
+<div class="topo escuro">
   <div class="topo-int media">
     <h1>Cadastro</h1>
     <a class="btn ghost pequeno" href="/central">Central</a>
@@ -55,14 +50,6 @@
         <input id="referencia" placeholder="Bairro Coral, casa amarela perto da escola" autocomplete="off"></label>
       <p class="cuidado"><b>Este é o campo mais sensível do sistema.</b> O GPS urbano erra de 20 a 50
         metros e a central precisa de uma âncora humana — mas só preencha se ela autorizar. Pode ficar vazio.</p>
-    </div>
-
-    <div class="card">
-      <h2>Os Anjos dela</h2>
-      <p class="dica">Pessoas de confiança que ela mesma aprovou. Quem está perto vale mais
-        que quem está longe — a ordem aqui é a ordem de acionamento.</p>
-      <div id="anjos"></div>
-      <button class="btn ghost pequeno" id="btn-mais">+ adicionar Anjo</button>
     </div>
 
     <button class="btn" id="btn-salvar">Cadastrar e gerar o código</button>
@@ -93,38 +80,10 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 
-let contador = 0;
-
-function adicionarAnjo() {
-  contador++;
-  const div = document.createElement("div");
-  div.className = "anjo-bloco";
-  div.innerHTML = `
-    <div class="anjo-topo"><b>Anjo ${contador}</b>
-      <button type="button" class="tirar">remover</button></div>
-    <label class="campo"><span>Nome</span><input class="a-nome" autocomplete="off"></label>
-    <div class="linha">
-      <label class="campo"><span>Telefone</span>
-        <input class="a-fone" placeholder="(49) 99999-0000" inputmode="tel" autocomplete="off"></label>
-      <label class="campo"><span>Relação</span>
-        <input class="a-rel" placeholder="irmã, vizinha, amiga" autocomplete="off"></label>
-    </div>`;
-  div.querySelector(".tirar").addEventListener("click", () => div.remove());
-  $("anjos").appendChild(div);
-}
-
-$("btn-mais").addEventListener("click", adicionarAnjo);
-adicionarAnjo();
 
 $("btn-salvar").addEventListener("click", async () => {
   const btn = $("btn-salvar");
   btn.disabled = true; $("erro").hidden = true;
-  const guardians = [...document.querySelectorAll(".anjo-bloco")].map((b) => ({
-    name: b.querySelector(".a-nome").value.trim(),
-    phone_e164: b.querySelector(".a-fone").value.trim(),
-    relationship: b.querySelector(".a-rel").value.trim()
-  })).filter((g) => g.name && g.phone_e164);
-
   try {
     const r = await fetch("/api/console/users", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -132,8 +91,7 @@ $("btn-salvar").addEventListener("click", async () => {
         display_name: $("nome").value.trim(),
         phone_e164: $("fone").value.trim(),
         city: $("cidade").value.trim(),
-        reference_note: $("referencia").value.trim(),
-        guardians
+        reference_note: $("referencia").value.trim()
       })
     });
     if (r.status === 401) { location.href = "/central"; return; }
