@@ -11,13 +11,24 @@ da usuária o app aparece **disfarçado de calculadora**, e a calculadora funcio
 
 **A ideia não é um botão, é um gatilho de voz.** A mulher fala uma frase secreta
 escolhida por ela; o celular reconhece **dentro do próprio aparelho, sem internet**, e
-envia alerta com localização para uma central, que despacha ajuda. Junto com a central,
-a rede de pessoas de confiança que ela aprovou é avisada por link de WhatsApp.
+envia alerta com localização para uma central, que despacha ajuda.
 
-**Modelo:** B2G, para Secretaria Estadual de Segurança. A landing também publica
-**preço em tabela** (R$ 98,90 / 198,90 / 248,90 por mês, para 20 / 50 / 100 mulheres,
-com plano anual de 2 meses grátis) — que é a porta de entrada sem licitação, para
-prefeitura pequena, delegacia ou ONG.
+**A rede de Anjos foi removida em 16/08/2026.** Quem atende é a central, e só ela. Avisar
+terceiro por link de WhatsApp criava uma promessa que ninguém garantia, e o benchmark já
+dizia que o gargalo é a resposta, não o número de avisados. No lugar entrou o **despacho**:
+viatura, 190, ligação ou equipe, cada um registrado com hora. É de lá que sai o tempo de
+resposta do relatório — e ele resolve, de quebra, a colisão de nome com a "Todas Por Uma".
+
+**Modelo, revisto em 16/08:** o canal de entrada passa a ser **empresa de segurança
+privada** (monitoramento de alarme e pronta resposta) — ela já tem central 24 h, viatura
+circulando e cobrança funcionando, que é tudo que a delegacia não tem. O poder público
+continua sendo o destino, financiado pelo canal privado: *a empresa paga, a Delegacia da
+Mulher recebe de graça.*
+
+**Preço em tabela** (na landing): R$ 249 / R$ 890 / R$ 2.190 por mês, para 25 / 100 / 300
+mulheres, anual com 2 meses grátis. Ancorado em R$ 70 por casa monitorada — um adicional
+que passe de 20% da assinatura-base morre na prateleira. A conta inteira está em
+[`precificacao.md`](precificacao.md).
 
 **Porta de entrada em Lages:** Delegacia da Mulher. Consenso do time.
 
@@ -32,17 +43,32 @@ prefeitura pequena, delegacia ou ONG.
 |---|---|
 | `docs/pesquisa-dominio.md` | O problema em números, com fontes |
 | `docs/benchmark/` | Brasil, EUA, Europa e Ásia — o que existe, o que morreu e por quê |
-| `docs/identidade-visual.md` | **Duas paletas**: institucional roxa e produto azul-petróleo |
+| `docs/identidade-visual.md` | Paleta roxa na landing **e na central**; o app dela segue sem marca |
 | `docs/arquitetura.md` | Como o servidor está organizado e onde acrescentar coisa nova |
 | `docs/como-rodar-a-demo.md` | Do laptop desligado até a palavra chegando na central |
 | `docs/roteiro-video.md` | Vídeo de 2min30 para o NotebookLM, falas prontas |
 | `docs/roteiro-pitch.md` | Pitch de 4 minutos, 14 slides, com preparação para o júri |
+| `docs/precificacao.md` | Custo real, canal B2B, tabela pública e ponto de equilíbrio |
 | `servidor/` | Três produtos num processo: site, pesquisa e o sistema |
 | `app-android/` | APK Kotlin: calculadora, Vosk offline, alerta com localização |
 
 **O fluxo inteiro funciona.** Em 15/08 o gatilho de voz foi acionado num Android real:
 a palavra foi falada, o alerta chegou à central, a ocorrência foi resolvida no painel e
 o aparelho voltou a acionar com a mesma palavra.
+
+### A central foi reconstruída em 16/08
+
+| O que entrou | Por quê |
+|---|---|
+| **Cartão de alerta em tela cheia**, com sirene, anel dos 15s e mini-mapa | num telão, card discreto na coluna espera ser notado |
+| **Mapa de verdade**, com ladrilhos do OpenStreetMap | sem chave de API e sem CDN; o SVG antigo era um retângulo liso |
+| **Endereço por extenso**, via Nominatim | ninguém lê coordenada no rádio |
+| **Despacho** com quatro botões e hora registrada | é o que substituiu os Anjos |
+| **Encerramento com desfecho** | "resolvido" sozinho não vira relatório |
+| **Anotação livre** na ocorrência | o que ela disse tem que caber em algum lugar |
+| **Cronômetros** até assumir e até despachar | são os números que um comprador público pede |
+| **Filtro da fila** (abertas / hoje / tudo) | a fila vinha com histórico de teste no telão |
+| **Paleta da landing** | central e landing aparecem em sequência no pitch |
 
 ---
 
@@ -80,8 +106,11 @@ do MVP** — hoje o produto envia alerta e localização, não som.
 
 **3. A solução gera mais alerta para uma central que já não vaza.** São Paulo tem 1.250
 tornozeleiras e 189 em uso. A França recebe 5 a 7 mil alertas por dia com dez
-funcionários. O gargalo não é o alarme — é a resposta. A rede de confiança é a nossa
-aposta contra isso, e é aposta, não prova.
+funcionários. O gargalo não é o alarme — é a resposta.
+
+**A resposta a este risco mudou em 16/08, e ficou melhor:** em vez de apostar numa rede de
+voluntários, vender para quem **já tem central 24 h e viatura circulando**. A empresa de
+monitoramento não é canal de venda por acaso — ela é a resposta que faltava.
 
 ---
 
@@ -97,19 +126,17 @@ escuta intermitente, que degrada a função central. **Decidir antes que pergunt
 
 ---
 
-## A colisão de nome, descoberta em 16/08
+## A colisão de nome, descoberta e resolvida em 16/08
 
 A referência de vídeo escolhida pelo time é o *Manual do Aplicativo* da **Todas Por
-Uma** — concorrente que o próprio benchmark registra como **ativa há 7 anos, com mais de
-20 mil usuárias**. A descrição do vídeo delas diz: *"pessoas de confiança, pré-cadastradas
-como **Anjos**"*.
+Uma** — concorrente ativa há 7 anos, com mais de 20 mil usuárias. A descrição do vídeo
+delas diz: *"pessoas de confiança, pré-cadastradas como **Anjos**"*. Era o termo delas,
+para a mesma função.
 
-**"Anjos" é o termo delas, para a mesma função.** Não é impeditivo, mas soa derivado para
-quem conhece. Os roteiros usam **"rede de confiança"**; o código ainda usa `guardian` /
-`Anjo`. Alternativas que cabem: *rede de confiança*, *quem chega primeiro*, *próximos*.
+**Resolvida ao remover o mecanismo inteiro.** Não existe mais rede de Anjos no produto,
+nem no código, nem na landing. Quem atende é a central, e o que ela faz chama-se despacho.
 
-O diferencial de vocês continua intacto: elas resolvem por botão e dispositivo, vocês
-por voz.
+O diferencial continua intacto: elas resolvem por botão e dispositivo, vocês por voz.
 
 ---
 
@@ -117,7 +144,7 @@ por voz.
 
 1. **Implementar a fila do alerta offline.** É a lacuna que transforma uma promessa
    quebrada em diferencial.
-2. **Decidir o nome da rede de confiança** — antes de gravar o vídeo e de imprimir slide.
+2. **Atualizar os roteiros de pitch e vídeo**: eles ainda falam em Anjos e no preço antigo.
 3. **Decidir o que dizer sobre o ponto verde do microfone.**
 4. **Levar as três perguntas à Delegacia da Mulher.** É a fonte que ninguém mais tem, e
    um "sim, topamos testar" vale mais que qualquer slide.

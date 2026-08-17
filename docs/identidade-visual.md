@@ -61,18 +61,28 @@ através da alternância de faixas. Se aparecer gradiente roxo→azul em qualque
 de perigo imediato do rodapé. Em qualquer outro lugar ele compete com o roxo e a página vira
 alarme — o oposto de "não agressivo".
 
-### Produto — central, cadastro, página do Anjo
+### Central e cadastro — **mudou em 16/08/2026**
 
-Continua no creme + azul-petróleo que está em `servidor/shared/web/theme.css` e já foi
-validado em tela. É a superfície operacional: quem a usa está atendendo uma emergência, não
-sendo convencido de nada.
+Antes eram creme + azul-petróleo. Agora usam **os mesmos valores da landing**, por
+`servidor/shared/web/central.css`, que só troca os tokens que `theme.css` já usava.
+
+**Por que mudou.** A regra das duas identidades nasceu para proteger **o celular dela** —
+e ali ela continua valendo inteira. A central é outra coisa: é a tela da operadora, e no
+domingo ela aparece no telão logo depois da landing. Duas paletas em sequência leem como
+dois produtos.
+
+O vermelho de emergência ganhou um par, porque `#FF5252` não passa em contraste como texto
+sobre branco:
 
 ```css
---cream: #FAF1E1;  --surface: #FFFBF3;  --petrol-deep: #155E63;
---coral: #AE432B;  --good: #387043;     --ink: #1F2A2B;
+--coral:      #C42B2B;   /* texto e ícone de alerta — 5.9:1 no branco */
+--emergencia: #FF5252;   /* preenchimento: trilho, marcador, anel */
 ```
 
-O app no celular dela não tem marca nenhuma: aparece como calculadora.
+### O app no celular dela — **não mudou e não muda**
+
+Sem marca, sem roxo, sem nada. Aparece como calculadora, e a calculadora funciona. É a
+única superfície onde a regra original vale sem exceção.
 
 **Contraste:** `--color-accent` sobre papel dá 4.6:1 — passa em AA para corpo de texto.
 `--color-accent-soft` **não passa** sobre papel; usar só sobre as faixas escuras ou em

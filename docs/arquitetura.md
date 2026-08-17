@@ -17,7 +17,7 @@ servidor/
 ├── modules/
 │   ├── site/              LANDING PAGE — pública, comercial
 │   ├── survey/            FORMULÁRIOS + DASHBOARD — pesquisa de campo
-│   └── alert/             O SISTEMA — aparelho, central e Anjos
+│   └── alert/             O SISTEMA — aparelho e central
 │
 └── shared/web/            servido em /shared para o navegador
     ├── theme.css            tokens de cor e primitivas de interface
@@ -40,8 +40,8 @@ comente uma linha no `server.js`.
 
 | | `site` | `survey` | `alert` |
 |---|---|---|---|
-| URLs | `/` | `/pesquisa`, `/pesquisa/painel` | `/central`, `/cadastro`, `/anjo/:token`, `/simulador` |
-| API | — | `/api/survey/*` | `/api/v1/*` (aparelho), `/api/console/*` (central), `/api/guardian/*` (Anjo) |
+| URLs | `/` | `/pesquisa`, `/pesquisa/painel` | `/central`, `/cadastro`, `/simulador` |
+| API | — | `/api/survey/*` | `/api/v1/*` (aparelho), `/api/console/*` (central) |
 | Banco | **nenhum** | `mer_app` → `respostas` | `mer_alerts` → 9 tabelas |
 | Sessão | **nenhuma** | papel `researcher` | papel `operator` |
 | Schema | — | `modules/survey/schema.sql` | `modules/alert/schema.sql` |
@@ -67,7 +67,6 @@ Isso espelha no código a separação que já existia no banco, onde `mer_app` e
 |---|---|---|
 | `/api/v1/*` | `Authorization: Bearer` do aparelho | aberto |
 | `/api/console/*` | cookie de sessão, papel `operator` | fechado |
-| `/api/guardian/*` | token na URL do link | fechado |
 
 A separação por prefixo é o que torna **impossível, por engano**, aplicar CORS
 aberto a uma rota que anda com credencial de navegador. Não é organização: é a
@@ -87,8 +86,7 @@ esses caminhos, e um celular no bolso de alguém não se atualiza sozinho.
 | `state.js` | ocorrências vivas: memória primeiro, banco em best-effort |
 | `stream.js` | SSE para a central |
 | `device.js` | API do aparelho + abrir alerta, posição, status |
-| `console.js` | API da central + convites e links de Anjo |
-| `guardian.js` | a página do Anjo |
+| `console.js` | API da central: fila, detalhe, despacho, anotação e convites |
 | `serialize.js` | o que sai do estado para as telas |
 | `pages.js` | as telas |
 | `internals.js` | constantes e utilidades do módulo |
@@ -113,7 +111,6 @@ perguntas do questionário, texto comercial. Se só um produto usa, mora nele.
 - `/admin`, `/painel` → redirecionam 301 para `/pesquisa/painel`
 - `/questionario` → redireciona para `/pesquisa`
 - `/api/v1/*` intocado, para os APKs já instalados
-- `/anjo/:token` intocado, para os links já enviados por WhatsApp
 - Sem `RESEARCHER_*`/`OPERATOR_*` no `.env`, o servidor cai para `ADMIN_*` e
   avisa no log — para uma instalação existente não cair durante a migração
 

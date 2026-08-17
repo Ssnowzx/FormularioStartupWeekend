@@ -75,11 +75,21 @@ assim". **Instale na noite anterior, nunca no palco.**
 ## 5. Cadastrar e vincular
 
 Abra `http://SEU_IP:3100/cadastro` (login `OPERATOR_USER` / `OPERATOR_PASSWORD` do `.env`),
-cadastre a usuária e ao menos um Anjo com telefone, e gere o código.
+cadastre a usuária com nome, telefone e referência de endereço, e gere o código.
 
 No celular, o app abre como **Calculadora**. Digite o código, confirme o servidor, escolha
 a frase e **fale em voz alta** quando ele pedir. Só dá para concluir depois que reconhecer:
 esse teste é o critério de aceitação.
+
+A frase da demonstração é **"orion park"**, e ela vem pré-selecionada — é a primeira da
+lista em `Settings.kt`.
+
+> ⚠️ **Frase nova exige conferir o vocabulário do modelo.** O detector monta a gramática do
+> Vosk a partir da frase normalizada (sem acento, minúscula). Palavra fora do léxico de
+> ~80 mil do `vosk-model-small-pt-0.3` não é "mais difícil de ouvir" — é **impossível**, e
+> em silêncio. Foi assim que "chuva de verão" ficou meses na lista sem nunca poder
+> disparar: o modelo tem `cafe`, não tem `verao`. Conferido em 16/08; a lista de hoje está
+> inteira dentro do léxico.
 
 Se precisar de um código novo para alguém já cadastrada, sem criar duplicata:
 
@@ -91,8 +101,32 @@ curl -s -b cookie.txt -X POST http://localhost:3100/api/console/users/ID/invite
 
 Deixe `http://SEU_IP:3100/central` aberto no telão (entre com o papel `OPERATOR_*`). Fale a frase perto do celular.
 
-O alerta entra na fila em menos de um segundo, com a barra de 15 segundos correndo.
-Clique no card para ver o trajeto e avisar o Anjo pelo WhatsApp.
+Em menos de um segundo o alerta **toma a tela inteira**: sirene curta, o nome dela em
+corpo grande, a referência de endereço, o telefone e um anel contando os 15 segundos em
+que ela ainda pode desdizer. A posição do GPS cai dentro do cartão um instante depois da
+abertura — é assim de propósito, o alerta sobe antes de esperar o satélite.
+
+O cartão não sai sozinho enquanto o alerta estiver aberto. Sai por:
+
+| Tecla ou botão | O que faz |
+|---|---|
+| **Assumir agora** | põe a ocorrência em atendimento e abre o detalhe |
+| **Ver a ocorrência** | abre o detalhe sem mudar o status |
+| **Esc** ou **×** | dispensa e volta para a fila |
+| **A** | traz o cartão de volta — para ensaiar sem acionar o celular de novo |
+
+Se ela cancelar dentro da janela, o cartão esfria na frente de todo mundo ("ela desdisse
+2s depois de acionar") e se retira em quatro segundos. É um bom momento de pitch: mostra
+que o falso alarme tem saída.
+
+Depois de dispensar o cartão, a ocorrência mostra o mapa da rua com o endereço escrito
+por extenso, os cronômetros de resposta e os quatro botões de **despacho** — viatura, 190,
+ligação, equipe. Cada clique vira evento com hora, e é dele que sai o "7s até o despacho"
+no topo da tela. Encerre escolhendo **como** terminou: é isso que vira relatório.
+
+> O som depende de um clique antes: o navegador só libera áudio depois de um gesto. O
+> próprio botão **Entrar** serve — por isso o login toca um bipe curto. Se você já estava
+> logado e a página só recarregou, clique em qualquer lugar da tela antes de acionar.
 
 Para cancelar um alerta de teste: **`C` três vezes** dentro dos 15 segundos.
 Para reabrir as configurações no celular: digite **`271828`** e aperte **`=`**.
@@ -106,6 +140,7 @@ Para reabrir as configurações no celular: digite **`271828`** e aperte **`=`**
 | APK não baixa | Celular em outra rede. Teste `/central` no navegador do celular primeiro |
 | "Código inválido" | Cada código serve uma vez. Gere outro |
 | Falou e não aconteceu nada | Ocorrência anterior ainda aberta, ou menos de 60s desde o último acionamento. Resolva no painel e espere um pouco |
+| Frase nova nunca dispara, nem gritando | Alguma palavra dela está fora do léxico do modelo. Volte para uma da lista |
 | Painel pede login de novo | O servidor reiniciou. As sessões vivem em memória, de propósito |
 | 403 numa tela que sempre funcionou | Você entrou com o papel errado. A pesquisa usa `RESEARCHER_*`, a central usa `OPERATOR_*` |
 | "Muitas tentativas" no login | 8 por hora. Reinicie o servidor para zerar |
@@ -124,12 +159,9 @@ GRANT SELECT, INSERT ON mulheres_em_risco.protected_user TO 'mer_alerts'@'%';
 GRANT UPDATE (display_name, phone_e164, city, reference_note, status, redacted_at)
   ON mulheres_em_risco.protected_user TO 'mer_alerts'@'%';
 GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.device          TO 'mer_alerts'@'%';
-GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.guardian        TO 'mer_alerts'@'%';
-GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.guardian_link   TO 'mer_alerts'@'%';
 GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.invite_code     TO 'mer_alerts'@'%';
 GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.alert           TO 'mer_alerts'@'%';
 GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.alert_location  TO 'mer_alerts'@'%';
-GRANT SELECT, INSERT, UPDATE ON mulheres_em_risco.guardian_access TO 'mer_alerts'@'%';
 GRANT SELECT, INSERT         ON mulheres_em_risco.alert_event     TO 'mer_alerts'@'%';
 FLUSH PRIVILEGES;
 ```
